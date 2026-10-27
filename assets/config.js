@@ -3,4 +3,4 @@
    live:true, test:true    system test: records saved with test = 1, sign-in works
    live:true               real data collection (after EC approval and ACCEPT = 1 in the script)
    splitTicket             show item 43 only if the EC approves it */
-window.SITE_CONFIG = { live: false, test: false, endpoint: "", splitTicket: false };
+window.SITE_CONFIG = { live: true, test: true, endpoint: "https://script.google.com/macros/s/AKfycby2Da3tqFHejlMEDZGpYrDZQWfze1TRzW1JLRTk1kn56yshFZnPFvJSBChdptUMMaRYnQ/exec", splitTicket: false };
