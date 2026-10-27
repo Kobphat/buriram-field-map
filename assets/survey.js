@@ -3,7 +3,12 @@
 (function () {
   "use strict";
   const CONFIG = window.SURVEY_CONFIG || { live: false, endpoint: "" };
-  const DEMO = !CONFIG.live;
+  const DEMO = !CONFIG.live;                 // demo: nothing leaves the browser
+  const TESTRUN = !!CONFIG.test;             // live + test: records are saved but marked test = 1
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem("bfm." + k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } },
+    set(k, v) { try { localStorage.setItem("bfm." + k, JSON.stringify(v)); } catch (e) {} },
+  };
   const S = window.SURVEY;
   const PARTS = S.parts;
   const $ = (s, el = document) => el.querySelector(s);
@@ -17,9 +22,26 @@
 
   const st = {
     screen: "intro", part: 0, ans: {}, txt: {}, warned: {},
-    meta: { id: (crypto.randomUUID ? crypto.randomUUID() : String(Date.now())).slice(0, 8), version: R() < .5 ? "A" : "B", order: R() < .5 ? 1 : 2, design: "fixed", mode: null, venue: null, started: null },
+    meta: { id: (crypto.randomUUID ? crypto.randomUUID() : String(Date.now())).slice(0, 8), version: R() < .5 ? "A" : "B", order: R() < .5 ? 1 : 2, design: "fixed", mode: null, venue: null, started: null, enumerator: null, seq: null, cdate: null, code: null },
     cj: { stage: "intro", i: 0, tasks: null, fails: 0, follow: {} },
   };
+
+  /* ---------- respondent code: Gen + LGU + DDMM + enumerator + set, e.g. ZT05-1501-103 ---------- */
+  const LGU_CODE = Object.fromEntries(S.lgus.map(l => [l.n, l.code]));
+  const todayISO = () => { const d = new Date(); return new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 10); };
+  const beYear = iso => +iso.slice(0, 4) + 543;
+  const ddmmOf = iso => iso.slice(8, 10) + iso.slice(5, 7);
+  const genFromAge = a => a <= 29 ? "Z" : a <= 45 ? "Y" : a <= 61 ? "X" : "B";
+  const seqKey = () => `seq.${st.meta.enumerator}.${ddmmOf(st.meta.cdate || todayISO())}`;
+  function makeCode() {
+    const iso = st.meta.cdate || todayISO(), y = st.ans["1"];
+    const gen = y ? genFromAge(beYear(iso) - y) : "Z";
+    let lc = LGU_CODE[st.ans["4"]];
+    if (!lc) { const d = st.ans["3"] || {}; const L = S.lgus.filter(l => l.d === d.a && d.t && l.t.includes(d.t)); lc = L.length === 1 ? L[0].code : "U00"; }
+    const online = st.meta.mode === 2;
+    return `${gen}${lc}-${ddmmOf(iso)}-${online ? "9" : (st.meta.enumerator || 1)}${online ? "??" : String(st.meta.seq || 1).padStart(2, "0")}`;
+  }
+  const validPhone = p => /^0\d{8,9}$/.test(String(p || "").replace(/\D/g, ""));
 
   /* ---------- helpers for item text ---------- */
   const optText = t => t.replace(/\s*_{2,}\s*/g, "").trim();
@@ -100,6 +122,14 @@
           <p class="sub">หมวดอาชีพ</p><div class="opts">${main.map(o => `<label class="opt"><input type="radio" name="q_7ก" value="${o.c}" ${chk(it, o.c)}><span class="box" aria-hidden="true"></span><span class="ot">${esc(o.t)}</span></label>`).join("")}</div>
           <p class="sub">ไม่ได้ทำงาน</p><div class="opts">${not.map(o => `<label class="opt"><input type="radio" name="q_7ก" value="${o.c}" ${chk(it, o.c)}><span class="box" aria-hidden="true"></span><span class="ot">${esc(o.t)}</span></label>`).join("")}</div>`;
       }
+      case "phase2": {
+        const v = st.ans["75"], c = st.contact || {};
+        return `<div class="opts row">${it.o.map(o => `<label class="opt"><input type="radio" name="q_75" value="${o.c}" ${v === o.c ? "checked" : ""}><span class="box" aria-hidden="true"></span><span class="ot">${o.t}</span></label>`).join("")}</div>
+          <div class="grid2" id="phonebox" ${v === 1 ? "" : "hidden"}>
+            <label class="fld"><span>เบอร์โทรศัพท์</span><input class="txt num" type="tel" inputmode="tel" autocomplete="off" name="ph" value="${esc(c.phone || "")}" placeholder="08x-xxx-xxxx"></label>
+            <label class="fld"><span>ช่วงเวลาที่สะดวกให้โทร <em>(ไม่บังคับ)</em></span><select name="pht"><option value="">ไม่ระบุ</option>${["เช้า", "บ่าย", "เย็น", "เสาร์–อาทิตย์"].map(t => `<option ${c.time === t ? "selected" : ""}>${t}</option>`).join("")}</select></label>
+          </div>`;
+      }
       case "ipc": {
         const L = [[-3, "ไม่เห็นด้วยอย่างยิ่ง"], [-2, "ไม่เห็นด้วย"], [-1, "ไม่เห็นด้วยเล็กน้อย"], [1, "เห็นด้วยเล็กน้อย"], [2, "เห็นด้วย"], [3, "เห็นด้วยอย่างยิ่ง"]];
         return `<div class="ipc" role="radiogroup">${L.map(([c, t]) => `<label class="ip${c < 0 ? " neg" : " pos"}"><input type="radio" name="q_${it.n}" value="${c}" ${st.ans[it.n] === c ? "checked" : ""}><b class="num">${c > 0 ? "+" + c : "−" + (-c)}</b><span>${t}</span></label>`).join("")}</div>`;
@@ -139,6 +169,7 @@
     if (it.type === "residence") return !!(v && v.a && v.t);
     if (it.type === "check") return Array.isArray(v) && v.length > 0;
     if (it.type === "year") return !!v;
+    if (it.type === "phase2") return v === 2 || (v === 1 && validPhone(st.contact && st.contact.phone));
     return v !== undefined && v !== null && v !== "";
   }
 
@@ -169,17 +200,33 @@
         <fieldset class="q" id="venue-q" ${st.meta.mode === 2 ? "hidden" : ""}><legend class="qh"><span class="qt">สถานที่พบผู้ตอบ <em class="muted">(ผู้เก็บข้อมูลเลือก)</em></span></legend><div class="opts row">
           ${[[1, "ตลาดหรือจุดที่คนพลุกพล่าน"], [2, "จุดรวมตัวของชุมชน (สภากาแฟ)"], [3, "เยี่ยมครัวเรือน"]].map(([c, t]) => `<label class="opt"><input type="radio" name="venue" value="${c}" ${st.meta.venue === c ? "checked" : ""}><span class="box"></span><span class="ot">${t}</span></label>`).join("")}</div></fieldset>
 
+        <fieldset class="q" id="enum-q" ${st.meta.mode === 2 || st.meta.mode == null ? "hidden" : ""}><legend class="qh"><span class="qt">ข้อมูลผู้เก็บ <em class="muted">(ใช้สร้างรหัสผู้ตอบ)</em></span></legend>
+          <div class="grid3">
+            <label class="fld"><span>เลขผู้เก็บข้อมูล</span><select name="enum"><option value="">เลือก</option>${[1, 2, 3, 4, 5, 6, 7, 8].map(n => `<option value="${n}" ${st.meta.enumerator === n ? "selected" : ""}>${n}</option>`).join("")}</select></label>
+            <label class="fld"><span>วันที่เก็บ</span><input class="txt" type="date" name="cdate" value="${st.meta.cdate || todayISO()}"></label>
+            <label class="fld"><span>ฟอร์มชุดที่ของวันนี้</span><input class="txt num" type="number" min="1" max="99" name="seq" value="${st.meta.seq || ""}"></label>
+          </div>
+          <p class="small muted">ผู้เก็บแต่ละคนนับเลขชุดของตัวเองต่อวัน เริ่มที่ 1 ระบบจำเลขล่าสุดของเครื่องนี้ไว้ให้</p></fieldset>
       </div>
+      ${!DEMO && !TESTRUN && store.get("done", false) ? `<div class="notice">เครื่องนี้เคยส่งคำตอบแบบตอบเองออนไลน์ไปแล้ว ถ้าเป็นผู้ตอบคนใหม่ ให้ผู้เก็บข้อมูลเลือก “ผู้เก็บข้อมูลอ่านให้ฟัง” หรือใช้อีกเครื่อง</div>` : ""}
       <p class="consent">การกด “เริ่มตอบ” ถือว่าท่านยินยอมเข้าร่วมการวิจัย (ความยินยอมโดยการกระทำ)</p>
       <div class="nav"><span></span><button class="btn primary" id="start">เริ่มตอบ</button></div>
     </section>`;
     app.onchange = e => {
       const t = e.target;
-      if (t.name === "mode") { st.meta.mode = +t.value; $("#venue-q").hidden = st.meta.mode === 2; if (st.meta.mode === 2) st.meta.venue = 4; else if (st.meta.venue === 4) st.meta.venue = null; }
+      if (t.name === "mode") { st.meta.mode = +t.value; $("#venue-q").hidden = st.meta.mode === 2; $("#enum-q").hidden = st.meta.mode === 2; if (st.meta.mode === 2) st.meta.venue = 4; else if (st.meta.venue === 4) st.meta.venue = null; }
       if (t.name === "venue") st.meta.venue = +t.value;
+      if (t.name === "enum") { st.meta.enumerator = +t.value || null; const sq = $('input[name="seq"]'); if (st.meta.enumerator) { st.meta.seq = store.get(seqKey(), 0) + 1; sq.value = st.meta.seq; } }
+      if (t.name === "cdate") { st.meta.cdate = t.value; if (st.meta.enumerator) { st.meta.seq = store.get(seqKey(), 0) + 1; $('input[name="seq"]').value = st.meta.seq; } }
+      if (t.name === "seq") st.meta.seq = Math.max(1, Math.min(99, +t.value || 1));
     };
     $("#start").onclick = () => {
       if (st.meta.mode == null) st.meta.mode = 2, st.meta.venue = 4;
+      if (st.meta.mode !== 2) {
+        if (!DEMO && (!st.meta.enumerator || !st.meta.seq)) { toast("เลือกเลขผู้เก็บข้อมูลและเลขชุดก่อนเริ่ม"); return; }
+        st.meta.enumerator = st.meta.enumerator || 1; st.meta.cdate = st.meta.cdate || todayISO();
+        st.meta.seq = st.meta.seq || store.get(seqKey(), 0) + 1;
+      } else st.meta.cdate = todayISO();
       st.meta.started = new Date().toISOString(); st.t0 = performance.now();
       st.screen = "part"; st.part = 0; render();
     };
@@ -188,7 +235,8 @@
   function partHead(i, extra = "") {
     const P = PARTS[i];
     const m = P.title.match(/^ส่วนที่ (\d) (.+?) \((ข้อ .+)\)$/);
-    return `${progress()}<header class="phead"><p class="eyebrow">ส่วนที่ ${m[1]} · ${m[3]}</p><h2>${m[2]}</h2>${extra}</header>`;
+    const bar = st.meta.code && st.meta.mode !== 2 ? `<p class="codebar">รหัสผู้ตอบ <b class="num">${st.meta.code}</b><span>เขียนรหัสนี้ไว้มุมขวาบนของฟอร์มกระดาษ</span></p>` : "";
+    return `${progress()}<header class="phead">${bar}<p class="eyebrow">ส่วนที่ ${m[1]} · ${m[3]}</p><h2>${m[2]}</h2>${extra}</header>`;
   }
 
   function renderPart() {
@@ -202,7 +250,7 @@
   }
   function navBtns(nextLabel = "ถัดไป") {
     return `<button type="button" class="btn ghost" id="back">← ย้อนกลับ</button>
-      <span class="navr">${DEMO ? `<button type="button" class="btn ghost small" id="autofill" title="เติมคำตอบสุ่มเพื่อดูขั้นตอนถัดไป">เติมคำตอบสุ่ม</button>` : ""}<button type="button" class="btn primary" id="next">${nextLabel}</button></span>`;
+      <span class="navr">${DEMO || TESTRUN ? `<button type="button" class="btn ghost small" id="autofill" title="เติมคำตอบสุ่มเพื่อดูขั้นตอนถัดไป">เติมคำตอบสุ่ม</button>` : ""}<button type="button" class="btn primary" id="next">${nextLabel}</button></span>`;
   }
 
   function bindForm(items) {
@@ -218,6 +266,7 @@
     if (t.name === "res_a") { st.ans["3"] = { a: t.value }; delete st.ans["4"]; refresh("3"); refresh("4"); return; }
     if (t.name === "res_t") { st.ans["3"].t = t.value; delete st.ans["4"]; refresh("4"); return; }
     if (t.name === "res_m") { st.ans["3"].m = t.value; return; }
+    if (t.name === "ph" || t.name === "pht") { st.contact = st.contact || {}; st.contact[t.name === "ph" ? "phone" : "time"] = t.value; clearFlag("75"); return; }
     if (t.name.startsWith("oo_")) {
       const n = t.name.slice(3);
       $$(`input[name="oo_${n}"]`).forEach(x => { if (x !== t) x.checked = false; });
@@ -244,6 +293,7 @@
       st.ans[n] = t.value;
     } else {
       st.ans[n] = +t.value;
+      if (it.type === "phase2") { const box = $("#phonebox"); box.hidden = st.ans[n] !== 1; if (st.ans[n] !== 1) st.contact = null; else if (e.type === "change") $('input[name="ph"]').focus(); }
       if (it.other) { const o = $(`[data-txt="${n}"]`); o.hidden = st.ans[n] !== it.other; if (!o.hidden && e.type === "change") o.focus(); }
     }
     clearFlag(n);
@@ -272,8 +322,9 @@
   function advance() {
     if (st.screen === "part" && st.part === 0) {
       const y = st.ans["1"], d = st.ans["3"];
-      const out = (y && y > 2551) || st.ans["5"] === 3;
+      const out = (y && y > 2551) || st.ans["5"] === 3 || st.ans["5ก"] === 2;
       if (out) { st.screen = "out"; return render(); }
+      st.meta.code = makeCode();
     }
     if (st.part === 3) return cjAdvance();
     if (st.part === 6) return finish();
@@ -299,11 +350,13 @@
         case "check": { const o = it.o.filter(o => !it.excl.includes(o.c)); st.ans[it.n] = shuffle(o).slice(0, 1 + Math.floor(R() * 2)).map(o => o.c).sort((a, b) => a - b); break; }
         case "ipc": st.ans[it.n] = pick([-3, -2, -1, 1, 2, 3]); break;
         case "occ": st.ans["7ก"] = pick(it.o).c; break;
+        case "phase2": st.ans["75"] = 2; break;
         default: st.ans[it.n] = pick(it.o.filter(o => o.c !== it.other)).c;
       }
     }
     if (st.ans["1"] > 2551) st.ans["1"] = 2540;
     if (st.ans["5"] === 3) st.ans["5"] = 1;
+    if (st.ans["5ก"] === 2) st.ans["5ก"] = 1;
   }
 
   /* ---------- conjoint ---------- */
@@ -510,10 +563,11 @@
   function record() {
     const sc = scores();
     return {
-      meta: { id: st.meta.id, started: st.meta.started, finished: new Date().toISOString(), seconds: Math.round((performance.now() - (st.t0 || 0)) / 1000), mode: st.meta.mode, venue: st.meta.venue, design: st.meta.design, version: st.meta.version, order: st.meta.order, instrument: "IOC v1.4" },
+      meta: { id: st.meta.id, code: st.meta.code, test: DEMO || TESTRUN, enumerator: st.meta.mode === 2 ? 9 : st.meta.enumerator, cdate: st.meta.cdate, collectedBE: beYear(st.meta.cdate || todayISO()), started: st.meta.started, finished: new Date().toISOString(), seconds: Math.round((performance.now() - (st.t0 || 0)) / 1000), mode: st.meta.mode, venue: st.meta.venue, design: st.meta.design, version: st.meta.version, order: st.meta.order, instrument: "IOC v1.4" },
       answers: { ...st.ans }, text: { ...st.txt },
       conjoint: (st.cj.tasks || []).map((t, i) => ({ task: i + 1, pair: t.k, item: t.n, chosen: t.choice, ms: t.at, left: strip(t.L, t.design), right: strip(t.Rt, t.design) })),
       ipc: { I: sc.I, P: sc.P, C: sc.C, complete: sc.complete },
+      contact: st.ans["75"] === 1 && st.contact && validPhone(st.contact.phone) ? { phone: String(st.contact.phone).replace(/\D/g, ""), time: st.contact.time || "" } : undefined,
     };
   }
   function strip(p, design) {
@@ -524,13 +578,54 @@
     return o;
   }
 
+  /* ---------- sending: an outbox in this browser, so a lost signal in the field does not lose an interview ---------- */
+  const outbox = () => store.get("outbox", []);
+  async function post(rec) {
+    const r = await fetch(CONFIG.endpoint, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(rec) });
+    return r.json();
+  }
+  async function flush() {
+    const keep = [];
+    for (const it of outbox()) {
+      const mine = it.rec.meta.id === st.meta.id;
+      try {
+        const j = await post(it.rec);
+        if (j.ok) { if (mine) st.send = { state: "ok", code: j.code, flag: j.flag }; if (it.rec.meta.mode === 2 && !TESTRUN) store.set("done", true); }
+        else if (mine) { st.send = { state: "rejected", error: j.error, dup: j.dup, next: j.next }; }          // the current interview is fixed on screen
+        else keep.push(Object.assign(it, { error: j.error }));
+      } catch (e) { keep.push(it); if (mine) st.send = { state: "queued" }; }
+    }
+    store.set("outbox", keep); chips();
+    if (st.screen === "done") sendBox();
+  }
   function finish() {
+    st.meta.code = makeCode();
     const rec = record();
     st.rec = rec;
-    if (!DEMO && CONFIG.endpoint) {
-      fetch(CONFIG.endpoint, { method: "POST", mode: "no-cors", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(rec) }).catch(() => {});
-    }
+    if (st.meta.mode !== 2 && st.meta.enumerator) store.set(seqKey(), Math.max(store.get(seqKey(), 0), st.meta.seq || 0));
+    if (!DEMO && CONFIG.endpoint) { store.set("outbox", outbox().concat([{ rec }])); st.send = { state: "sending" }; flush(); }
     st.screen = "done"; render();
+  }
+  function sendBox() {
+    const el = $("#sendbox"); if (!el) return;
+    const s = st.send || {};
+    if (s.state === "ok") el.innerHTML = `<div class="notice acc"><b>บันทึกแล้ว</b> · รหัสผู้ตอบ <b class="num">${esc(s.code)}</b>${s.flag ? `<br><span class="small">ระบบติดธง: ${esc(s.flag)} ผู้วิจัยจะตรวจสอบภายหลัง</span>` : ""}</div>`;
+    else if (s.state === "sending") el.innerHTML = `<div class="notice acc">กำลังส่งคำตอบ…</div>`;
+    else if (s.state === "queued") el.innerHTML = `<div class="notice"><b>ยังส่งไม่ได้</b> คำตอบเก็บไว้ในเครื่องนี้แล้ว ระบบจะส่งให้เองเมื่อเปิดหน้าแบบสอบถามครั้งถัดไป หรือกดส่งอีกครั้งเมื่อมีสัญญาณ <button type="button" class="btn" id="resend">ส่งอีกครั้ง</button></div>`;
+    else if (s.state === "rejected") el.innerHTML = `<div class="notice"><b>ระบบไม่รับคำตอบนี้</b> ${esc(s.error || "")}${s.dup ? `<div class="inrow" style="margin-top:8px"><label class="fld"><span>เปลี่ยนเลขชุดเป็น</span><input class="txt short num" type="number" min="1" max="99" id="newseq" value="${s.next || (st.meta.seq || 0) + 1}"></label><button type="button" class="btn primary" id="fixseq">ส่งด้วยเลขชุดใหม่</button></div>` : ""}</div>`;
+    const rs = $("#resend"); if (rs) rs.onclick = () => { st.send = { state: "sending" }; sendBox(); flush(); };
+    const fx = $("#fixseq"); if (fx) fx.onclick = () => {
+      st.meta.seq = Math.max(1, Math.min(99, +$("#newseq").value || 1)); st.meta.code = makeCode(); st.rec.meta.code = st.meta.code;
+      store.set(seqKey(), Math.max(store.get(seqKey(), 0), st.meta.seq));
+      store.set("outbox", outbox().filter(x => x.rec.meta.id !== st.meta.id).concat([{ rec: st.rec }])); st.send = { state: "sending" }; sendBox(); flush();
+    };
+  }
+  function chips() {
+    const el = $("#chips"); if (!el) return;
+    const n = outbox().length;
+    el.innerHTML = (DEMO ? `<span class="chip warn"><i></i>โหมดตัวอย่าง · ไม่บันทึกคำตอบ</span><span class="chip">รอ EC อนุมัติก่อนเปิดเก็บจริง</span>`
+      : TESTRUN ? `<span class="chip warn"><i></i>โหมดทดสอบระบบ · บันทึกเป็นข้อมูลทดสอบ</span>` : `<span class="chip mint"><i></i>เก็บข้อมูลจริง</span>`) +
+      (n ? `<span class="chip warn">รอส่ง ${n} ชุด</span>` : "");
   }
 
   function renderDone() {
@@ -553,20 +648,22 @@
           ${sc.complete ? "" : `<p class="small muted">ตอบส่วนที่ 6 ไม่ครบ คะแนนจึงคำนวณจากข้อที่ตอบแล้วเฉลี่ยขึ้นเป็น 8 ข้อ</p>`}
         </div></div>` : `<div class="notice">ยังไม่ได้ตอบส่วนที่ 6 จึงยังแสดงผลไม่ได้</div>`}
       <div class="notice acc small">ผลนี้เป็นคะแนนจากแบบวัด IPC ของ Levenson (1981) ฉบับแปลไทยที่อยู่ระหว่างตรวจสอบ ใช้เพื่อให้ท่านเห็นภาพความคิดของตัวเองเท่านั้น <b>ไม่ใช่การวินิจฉัย</b> และไม่มีด้านใดดีหรือแย่กว่ากัน เส้นกลางของแต่ละแถบคือ 24 คะแนน (จุดกึ่งกลางของมาตรา) ไม่ใช่ค่าเฉลี่ยของคนทั่วไป</div>
+      <div id="sendbox"></div>
       ${DEMO ? `<details class="rec"><summary>ข้อมูลที่ระบบจะบันทึกเมื่อเปิดเก็บจริง <span class="chip">โหมดตัวอย่าง · ไม่ได้ส่งไปที่ใด</span></summary>
-        <p class="small muted">หนึ่งแถวต่อผู้ตอบ ไม่มีชื่อ เบอร์โทร หรือพิกัด ข้อ 25–28 เก็บเฉพาะคำตอบ การตรวจคะแนนทำตอนวิเคราะห์เท่านั้น</p>
-        <pre>${esc(JSON.stringify(st.rec, null, 1))}</pre>
-        <button type="button" class="btn" id="dl">ดาวน์โหลดไฟล์ JSON</button></details>` : `<p class="small muted">ระบบส่งคำตอบแล้ว ปิดหน้านี้ได้เลย</p>`}
+        <p class="small muted">หนึ่งแถวต่อผู้ตอบ ไม่มีชื่อหรือพิกัด เบอร์โทร (เฉพาะผู้ที่ยินดี) แยกไปเก็บอีกชีตและไม่อยู่ในแถวคำตอบ ข้อ 25–28 เก็บเฉพาะคำตอบ การตรวจคะแนนทำตอนวิเคราะห์เท่านั้น</p>
+        <pre>${esc(JSON.stringify(Object.assign({}, st.rec, st.rec.contact ? { contact: { phone: "[ซ่อน]", time: st.rec.contact.time } } : {}), null, 1))}</pre>
+        <button type="button" class="btn" id="dl">ดาวน์โหลดไฟล์ JSON</button></details>` : ""}
       <div class="nav"><button type="button" class="btn ghost" id="again">เริ่มใหม่</button><a class="btn primary" href="../">กลับหน้าหลักงานวิจัย</a></div>
     </section>`;
     const dl = $("#dl");
-    if (dl) dl.onclick = () => { const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([JSON.stringify(st.rec, null, 1)], { type: "application/json" })); a.download = `survey-demo-${st.meta.id}.json`; a.click(); };
+    if (dl) dl.onclick = () => { const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([JSON.stringify(Object.assign({}, st.rec, { contact: undefined }), null, 1)], { type: "application/json" })); a.download = `survey-demo-${st.meta.id}.json`; a.click(); };
     $("#again").onclick = () => location.reload();
+    sendBox();
   }
 
   function renderOut() {
     app.innerHTML = `<section class="panel"><h2>ขอบคุณสำหรับเวลาของท่าน</h2>
-      <p class="lead">จากคำตอบในส่วนที่ 1 ท่านไม่อยู่ในกลุ่มที่งานวิจัยนี้ศึกษา (ผู้มีสิทธิเลือกตั้งที่มีชื่อในทะเบียนบ้านใน 4 อำเภอของบุรีรัมย์) จึงขอยุติการตอบเพียงเท่านี้</p>
+      <p class="lead">${st.ans["5ก"] === 2 ? "ท่านเคยตอบแบบสอบถามชุดนี้แล้ว ขอบคุณที่ร่วมงานวิจัยอีกครั้ง ไม่ต้องตอบซ้ำ" : "จากคำตอบในส่วนที่ 1 ท่านไม่อยู่ในกลุ่มที่งานวิจัยนี้ศึกษา (ผู้มีสิทธิเลือกตั้งที่มีชื่อในทะเบียนบ้านใน 4 อำเภอของบุรีรัมย์) จึงขอยุติการตอบเพียงเท่านี้"}</p>
       <div class="nav"><button class="btn ghost" id="b">← แก้คำตอบส่วนที่ 1</button>${DEMO ? `<button class="btn" id="c">ทดลองต่อ (โหมดตัวอย่าง)</button>` : ""}</div></section>`;
     $("#b").onclick = () => { st.screen = "part"; st.part = 0; render(); };
     const c = $("#c"); if (c) c.onclick = () => { st.screen = "part"; st.part = 1; render(); };
@@ -578,8 +675,10 @@
     t.textContent = msg; t.classList.add("on"); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove("on"), 3800);
   }
 
-  window.__survey = { st, scores, record };     // for testing
-  const jump = DEMO && location.hash.match(/^#p([1-7])$/);
+  window.__survey = { st, scores, record, makeCode };     // for testing
+  chips();
+  if (!DEMO && CONFIG.endpoint && outbox().length) flush();
+  const jump = (DEMO || TESTRUN) && location.hash.match(/^#p([1-7])$/);
   if (jump) { st.meta.mode = 2; st.meta.venue = 4; st.meta.started = new Date().toISOString(); st.t0 = performance.now(); st.screen = "part"; st.part = +jump[1] - 1; if (st.part === 3) st.cj.stage = "intro"; }
   render();
 })();

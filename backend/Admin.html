@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<base target="_top">
+<meta charset="utf-8">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kanit:wght@500;600&family=IBM+Plex+Sans+Thai:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: field-office console — status strip, district progress against quota, then tabs for LGU table, responses and phase-2 contacts */
+:root{--bg:#f7f7f4;--surface:#fff;--sunk:#efeee9;--ink:#1d1b19;--muted:#6b6560;--line:#e4e2dc;--line2:#c9c6be;--mint:#b6f3b5;--mint-line:#8fdc94;--mint-ink:#1f4d2c;--mint-soft:#e9f9e7;
+  --warn:#a4561a;--warn-soft:#fbeee2;--bad:#b4232c;--brown:#5c4034;--z:#23847a;--o:#8a5a44;
+  --f-display:"Kanit","IBM Plex Sans Thai",sans-serif;--f-body:"IBM Plex Sans Thai",Tahoma,sans-serif;--f-mono:"IBM Plex Mono",ui-monospace,monospace;color-scheme:light}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.6;padding:0 max(16px,env(safe-area-inset-left,0px)) 48px}
+h1,h2,h3{font-family:var(--f-display);font-weight:600;margin:0;line-height:1.25}
+.num{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)} .small{font-size:.86rem}
+.wrap{max-width:1180px;margin:0 auto;display:grid;gap:18px}
+header{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;justify-content:space-between;padding:18px 0 4px}
+header h1{font-size:1.35rem}
+.who{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.chip{display:inline-flex;gap:6px;align-items:center;padding:3px 11px;border-radius:999px;border:1px solid var(--line2);font-size:.8rem;color:var(--muted);background:var(--surface);white-space:nowrap}
+.chip.on{background:var(--mint);border-color:var(--mint-line);color:var(--mint-ink)}
+.chip.warn{background:var(--warn-soft);border-color:#ecc9a7;color:var(--warn)}
+.btn{appearance:none;font:inherit;font-weight:500;border:1px solid var(--line2);background:var(--surface);color:var(--ink);border-radius:999px;padding:8px 16px;min-height:40px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:6px}
+.btn.primary{background:var(--ink);color:#fff;border-color:var(--ink)}
+.btn.danger{color:var(--bad);border-color:#e6b7b9}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+:focus-visible{outline:2px solid #e8730c;outline-offset:2px}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:14px 16px;display:grid;gap:2px}
+.stat b{font-family:var(--f-mono);font-size:1.7rem;font-weight:500;line-height:1.2}
+.stat span{font-size:.84rem;color:var(--muted)}
+.stat .bar{height:6px;border-radius:3px;background:var(--sunk);overflow:hidden;margin-top:6px}.stat .bar i{display:block;height:100%;background:var(--ink)}
+@media (max-width:760px){.stats{grid-template-columns:1fr 1fr}}
+.dists{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+@media (max-width:900px){.dists{grid-template-columns:1fr 1fr}}@media (max-width:520px){.dists{grid-template-columns:1fr}}
+.dist{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:14px 16px;display:grid;gap:8px}
+.dist .top{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.cells{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.cell{display:grid;gap:3px;font-size:.74rem;color:var(--muted)}
+.cell .m{height:34px;border-radius:8px;background:var(--sunk);position:relative;overflow:hidden}
+.cell .m i{position:absolute;inset:auto 0 0 0;background:var(--z);opacity:.85}
+.cell.o .m i{background:var(--o)}
+.cell .v{font-family:var(--f-mono);color:var(--ink);font-size:.78rem}
+.cell.full .v{color:var(--mint-ink);font-weight:600}
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);overflow-x:auto}
+.tab{appearance:none;border:0;background:none;font:inherit;padding:10px 14px;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap}
+.tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--ink);font-weight:600}
+.panel{display:grid;gap:12px}
+.panel[hidden]{display:none}
+.tools{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.tools input,.tools select{font:inherit;border:1px solid var(--line2);border-radius:10px;padding:7px 10px;min-height:40px;background:var(--surface);color:var(--ink)}
+.tscroll{overflow-x:auto;border:1px solid var(--line);border-radius:16px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:.88rem}
+th,td{text-align:left;padding:8px 12px;border-bottom:1px solid var(--line);white-space:nowrap}
+th{font-family:var(--f-display);font-weight:500;color:var(--muted);font-size:.8rem;background:var(--sunk);position:sticky;top:0}
+td.r,th.r{text-align:right}
+tr.click{cursor:pointer}tr.click:hover td{background:var(--mint-soft)}
+.flag{color:var(--warn);font-weight:600}
+.prog{display:inline-block;width:70px;height:6px;border-radius:3px;background:var(--sunk);vertical-align:middle;margin-left:6px;overflow:hidden}.prog i{display:block;height:100%;background:var(--ink)}
+.empty{padding:28px;text-align:center;color:var(--muted)}
+.phone{font-family:var(--f-mono)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px 16px}
+.danger-zone{border:1px solid #e6b7b9;background:#fdf3f3;border-radius:16px;padding:14px 16px;display:grid;gap:8px}
+dialog{border:0;border-radius:18px;padding:0;max-width:min(720px,94vw);width:100%;box-shadow:0 30px 80px -30px rgba(0,0,0,.5)}
+dialog::backdrop{background:rgba(20,18,16,.35)}
+dialog .in{padding:18px;display:grid;gap:10px}
+dialog pre{font-family:var(--f-mono);font-size:.76rem;background:var(--sunk);border-radius:10px;padding:10px;max-height:60vh;overflow:auto;white-space:pre-wrap;word-break:break-all}
+#msg{min-height:1.4em}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div><h1>หลังบ้านแบบสอบถาม</h1><p class="small muted">ระบบอุปถัมภ์ · บุรีรัมย์ · ข้อมูลจาก Google Sheet ของผู้วิจัย</p></div>
+    <div class="who"><span class="chip" id="me">กำลังโหลด…</span><span class="chip" id="gate"></span><label class="chip"><input type="checkbox" id="showTest"> แสดงข้อมูลทดสอบ</label><button class="btn" id="reload">รีเฟรช</button><a class="btn" id="sheet" target="_blank" rel="noopener">เปิด Google Sheet</a></div>
+  </header>
+  <p id="msg" class="small" role="status"></p>
+  <section class="stats" id="stats"></section>
+  <section class="dists" id="dists" aria-label="ความคืบหน้ารายอำเภอ"></section>
+  <nav class="tabs" role="tablist">
+    <button class="tab" role="tab" aria-selected="true" data-p="pl">ราย อปท.</button>
+    <button class="tab" role="tab" aria-selected="false" data-p="pr">รายการคำตอบ</button>
+    <button class="tab" role="tab" aria-selected="false" data-p="pe">ผู้เก็บ × วัน</button>
+    <button class="tab" role="tab" aria-selected="false" data-p="pc">ผู้ยินดีให้สัมภาษณ์</button>
+    <button class="tab" role="tab" aria-selected="false" data-p="ps">ตั้งค่าและทดสอบ</button>
+  </nav>
+  <section class="panel" id="pl"></section>
+  <section class="panel" id="pr" hidden></section>
+  <section class="panel" id="pe" hidden></section>
+  <section class="panel" id="pc" hidden></section>
+  <section class="panel" id="ps" hidden></section>
+</div>
+<dialog id="dlg"><div class="in"><div style="display:flex;justify-content:space-between;align-items:center"><h3 id="dlgT"></h3><button class="btn" id="dlgX">ปิด</button></div><pre id="dlgB"></pre></div></dialog>
+
+<script>
+var RE=/^([ZYXB])([NMTAU])(\d{2})-(\d{2})(\d{2})-([1-9])(\d{2})$/;
+var D=null, CONTACTS=null, TIER=440;
+var DIST=["เมืองบุรีรัมย์","สตึก","บ้านด่าน","แคนดง"], CELL=["Gen Z ชาย","Gen Z หญิง","รุ่นอื่น ชาย","รุ่นอื่น หญิง"];
+var $=function(s){return document.querySelector(s)}, esc=function(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})};
+function run(fn,arg){return new Promise(function(ok,no){google.script.run.withSuccessHandler(ok).withFailureHandler(function(e){no(e)})[fn](arg)})}
+function msg(t,bad){var m=$("#msg");m.textContent=t||"";m.style.color=bad?"var(--bad)":"var(--muted)";}
+function parse(code){var m=RE.exec(code);return m?{gen:m[1],lgu:m[2]+m[3],dd:m[4]+"/"+m[5],ddmm:m[4]+m[5],en:m[6],seq:m[7]}:null}
+function cellOf(r,p){if(r.sex!==1&&r.sex!==2)return -1;return (p.gen==="Z"?0:2)+(r.sex===2?1:0)}
+
+function load(){msg("กำลังโหลดข้อมูล…");run("apiData").then(function(d){D=d;msg("");render()}).catch(function(e){msg(e.message||String(e),true)})}
+function rows(){return D.rows.filter(function(r){return $("#showTest").checked||!r.test}).map(function(r){r.p=parse(r.code);return r}).filter(function(r){return r.p})}
+
+function render(){
+  $("#me").textContent=D.me||"-"; $("#sheet").href=D.sheetUrl;
+  var g=$("#gate"); g.className="chip "+(D.accept?"on":"warn"); g.textContent=D.accept?"เปิดรับข้อมูลจริงแล้ว":"ยังไม่เปิดรับข้อมูลจริง (รับเฉพาะข้อมูลทดสอบ)";
+  var R=rows(), today=new Date(), dd=("0"+today.getDate()).slice(-2)+("0"+(today.getMonth()+1)).slice(-2);
+  var nToday=R.filter(function(r){return r.p.ddmm===dd}).length, flags=R.filter(function(r){return r.flag}).length;
+  $("#stats").innerHTML=
+    stat(R.length,"เก็บแล้ว จากเป้า "+TIER,R.length/TIER)+stat(nToday,"เก็บวันนี้ ("+dd.slice(0,2)+"/"+dd.slice(2)+")")+
+    stat(R.filter(function(r){return r.phase2}).length,"ยินดีให้สัมภาษณ์รอบ 2 · มีเบอร์ "+D.contacts)+stat(flags,"ธงอาจตอบซ้ำ",null,flags?"var(--warn)":"");
+  // per LGU counts by cell
+  var byL={};D.lgus.forEach(function(l){byL[l.code]=[0,0,0,0]});
+  R.forEach(function(r){var c=cellOf(r,r.p);if(c>=0&&byL[r.p.lgu])byL[r.p.lgu][c]++});
+  $("#dists").innerHTML=DIST.map(function(d){
+    var tgt=D.district[TIER][d], got=[0,0,0,0];D.lgus.filter(function(l){return l.d===d}).forEach(function(l){byL[l.code].forEach(function(v,i){got[i]+=v})});
+    var tot=got.reduce(function(a,b){return a+b},0), T=tgt.reduce(function(a,b){return a+b},0);
+    return '<div class="dist"><div class="top"><h3>อ.'+d+'</h3><span class="num">'+tot+' / '+T+'</span></div><div class="cells">'+
+      CELL.map(function(n,i){var f=Math.min(1,tgt[i]?got[i]/tgt[i]:0);return '<div class="cell'+(i>1?" o":"")+(got[i]>=tgt[i]?" full":"")+'"><div class="m"><i style="height:'+(f*100).toFixed(0)+'%"></i></div><span class="v">'+got[i]+'/'+tgt[i]+'</span><span>'+n+'</span></div>'}).join("")+'</div></div>'}).join("");
+  // LGU table
+  $("#pl").innerHTML='<p class="small muted">เป้าตามแผนหลัก (เก็บ 440) ราย อปท. ตามแผนที่ภาคสนาม · ช่องเป็น ได้/เป้า</p><div class="tscroll"><table><thead><tr><th>รหัส</th><th>อปท.</th><th>อำเภอ</th>'+CELL.map(function(c){return '<th class="r">'+c+'</th>'}).join("")+'<th class="r">รวม</th></tr></thead><tbody>'+
+    D.lgus.map(function(l){var t=l.target[TIER],g=byL[l.code],G=g.reduce(function(a,b){return a+b},0),TT=t.reduce(function(a,b){return a+b},0);
+      return '<tr><td class="num">'+l.code+'</td><td>'+esc(l.n)+'</td><td>'+esc(l.d)+'</td>'+t.map(function(v,i){return '<td class="r num"'+(g[i]>=v&&v?' style="color:var(--mint-ink);font-weight:600"':'')+'>'+g[i]+'/'+v+'</td>'}).join("")+
+      '<td class="r num">'+G+'/'+TT+'<span class="prog"><i style="width:'+Math.min(100,TT?G/TT*100:0).toFixed(0)+'%"></i></span></td></tr>'}).join("")+'</tbody></table></div>';
+  // responses
+  var GEN={Z:"Z",Y:"Y",X:"X",B:"B"}, SEX={1:"ชาย",2:"หญิง",3:"ไม่ระบุ"};
+  $("#pr").innerHTML='<div class="tools"><input id="q" placeholder="ค้นหารหัส ตำบล หรือธง" aria-label="ค้นหา"><span class="small muted">แตะแถวเพื่อดูคำตอบทั้งหมด</span></div><div class="tscroll"><table><thead><tr><th>รหัส</th><th>รับเมื่อ</th><th>อำเภอ</th><th>ตำบล</th><th>รุ่น</th><th>เพศ</th><th>ผู้เก็บ</th><th class="r">I</th><th class="r">P</th><th class="r">C</th><th>ธง</th></tr></thead><tbody id="rb"></tbody></table></div>';
+  var draw=function(){var q=($("#q").value||"").trim();var L=R.filter(function(r){return !q||(r.code+" "+r.tambon+" "+r.flag).indexOf(q)>=0}).sort(function(a,b){return b.received<a.received?-1:1});
+    $("#rb").innerHTML=L.length?L.map(function(r){return '<tr class="click" data-code="'+esc(r.code)+'"><td class="num">'+esc(r.code)+(r.test?' <span class="chip">ทดสอบ</span>':'')+'</td><td class="num">'+esc((r.received||"").replace("T"," ").slice(0,16))+'</td><td>'+esc(r.district)+'</td><td>'+esc(r.tambon)+'</td><td>'+GEN[r.p.gen]+'</td><td>'+(SEX[r.sex]||"-")+'</td><td class="num">'+(r.p.en==="9"?"ออนไลน์":r.p.en)+'</td><td class="r num">'+esc(r.I)+'</td><td class="r num">'+esc(r.P)+'</td><td class="r num">'+esc(r.C)+'</td><td class="flag">'+esc(r.flag)+'</td></tr>'}).join(""):'<tr><td colspan="11" class="empty">ยังไม่มีคำตอบ</td></tr>';};
+  draw();$("#q").oninput=draw;
+  $("#rb").onclick=function(e){var tr=e.target.closest("tr[data-code]");if(!tr)return;var c=tr.dataset.code;$("#dlgT").textContent=c;$("#dlgB").textContent="กำลังโหลด…";$("#dlg").showModal();run("apiDetail",c).then(function(j){try{$("#dlgB").textContent=JSON.stringify(JSON.parse(j),null,1)}catch(x){$("#dlgB").textContent=j||"ไม่พบ"}})};
+  // enumerator x day
+  var days=[],en={};R.forEach(function(r){if(days.indexOf(r.p.ddmm)<0)days.push(r.p.ddmm);var k=r.p.en;(en[k]=en[k]||{})[r.p.ddmm]=(en[k][r.p.ddmm]||0)+1});
+  days.sort(function(a,b){return (a.slice(2)+a.slice(0,2))<(b.slice(2)+b.slice(0,2))?-1:1});
+  var ens=Object.keys(en).sort();
+  $("#pe").innerHTML=ens.length?'<div class="tscroll"><table><thead><tr><th>ผู้เก็บ</th>'+days.map(function(d){return '<th class="r num">'+d.slice(0,2)+'/'+d.slice(2)+'</th>'}).join("")+'<th class="r">รวม</th></tr></thead><tbody>'+
+    ens.map(function(k){var s=0;return '<tr><td>'+(k==="9"?"ออนไลน์ (9)":"ผู้เก็บ "+k)+'</td>'+days.map(function(d){var v=en[k][d]||0;s+=v;return '<td class="r num">'+(v||"")+'</td>'}).join("")+'<td class="r num"><b>'+s+'</b></td></tr>'}).join("")+'</tbody></table></div>':'<p class="empty">ยังไม่มีคำตอบ</p>';
+  renderContacts();
+  $("#ps").innerHTML='<div class="card" style="display:grid;gap:8px"><h3>ข้อมูลทดสอบ</h3><p class="small muted">ใช้ทดสอบระบบก่อน EC อนุมัติ ทุกแถวมีค่า test = 1 และลบออกได้ทั้งหมด</p><div class="tools"><button class="btn" id="seed">สร้างข้อมูลทดสอบ 30 ชุด</button><button class="btn" id="clr">ลบข้อมูลทดสอบทั้งหมด</button></div></div>'+
+    '<div class="danger-zone"><h3>ลบเบอร์ติดต่อทั้งหมด</h3><p class="small">ทำเมื่อสัมภาษณ์รอบ 2 เสร็จ ตามที่แจ้งคณะกรรมการจริยธรรมฯ'+(D.deleteBy?' (กำหนดภายใน '+esc(D.deleteBy)+')':'')+' ลบแล้วกู้คืนไม่ได้ พิมพ์ <b>ลบเบอร์ทั้งหมด</b> เพื่อยืนยัน</p><div class="tools"><input id="cf" placeholder="ลบเบอร์ทั้งหมด" aria-label="ข้อความยืนยัน"><button class="btn danger" id="del" disabled>ลบเบอร์ '+D.contacts+' รายการ</button></div></div>'+
+    '<p class="small muted">การเปิดรับข้อมูลจริง: เจ้าของสคริปต์ตั้งค่า ACCEPT = 1 ใน Script properties หลัง EC อนุมัติ</p>';
+  $("#seed").onclick=function(){msg("กำลังสร้างข้อมูลทดสอบ…");run("apiSeedTest",30).then(function(n){msg("สร้างแล้ว "+n+" ชุด");$("#showTest").checked=true;load()}).catch(function(e){msg(e.message,true)})};
+  $("#clr").onclick=function(){msg("กำลังลบข้อมูลทดสอบ…");run("apiClearTest").then(function(n){msg("ลบแล้ว "+n+" ชุด");load()}).catch(function(e){msg(e.message,true)})};
+  $("#cf").oninput=function(){$("#del").disabled=$("#cf").value!=="ลบเบอร์ทั้งหมด"};
+  $("#del").onclick=function(){run("apiDeleteContacts",$("#cf").value).then(function(n){msg("ลบเบอร์แล้ว "+n+" รายการ");CONTACTS=null;load()}).catch(function(e){msg(e.message,true)})};
+}
+function stat(v,l,f,color){return '<div class="stat"><b'+(color?' style="color:'+color+'"':'')+'>'+v+'</b><span>'+l+'</span>'+(f!=null?'<div class="bar"><i style="width:'+Math.min(100,f*100).toFixed(1)+'%"></i></div>':'')+'</div>'}
+function renderContacts(){
+  var P=$("#pc");
+  if(!CONTACTS){P.innerHTML='<p class="small muted">เบอร์โทรเก็บแยกจากคำตอบ เปิดดูเมื่อจำเป็น ทุกครั้งที่เปิดจะถูกบันทึกในชีต “บันทึกระบบ”</p><div><button class="btn primary" id="openC">แสดงรายชื่อ '+D.contacts+' คน</button></div>';
+    $("#openC").onclick=function(){run("apiContacts").then(function(c){CONTACTS=c;renderContacts()}).catch(function(e){msg(e.message,true)})};return;}
+  var by={};D.rows.forEach(function(r){by[r.code]=r});
+  P.innerHTML='<div class="tools"><label class="small">เรียงตาม <select id="srt"><option value="P">คะแนน P สูงไปต่ำ</option><option value="code">รหัส</option></select></label><span class="small muted">แตะเบอร์เพื่อแสดงเต็ม</span></div><div class="tscroll"><table><thead><tr><th>รหัส</th><th>อำเภอ</th><th>รุ่น</th><th class="r">I</th><th class="r">P</th><th class="r">C</th><th>เบอร์</th><th>เวลาที่สะดวก</th><th>ลบภายใน</th></tr></thead><tbody id="cb"></tbody></table></div>';
+  var draw=function(){var k=$("#srt").value;var L=CONTACTS.map(function(c){var r=by[c.code]||{};return Object.assign({},c,{d:r.district,P:r.P,I:r.I,C:r.C,test:r.test})}).filter(function(c){return $("#showTest").checked||!c.test});
+    L.sort(function(a,b){return k==="P"?(+b.P||0)-(+a.P||0):a.code<b.code?-1:1});
+    $("#cb").innerHTML=L.length?L.map(function(c){var p=c.phone,m=p.length>4?p.slice(0,3)+"-xxx-"+p.slice(-4):p;return '<tr><td class="num">'+esc(c.code)+'</td><td>'+esc(c.d)+'</td><td>'+esc(c.code[0])+'</td><td class="r num">'+esc(c.I)+'</td><td class="r num">'+esc(c.P)+'</td><td class="r num">'+esc(c.C)+'</td><td><button class="btn phone" data-full="'+esc(p)+'">'+esc(m)+'</button></td><td>'+esc(c.time)+'</td><td class="num">'+esc(c.deleteBy)+'</td></tr>'}).join(""):'<tr><td colspan="9" class="empty">ยังไม่มีผู้ให้เบอร์</td></tr>';};
+  draw();$("#srt").onchange=draw;
+  $("#cb").onclick=function(e){var b=e.target.closest("button[data-full]");if(b)b.textContent=b.dataset.full};
+}
+document.querySelectorAll(".tab").forEach(function(t){t.onclick=function(){document.querySelectorAll(".tab").forEach(function(x){x.setAttribute("aria-selected",x===t);document.getElementById(x.dataset.p).hidden=x!==t})}});
+$("#reload").onclick=load;$("#showTest").onchange=function(){if(D)render()};$("#dlgX").onclick=function(){$("#dlg").close()};
+load();
+</script>
+</body>
+</html>
