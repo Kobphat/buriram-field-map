@@ -17,7 +17,7 @@
 
   const st = {
     screen: "intro", part: 0, ans: {}, txt: {}, warned: {},
-    meta: { id: (crypto.randomUUID ? crypto.randomUUID() : String(Date.now())).slice(0, 8), version: R() < .5 ? "A" : "B", order: R() < .5 ? 1 : 2, design: "random", mode: null, venue: null, started: null },
+    meta: { id: (crypto.randomUUID ? crypto.randomUUID() : String(Date.now())).slice(0, 8), version: R() < .5 ? "A" : "B", order: R() < .5 ? 1 : 2, design: "fixed", mode: null, venue: null, started: null },
     cj: { stage: "intro", i: 0, tasks: null, fails: 0, follow: {} },
   };
 
@@ -158,7 +158,7 @@
       <h2>ก่อนเริ่ม</h2>
       <div class="infogrid">
         <div><b>งานวิจัยนี้ศึกษาอะไร</b><p>วิธีที่ผู้มีสิทธิเลือกตั้งในบุรีรัมย์ชั่งน้ำหนักระหว่างผู้สมัครที่ช่วยเหลือเป็นรายครัวเรือน กับผู้สมัครที่เสนอนโยบาย และความเชื่อของแต่ละคนว่าชีวิตถูกกำหนดโดยอะไร</p></div>
-        <div><b>ท่านจะต้องทำอะไร</b><p>ตอบคำถาม 7 ส่วน รวมการเลือกผู้สมัครสมมติ 7 คู่ ใช้เวลาประมาณ 30 นาที (ตัวเลขประมาณ)</p></div>
+        <div><b>ท่านจะต้องทำอะไร</b><p>ตอบคำถาม 7 ส่วน รวมการเลือกผู้สมัครสมมติ 7 คู่ ใช้เวลาประมาณ 30 นาที</p></div>
         <div><b>สิทธิของท่าน</b><p>ไม่ต้องบอกชื่อ ข้ามข้อที่ไม่สบายใจได้ และหยุดได้ทุกเมื่อ แบบสอบถามนี้ไม่ถามว่าท่านเลือกผู้สมัครหรือพรรคใด</p></div>
         <div><b>ข้อมูลของท่าน</b><p>ใช้วิเคราะห์ในภาพรวมเท่านั้น ไม่นำเสนอรายบุคคลหรือรายหมู่บ้าน</p></div>
       </div>
@@ -168,9 +168,7 @@
           ${[[1, "ผู้เก็บข้อมูลอ่านให้ฟัง"], [0, "กรอกเองโดยมีผู้เก็บข้อมูลอยู่ด้วย"], [2, "ตอบเองออนไลน์"]].map(([c, t]) => `<label class="opt"><input type="radio" name="mode" value="${c}" ${st.meta.mode === c ? "checked" : ""}><span class="box"></span><span class="ot">${t}</span></label>`).join("")}</div></fieldset>
         <fieldset class="q" id="venue-q" ${st.meta.mode === 2 ? "hidden" : ""}><legend class="qh"><span class="qt">สถานที่พบผู้ตอบ <em class="muted">(ผู้เก็บข้อมูลเลือก)</em></span></legend><div class="opts row">
           ${[[1, "ตลาดหรือจุดที่คนพลุกพล่าน"], [2, "จุดรวมตัวของชุมชน (สภากาแฟ)"], [3, "เยี่ยมครัวเรือน"]].map(([c, t]) => `<label class="opt"><input type="radio" name="venue" value="${c}" ${st.meta.venue === c ? "checked" : ""}><span class="box"></span><span class="ot">${t}</span></label>`).join("")}</div></fieldset>
-        ${DEMO ? `<fieldset class="q"><legend class="qh"><span class="qt">รูปแบบคู่ผู้สมัคร <span class="chip">สำหรับผู้ทรงคุณวุฒิ</span></span></legend><div class="opts">
-          <label class="opt"><input type="radio" name="design" value="random" ${st.meta.design === "random" ? "checked" : ""}><span class="box"></span><span class="ot"><b>สุ่มคุณลักษณะทั้งหมด</b> · ทุกคู่สุ่มใหม่ วิเคราะห์ด้วย AMCE</span></label>
-          <label class="opt"><input type="radio" name="design" value="fixed" ${st.meta.design === "fixed" ? "checked" : ""}><span class="box"></span><span class="ot"><b>7 คู่ตายตัวตาม IOC v1.4</b> · ชุด ${st.meta.version} · ลำดับแบบ ${st.meta.order}</span></label></div></fieldset>` : ""}
+
       </div>
       <p class="consent">การกด “เริ่มตอบ” ถือว่าท่านยินยอมเข้าร่วมการวิจัย (ความยินยอมโดยการกระทำ)</p>
       <div class="nav"><span></span><button class="btn primary" id="start">เริ่มตอบ</button></div>
@@ -179,7 +177,6 @@
       const t = e.target;
       if (t.name === "mode") { st.meta.mode = +t.value; $("#venue-q").hidden = st.meta.mode === 2; if (st.meta.mode === 2) st.meta.venue = 4; else if (st.meta.venue === 4) st.meta.venue = null; }
       if (t.name === "venue") st.meta.venue = +t.value;
-      if (t.name === "design") { st.meta.design = t.value; st.cj.tasks = null; }
     };
     $("#start").onclick = () => {
       if (st.meta.mode == null) st.meta.mode = 2, st.meta.venue = 4;
@@ -520,7 +517,7 @@
     };
   }
   function strip(p, design) {
-    const look = { sex: p.look.sex, skin: p.look.skin, hair: p.look.hair, hairC: p.look.hairC, glasses: p.look.glasses };
+    const look = { sex: p.look.sex, pose: p.look.pose, skin: p.look.skin, shirt: p.look.shirt, hairC: p.look.hairC, flip: p.look.flip };
     if (design === "fixed") return { name: p.name, party: p.partyCode || p.party, look };
     const o = { party: p.party, sex: p.sex, age: p.age, look };
     for (const k of ["occ", "exp", "fam", "role", "tie", "offer", "amt", "time", "cert"]) if (p[k] !== undefined) o[k] = p[k];
@@ -582,5 +579,7 @@
   }
 
   window.__survey = { st, scores, record };     // for testing
+  const jump = DEMO && location.hash.match(/^#p([1-7])$/);
+  if (jump) { st.meta.mode = 2; st.meta.venue = 4; st.meta.started = new Date().toISOString(); st.t0 = performance.now(); st.screen = "part"; st.part = +jump[1] - 1; if (st.part === 3) st.cj.stage = "intro"; }
   render();
 })();

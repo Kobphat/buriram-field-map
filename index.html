@@ -3,159 +3,240 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Behavioral Political Economy of Clientelism · Buriram</title>
-<meta name="description" content="ภาพรวมงานวิจัย: เศรษฐศาสตร์การเมืองเชิงพฤติกรรมของระบบอุปถัมภ์ บทบาทของการรับรู้แหล่งที่มาของการควบคุมในการประเมินความเสี่ยงและพฤติกรรมการเลือกตั้งในจังหวัดบุรีรัมย์">
+<title>การรับรู้แหล่งที่มาของการควบคุม · บุรีรัมย์</title>
+<meta name="description" content="งานวิจัย: เศรษฐศาสตร์การเมืองเชิงพฤติกรรมของระบบอุปถัมภ์ บทบาทของการรับรู้แหล่งที่มาของการควบคุมในการประเมินความเสี่ยงและพฤติกรรมการเลือกตั้งในจังหวัดบุรีรัมย์">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@500;600;700&family=IBM+Plex+Sans+Thai:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kanit:wght@500;600;700;800&family=IBM+Plex+Sans+Thai:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <link rel="stylesheet" href="assets/site.css">
 <style>
-/* Layout: long-form research overview — hero, then numbered sections (intro, literature, method, tools, references) in a single reading column with wide figures */
-.hero{padding:clamp(36px,7vw,84px) 0 28px;display:grid;gap:18px;border-bottom:1px solid var(--line)}
-.eyebrow{font-family:var(--f-display);font-size:.84rem;font-weight:600;letter-spacing:.05em;color:var(--muted)}
-.hero h1{font-size:clamp(1.7rem,1.2rem + 2.4vw,2.9rem);font-weight:700;letter-spacing:-.01em;max-width:22ch}
-.hero .en{font-family:var(--f-display);font-size:clamp(1rem,.9rem + .5vw,1.25rem);color:var(--muted);font-weight:500;max-width:52ch;line-height:1.45}
-.byline{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:.93rem;color:var(--muted)}
-.byline b{color:var(--ink);font-weight:600}
-.status{display:flex;flex-wrap:wrap;gap:6px}
-.cta{display:flex;flex-wrap:wrap;gap:10px;margin-top:4px}
-.toc{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:6px}
-.toc a{display:grid;gap:2px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);text-decoration:none;color:var(--ink);font-size:.9rem;transition:border-color .15s,transform .15s}
-.toc a:hover{border-color:var(--line2);transform:translateY(-2px)}
-.toc a span{font-family:var(--f-mono);font-size:.74rem;color:var(--muted)}
-@media (max-width:760px){.toc{grid-template-columns:repeat(2,1fr)}}
+/* Layout: cover = a paper table with draggable party-coloured shapes and policy tags (from the slide deck), title top-right;
+   then an Apple-style shelf into the survey, then the research write-up in one reading column */
 
-section.s{padding:48px 0 8px;display:grid;gap:18px}
-.sh{display:grid;gap:4px}
-.sh .no{font-family:var(--f-mono);font-size:.8rem;color:var(--accent)}
-.sh h2{font-size:clamp(1.4rem,1.1rem + 1.2vw,1.95rem)}
-.prose{display:grid;gap:14px;max-width:70ch}
+/* ---------- cover table ---------- */
+.cover{position:relative;margin-inline:calc(-1 * max(16px,env(safe-area-inset-left,0px)));height:clamp(620px,86vh,860px);overflow:hidden;
+  background:radial-gradient(120% 90% at 18% 10%,#fbfbf9 0%,#f4f4f0 46%,#e7e6e1 78%,#d9d8d2 100%);border-bottom:1px solid var(--line);touch-action:pan-y}
+.cover::after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(60% 50% at 100% 100%,rgba(0,0,0,.10),transparent 70%)}
+.titleblock{position:absolute;top:clamp(28px,6%,64px);right:max(24px,4vw);width:min(640px,54%);display:grid;gap:14px;z-index:2;pointer-events:none}
+.titleblock > *{pointer-events:auto}
+.tb-small{font-family:var(--f-mono);font-size:clamp(.78rem,.7rem + .3vw,.95rem);font-weight:500;letter-spacing:.02em;color:var(--ink);line-height:1.5}
+.big{font-family:var(--f-display);font-weight:800;font-size:clamp(2.6rem,1.4rem + 4.6vw,5.4rem);line-height:.98;letter-spacing:-.045em;margin:0;color:var(--brown)}
+.big .ln{display:block;white-space:nowrap}
+.big .g{color:rgba(92,64,52,.80);mix-blend-mode:multiply}
+.tb-cta{display:flex;flex-wrap:wrap;gap:10px;margin-top:8px}
+.tb-cta .btn{min-height:48px;padding:12px 24px;font-size:1rem}
+.byline{position:absolute;right:max(24px,4vw);bottom:22px;text-align:right;font-size:.82rem;color:var(--muted);z-index:2;line-height:1.55}
+.byline b{color:var(--ink);font-weight:600;font-family:var(--f-display);letter-spacing:.04em;font-size:.78rem}
+.hint{font-family:var(--f-mono);font-size:.76rem;color:var(--muted);background:color-mix(in oklab,var(--bg) 80%,transparent);padding:4px 12px;border-radius:999px;white-space:nowrap}
+
+.piece{position:absolute;left:0;top:0;border:0;padding:0;background:none;cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none;will-change:transform;z-index:3;
+  filter:drop-shadow(0 14px 14px rgba(40,30,20,.16)) drop-shadow(0 3px 3px rgba(40,30,20,.12));transition:filter .2s}
+.piece svg{display:block;width:100%;height:100%;overflow:visible}
+.piece.lift{cursor:grabbing;filter:drop-shadow(0 34px 26px rgba(40,30,20,.22)) drop-shadow(0 8px 8px rgba(40,30,20,.12))}
+.piece.tag{display:flex;align-items:center;gap:8px;height:auto;padding:6px 10px 6px 14px;border-radius:999px;background:var(--mint);border:1.5px solid var(--mint-line);color:var(--mint-ink);font-family:var(--f-body);font-weight:600;font-size:clamp(.74rem,.66rem + .25vw,.9rem);white-space:nowrap;
+  box-shadow:inset 0 -2px 0 rgba(0,0,0,.06)}
+.piece.tag svg{width:14px;height:14px;flex:none}
+.piece:focus-visible{outline:2px solid var(--focus);outline-offset:4px}
+.piece.in{transition:transform .5s cubic-bezier(.3,1.3,.5,1),opacity .3s}
+.piece.drop{animation:dropin .7s cubic-bezier(.3,1.4,.5,1) backwards}
+@keyframes dropin{from{opacity:0;translate:0 -40px;scale:1.15}}
+
+.hand{position:absolute;z-index:6;pointer-events:none;width:clamp(260px,30vw,460px);height:auto;transition:translate .6s cubic-bezier(.2,.8,.2,1),opacity .4s;filter:drop-shadow(-14px 22px 22px rgba(40,30,20,.18))}
+.hand.away{translate:75% 12%;opacity:.0}
+
+.cloth{position:absolute;z-index:1;left:-60px;bottom:-60px;width:clamp(260px,30vw,420px);height:clamp(170px,19vw,250px);transform:rotate(14deg);border-radius:6px;
+  background:
+    repeating-linear-gradient(90deg,rgba(43,43,162,.85) 0 18px,transparent 18px 36px),
+    repeating-linear-gradient(0deg,rgba(214,38,140,.75) 0 18px,transparent 18px 36px),
+    repeating-linear-gradient(90deg,transparent 0 7px,rgba(255,255,255,.18) 7px 9px,transparent 9px 18px),
+    #6d2aa6;
+  box-shadow:0 10px 30px rgba(40,20,60,.25);transition:box-shadow .2s,filter .2s}
+.cloth.hot{box-shadow:0 0 0 4px var(--mint),0 10px 30px rgba(40,20,60,.25);filter:brightness(1.08)}
+.cloth-lab{position:absolute;z-index:2;left:18px;bottom:16px;display:grid;gap:2px;max-width:min(330px,70vw);pointer-events:none}
+.cloth-lab b{font-family:var(--f-display);font-weight:600;color:#fff;font-size:.95rem;text-shadow:0 1px 3px rgba(0,0,0,.4)}
+.cloth-lab span{font-size:.78rem;color:#f3e9ff;text-shadow:0 1px 3px rgba(0,0,0,.4)}
+.kept{position:absolute;z-index:1000001;left:16px;bottom:96px;max-width:min(360px,calc(100% - 32px));background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:12px 14px;display:grid;gap:6px;box-shadow:0 12px 30px -16px rgba(0,0,0,.35);font-size:.86rem}
+.kept[hidden]{display:none}
+.kept a{font-weight:600}
+.reset{position:absolute;z-index:1000000;left:16px;top:16px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.reset .btn{min-height:36px;padding:6px 14px;font-size:.84rem;background:color-mix(in oklab,var(--surface) 80%,transparent)}
+
+@media (max-width:760px){
+  .cover{height:auto;min-height:0;display:grid;grid-template-rows:auto 470px;padding-top:24px}
+  .titleblock{position:relative;top:auto;right:auto;width:auto;padding-inline:max(16px,env(safe-area-inset-left,0px));gap:10px}
+  .big{font-size:clamp(2.1rem,9.6vw,3rem)}
+  .byline{display:none}
+  .hand{width:190px}
+  .hint{display:none}
+  .kept{display:none!important}
+  .reset{top:auto;bottom:12px;left:auto;right:12px}
+}
+
+/* ---------- sections ---------- */
+.sec{padding:clamp(56px,8vw,96px) 0 8px;display:grid;gap:22px}
+.sh{font-size:clamp(1.9rem,1.3rem + 2.2vw,3rem);font-weight:700;letter-spacing:-.02em;line-height:1.15;max-width:920px}
+.sh span{color:var(--muted);font-weight:500}
+.prose{display:grid;gap:14px;max-width:68ch;font-size:1.04rem}
 .prose p{text-wrap:pretty}
-h3.sub{font-size:1.12rem;margin-top:10px}
-.cite{color:var(--muted);font-size:.92em;white-space:nowrap}
-ol.obj{margin:0;padding:0;list-style:none;display:grid;gap:8px;counter-reset:o}
-ol.obj li{display:grid;grid-template-columns:36px 1fr;gap:10px;align-items:start;padding:10px 12px;background:var(--surface);border:1px solid var(--line);border-radius:10px}
-ol.obj li::before{counter-increment:o;content:"1." counter(o);font-family:var(--f-mono);font-size:.85rem;color:var(--accent);padding-top:2px}
+.cite{color:var(--muted);font-size:.9em;white-space:nowrap}
+h3.sub{font-size:1.2rem;font-weight:600;margin-top:14px}
+
+/* survey shelf */
+.shelf-head{display:flex;justify-content:space-between;align-items:end;gap:16px;flex-wrap:wrap}
+.shelf-nav{display:flex;gap:8px}
+.shelf-nav button{width:40px;height:40px;border-radius:50%;border:1px solid var(--line2);background:var(--surface);cursor:pointer;font-size:1.1rem;color:var(--ink)}
+.shelf{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(250px,290px);gap:16px;overflow-x:auto;scroll-snap-type:x mandatory;padding:6px 2px 22px;scrollbar-width:none;margin-inline:-2px}
+.shelf::-webkit-scrollbar{display:none}
+.pc{scroll-snap-align:start;display:grid;grid-template-rows:auto auto 1fr auto;gap:10px;min-height:360px;padding:24px;border-radius:26px;background:var(--surface);border:1px solid var(--line);text-decoration:none;color:var(--ink);box-shadow:0 2px 12px -8px rgba(0,0,0,.2);transition:transform .25s cubic-bezier(.2,.8,.2,1),box-shadow .25s}
+.pc:hover{transform:translateY(-4px) scale(1.01);box-shadow:0 22px 40px -22px rgba(0,0,0,.35)}
+.pc .ico{width:64px;height:64px}
+.pc .k{font-family:var(--f-mono);font-size:.78rem;color:var(--muted)}
+.pc h3{font-size:1.3rem;font-weight:600}
+.pc p{color:var(--muted);font-size:.93rem}
+.pc .go{font-weight:600;font-size:.92rem}
+.pc.start{background:var(--ink);color:#fff;border-color:var(--ink)}
+.pc.start p,.pc.start .k{color:#c9c4bc}
+.pc.start h3{font-size:1.7rem;line-height:1.2}
+.pc.start .btn{background:var(--mint);border-color:var(--mint-line);color:var(--mint-ink);justify-self:start}
+
+ol.obj{margin:0;padding:0;list-style:none;display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+ol.obj li{display:grid;gap:6px;padding:18px 20px;background:var(--surface);border:1px solid var(--line);border-radius:20px}
+ol.obj li b{font-family:var(--f-mono);font-size:.85rem;color:var(--brown)}
+@media (max-width:680px){ol.obj{grid-template-columns:1fr}}
 .hyp td:first-child{font-family:var(--f-mono);font-weight:500;white-space:nowrap}
 .hyp td:nth-child(2){color:var(--muted);font-size:.86rem;white-space:nowrap}
-.hyp tr.main td:first-child{color:var(--accent)}
+.hyp tr.main td:first-child{color:var(--brown)}
 
 figure{margin:0;display:grid;gap:8px}
 figcaption{font-size:.86rem;color:var(--muted)}
-.fig{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px;overflow-x:auto}
+.fig{background:var(--surface);border:1px solid var(--line);border-radius:24px;padding:16px;overflow-x:auto}
 .fig svg{display:block;width:100%;height:auto;min-width:660px}
 .fig .node rect{fill:var(--surface);stroke:var(--line2);stroke-width:1.2}
-.fig .node.y rect{fill:var(--accent-soft);stroke:var(--accent)}
-.fig .node .t{font-family:var(--f-display);font-weight:600;font-size:14px;fill:var(--ink)}
+.fig .node.y rect{fill:var(--mint-soft);stroke:var(--mint-ink)}
+.fig .node .t{font-family:var(--f-display);font-weight:500;font-size:14px;fill:var(--ink)}
 .fig .node .d{font-family:var(--f-mono);font-size:11px;fill:var(--muted)}
 .fig .pill rect{stroke:none}
 .fig .pill text{font-family:var(--f-body);font-size:12.5px;fill:var(--ink)}
 .fig .e{fill:none;stroke:var(--ink);stroke-width:1.6}
-.fig .e.main{stroke:var(--accent);stroke-width:2.6}
+.fig .e.main{stroke:var(--brown);stroke-width:2.8}
 .fig .e.mech{stroke:var(--line2);stroke-dasharray:5 4}
 .fig .e.mod{stroke:var(--tb);stroke-dasharray:2 4;stroke-width:2}
 .fig .lab{font-family:var(--f-mono);font-size:11.5px;fill:var(--ink);paint-order:stroke;stroke:var(--surface);stroke-width:4px}
-.fig .lab.acc{fill:var(--accent);font-weight:500}
+.fig .lab.acc{fill:var(--brown);font-weight:500}
 .fig .note{font-family:var(--f-body);font-size:12px;fill:var(--muted)}
 
-.lit{display:grid;gap:22px}
-.theme{display:grid;gap:10px}
-.theme h3{font-size:1.05rem;display:flex;gap:10px;align-items:baseline}
-.theme h3 small{font-family:var(--f-body);font-weight:400;color:var(--muted);font-size:.86rem}
-.works{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:10px}
-.work{display:grid;gap:8px;align-content:start;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
-.work .wh{display:flex;justify-content:space-between;gap:10px;align-items:baseline}
-.work .wh b{font-family:var(--f-display);font-size:1rem}
-.work .use{font-size:.88rem;border-left:3px solid var(--accent);padding-left:10px}
-.work .m{font-size:.88rem;color:var(--muted)}
-.work .links{display:flex;gap:12px;flex-wrap:wrap;font-size:.86rem}
-.work .links a{font-weight:500}
-.work .uses{font-family:var(--f-mono);font-size:.76rem;color:var(--muted);white-space:nowrap}
+/* literature: folder tabs like the deck */
+.folders{display:grid;gap:0}
+.ftabs{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;padding-left:10px}
+.ftabs::-webkit-scrollbar{display:none}
+.ftab{appearance:none;border:0;font:inherit;font-family:var(--f-display);font-weight:500;font-size:.92rem;color:#fff;padding:10px 20px 12px;border-radius:16px 16px 0 0;cursor:pointer;white-space:nowrap;opacity:.55;transition:opacity .15s;background:var(--c)}
+.ftab[aria-selected="true"]{opacity:1}
+.fpanel{background:var(--c);border-radius:22px;padding:clamp(12px,2.4vw,24px);display:grid;gap:12px}
+.fpanel[hidden]{display:none}
+.fpanel .lead{color:#fff;font-size:.95rem;opacity:.9;padding:2px 4px}
+.row{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.4fr);gap:12px}
+@media (max-width:720px){.row{grid-template-columns:1fr}}
+.paper,.find{background:#fbfaf6;border-radius:14px;padding:14px 16px;display:grid;gap:6px;align-content:start}
+.paper .tag,.find .tag{justify-self:start;font-family:var(--f-display);font-weight:500;font-size:.8rem;padding:2px 12px;border-radius:999px;color:#fff;background:var(--c)}
+.paper b{font-family:var(--f-display);font-weight:600;font-size:1.02rem}
+.paper .ref{font-size:.82rem;color:var(--muted)}
+.find p{font-size:.92rem}
+.find .use{border-left:3px solid var(--c);padding-left:10px;font-weight:500}
+.links{display:flex;gap:12px;flex-wrap:wrap;font-size:.86rem}
+.links a{font-weight:600}
+.uses{font-family:var(--f-mono);font-size:.76rem;color:var(--muted)}
 
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-@media (max-width:780px){.grid2{grid-template-columns:1fr}}
-.phase{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.phase > div{display:grid;gap:6px;padding:14px 16px;border-radius:12px;background:var(--surface);border:1px solid var(--line)}
-.phase .k{font-family:var(--f-mono);font-size:.78rem;color:var(--accent)}
-.phase p{font-size:.92rem;color:var(--muted)}
+.phase{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.phase > div{display:grid;gap:6px;padding:20px;border-radius:22px;background:var(--surface);border:1px solid var(--line)}
+.phase .k{font-family:var(--f-mono);font-size:.78rem;color:var(--brown)}
+.phase p{font-size:.93rem;color:var(--muted)}
 @media (max-width:620px){.phase{grid-template-columns:1fr}}
-.mapwrap{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:16px;align-items:center}
+.mapwrap{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:18px;align-items:center}
 @media (max-width:780px){.mapwrap{grid-template-columns:1fr}}
 .minimap{width:100%;height:auto;max-height:440px}
-.minimap .ctx{fill:var(--sunk);stroke:var(--line2);stroke-width:1}
+.minimap .ctx{fill:#ebe9e3;stroke:#d3d0c8;stroke-width:1}
 .minimap .st{stroke:var(--surface);stroke-width:2}
 .minimap text{font-family:var(--f-display);font-weight:600;font-size:46px;fill:var(--ink);paint-order:stroke;stroke:var(--surface);stroke-width:10px;text-anchor:middle}
 .minimap text.n{font-family:var(--f-mono);font-weight:500;font-size:36px;fill:var(--muted)}
 .sw{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:0}
-.tiers{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-.tier{display:grid;gap:4px;padding:14px 16px;border-radius:12px;background:var(--surface);border:1px solid var(--line)}
-.tier.main{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent) inset}
-.tier .big{font-family:var(--f-mono);font-size:1.7rem;font-weight:500;line-height:1.1}
-.tier .big small{font-size:.9rem;color:var(--muted)}
+.tiers{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.tier{display:grid;gap:4px;padding:20px;border-radius:22px;background:var(--surface);border:1px solid var(--line)}
+.tier.main{background:var(--mint-soft);border-color:var(--mint-line)}
+.tier .bign{font-family:var(--f-mono);font-size:1.8rem;font-weight:500;line-height:1.1}
+.tier .bign small{font-size:.9rem;color:var(--muted)}
+.tier .eb{font-family:var(--f-display);font-size:.84rem;color:var(--muted)}
 .tier p{font-size:.86rem;color:var(--muted)}
 @media (max-width:620px){.tiers{grid-template-columns:1fr}}
-.eq{font-family:var(--f-mono);font-size:.92rem;line-height:2;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 18px;overflow-x:auto;white-space:nowrap}
-.eq .b1{color:var(--accent);font-weight:500}
+.eq{font-family:var(--f-mono);font-size:.92rem;line-height:2;background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:16px 20px;overflow-x:auto;white-space:nowrap}
+.eq .b1{color:var(--brown);font-weight:500}
 .eq sub{font-size:.72em}
-.parts td:first-child{font-family:var(--f-mono);white-space:nowrap}
-.parts td.r{font-family:var(--f-mono)}
-.tools{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.tool{display:grid;gap:10px;padding:20px;border-radius:14px;background:var(--surface);border:1px solid var(--line);text-decoration:none;color:var(--ink);transition:border-color .15s,transform .15s}
-.tool:hover{border-color:var(--accent);transform:translateY(-2px)}
-.tool h3{font-size:1.15rem}
-.tool p{color:var(--muted);font-size:.92rem}
-.tool .go{font-weight:600;color:var(--accent)}
-@media (max-width:680px){.tools{grid-template-columns:1fr}}
+.parts td:first-child,.parts td.r{font-family:var(--f-mono)}
+.toolcard{display:grid;grid-template-columns:auto 1fr auto;gap:18px;align-items:center;padding:24px;border-radius:26px;background:var(--surface);border:1px solid var(--line);text-decoration:none;color:var(--ink);transition:transform .2s}
+.toolcard:hover{transform:translateY(-3px)}
+.toolcard p{color:var(--muted);font-size:.93rem}
+@media (max-width:620px){.toolcard{grid-template-columns:1fr}}
 ol.refs{margin:0;padding:0;list-style:none;display:grid;gap:10px;font-size:.92rem}
 ol.refs li{padding-left:28px;text-indent:-28px}
-ol.refs a{word-break:break-all}
-footer{margin-top:56px;padding-top:18px;border-top:1px solid var(--line);font-size:.85rem;color:var(--muted);display:grid;gap:6px}
+ol.refs a{word-break:break-all;color:var(--muted)}
+footer{margin-top:64px;padding-top:18px;border-top:1px solid var(--line);font-size:.85rem;color:var(--muted);display:grid;gap:6px}
 </style>
 </head>
 <body>
-<nav class="site-nav" aria-label="เมนูหลัก"><div class="wrap"><a class="brand" href="./"><i></i>Clientelism × LoC · บุรีรัมย์</a><ul><li><a class="nl" href="#intro">บทนำ</a></li><li><a class="nl" href="#lit">วรรณกรรม</a></li><li><a class="nl" href="#method">ระเบียบวิธี</a></li><li><a class="nl" href="field/">แผนที่ภาคสนาม</a></li><li><a class="nl" href="survey/">แบบสอบถาม</a></li></ul></div></nav>
+<nav class="site-nav" aria-label="เมนูหลัก"><div class="wrap"><a class="brand" href="./"><i aria-hidden="true"><b style="background:#fed257"></b><b style="background:#fbb1d1"></b><b style="background:#35b4ec"></b><b style="background:#28bd6b"></b></i>ระบบอุปถัมภ์ · บุรีรัมย์</a><ul><li><a class="nl" href="#intro">บทนำ</a></li><li><a class="nl" href="#lit">วรรณกรรม</a></li><li><a class="nl" href="#method">ระเบียบวิธี</a></li><li><a class="nl" href="field/">แผนที่ภาคสนาม</a></li><li><a class="nl cta" href="survey/">แบบสอบถาม</a></li></ul></div></nav>
+
+<section class="cover" id="table" aria-label="ปกงานวิจัย">
+  <div class="cloth" id="cloth" aria-hidden="true"></div>
+  <div class="cloth-lab" aria-hidden="true"><b>ผ้าขาวม้าของคุณ</b><span id="clothCount">ลากรูปทรงหรือป้ายนโยบายมาวางเพื่อเก็บ</span></div>
+  <div class="titleblock">
+    <p class="tb-small">เศรษฐศาสตร์การเมืองเชิงพฤติกรรมของระบบอุปถัมภ์: บทบาทของ</p>
+    <h1 class="big" id="bigtitle"><span class="ln">การรับรู้แหล่งที่มา</span><span class="ln">ของการควบคุม</span></h1>
+    <p class="tb-small">ในการประเมินความเสี่ยงและพฤติกรรมการเลือกตั้งในจังหวัดบุรีรัมย์</p>
+    <div class="tb-cta"><a class="btn primary" href="survey/">เริ่มทำแบบสอบถาม</a><a class="btn" href="#intro">อ่านงานวิจัย</a></div>
+  </div>
+  <div class="byline"><b>นำเสนอโดย</b><br>กอบพัชร์ ทวีโคตร · วรนิษฐา ปกาสิทธิ์<br>อาจารย์ที่ปรึกษา รศ.ดร.จงรักษ์ หงษ์งาม<br>คณะเศรษฐศาสตร์ มหาวิทยาลัยขอนแก่น</div>
+  <img class="hand" id="hand" src="assets/hand.png" alt="" aria-hidden="true">
+  <div class="reset"><button class="btn" id="reset" type="button">จัดโต๊ะใหม่</button><span class="hint" id="hint">ลากรูปทรงและป้ายได้ · วางบนผ้าขาวม้าเพื่อเก็บ</span></div>
+  <div class="kept" id="kept" hidden></div>
+</section>
+
 <main class="wrap">
 
-<header class="hero">
-  <p class="eyebrow">โครงร่างงานวิจัย · คณะเศรษฐศาสตร์ มหาวิทยาลัยขอนแก่น</p>
-  <h1>เศรษฐศาสตร์การเมืองเชิงพฤติกรรมของระบบอุปถัมภ์</h1>
-  <p class="en">Behavioral Political Economy of Clientelism: The Role of Locus of Control in Risk Assessment and Voting Behavior in Buriram</p>
-  <p class="prose" style="color:var(--muted)">บทบาทของการรับรู้แหล่งที่มาของการควบคุม (locus of control) ในการประเมินความเสี่ยงและพฤติกรรมการเลือกตั้งในจังหวัดบุรีรัมย์</p>
-  <div class="byline"><span>ผู้วิจัย <b>กอบพัชร์ ทวีโคตร</b> · <b>วรนิษฐา ปกาสิทธิ์</b></span><span>อาจารย์ที่ปรึกษา <b>รศ.ดร.จงรักษ์ หงษ์งาม</b></span></div>
-  <div class="status"><span class="chip acc"><i></i>แบบสอบถาม IOC ฉบับที่ 1.4</span><span class="chip warn"><i></i>อยู่ระหว่างยื่นคณะกรรมการจริยธรรมฯ</span><span class="chip">ยังไม่เริ่มเก็บข้อมูล</span></div>
-  <div class="cta"><a class="btn primary" href="survey/">ลองทำแบบสอบถาม (ตัวอย่าง)</a><a class="btn" href="field/">แผนที่ภาคสนาม</a></div>
-  <nav class="toc" aria-label="สารบัญ">
-    <a href="#intro"><span>01</span>บทนำ</a><a href="#lit"><span>02</span>ทบทวนวรรณกรรม</a><a href="#method"><span>03</span>ระเบียบวิธีวิจัย</a><a href="#tools"><span>04</span>เครื่องมือ</a><a href="#refs"><span>05</span>บรรณานุกรม</a>
-  </nav>
-</header>
+<section class="sec" id="survey">
+  <div class="shelf-head">
+    <h2 class="sh">แบบสอบถาม <span>ตอบได้บนมือถือ ใช้เวลาราว 30 นาที</span></h2>
+    <div class="shelf-nav"><button type="button" id="shL" aria-label="เลื่อนไปทางซ้าย">‹</button><button type="button" id="shR" aria-label="เลื่อนไปทางขวา">›</button></div>
+  </div>
+  <div style="display:flex;gap:6px;flex-wrap:wrap"><span class="chip warn"><i></i>โหมดตัวอย่าง · ไม่บันทึกคำตอบ</span><span class="chip">เปิดเก็บจริงหลังคณะกรรมการจริยธรรมฯ อนุมัติ</span></div>
+  <div class="shelf" id="shelf"></div>
+</section>
 
-<section class="s" id="intro">
-  <div class="sh"><span class="no">01</span><h2>บทนำ</h2></div>
+<section class="sec" id="intro">
+  <h2 class="sh">บทนำ <span>ทำไมผู้สมัครที่ช่วยเป็นรายครอบครัวจึงยังชนะ</span></h2>
   <div class="prose">
     <p>ในหลายพื้นที่ของภาคอีสาน การเลือก ส.ส. ไม่ได้ตัดสินกันด้วยนโยบายอย่างเดียว ผู้สมัครที่มีเครือข่ายในพื้นที่ ไปงานบุญ งานศพ ช่วยค่ารักษา หรือช่วยติดต่อราชการให้เป็นรายครอบครัว มักได้เปรียบ <span class="cite">(Callahan &amp; McCargo, 1996; Walker, 2008)</span> งานล่าสุดยังพบว่าผู้สมัครที่ “บ้านใหญ่” หนุนชนะการเลือกตั้งท้องถิ่นระดับจังหวัดได้ต่อเนื่อง <span class="cite">(Chambers &amp; Supajakwattana, 2025)</span> บุรีรัมย์เป็นจังหวัดที่มักถูกยกเป็นตัวอย่างของการเมืองแบบนี้ในภาคอีสาน</p>
     <p>คำอธิบายที่มีอยู่มองผ่านสองเลนส์หลัก เลนส์แรกเป็นเชิงโครงสร้าง ระบบอุปถัมภ์อยู่ได้เพราะนักการเมืองติดตามและให้รางวัลผู้สนับสนุนได้ <span class="cite">(Stokes, 2005)</span> หรือเพราะคำสัญญาเชิงนโยบายไม่น่าเชื่อถือ <span class="cite">(Keefer &amp; Vlaicu, 2008)</span> เลนส์ที่สองเป็นเชิงเศรษฐกิจ ครัวเรือนที่รายได้ไม่แน่นอนให้ค่ากับความช่วยเหลือที่ได้แน่นอนและได้ทันที เหมือนซื้อประกัน <span class="cite">(Rains &amp; Wibbels, 2023)</span></p>
-    <p>งานนี้เพิ่มเลนส์ที่สาม คือ<b>ความเชื่อของผู้เลือกตั้งเองว่าอะไรกำหนดชีวิต</b> Levenson <span class="cite">(1981)</span> แยกความเชื่อนี้เป็นสามด้านที่วัดแยกกัน ได้แก่ ภายในตน (I) ผู้มีอำนาจ (P) และโชค (C) ข้อเสนอหลักคือ คนที่เชื่อว่าชีวิตขึ้นกับผู้มีอำนาจ จะมองผู้สมัครที่มีเครือข่ายว่าเป็นช่องทางที่ใช้ได้จริง และมองนโยบายระยะยาวว่าเสี่ยง จึงเลือกฝั่งเครือข่ายมากกว่า ส่วนความเชื่อเรื่องโชคใช้เป็นตัวเทียบ เพื่อแยกว่าความสัมพันธ์มาจากความเชื่อเรื่อง “ผู้มีอำนาจ” จริง ไม่ใช่แค่ความรู้สึกว่าควบคุมชีวิตไม่ได้</p>
+    <p>งานนี้เพิ่มเลนส์ที่สาม คือ<b>ความเชื่อของผู้เลือกตั้งเองว่าอะไรกำหนดชีวิต</b> Levenson <span class="cite">(1981)</span> แยกความเชื่อนี้เป็นสามด้านที่วัดแยกกัน ได้แก่ ภายในตน (I) ผู้มีอำนาจ (P) และโชค (C) ข้อเสนอหลักคือ คนที่เชื่อว่าชีวิตขึ้นกับผู้มีอำนาจ จะมองผู้สมัครที่มีเครือข่ายว่าเป็นช่องทางที่ใช้ได้จริง และมองนโยบายระยะยาวว่าเสี่ยง จึงเลือกฝั่งเครือข่ายมากกว่า ส่วนความเชื่อเรื่องโชคใช้เป็นตัวเทียบ เพื่อแยกว่าความสัมพันธ์มาจากความเชื่อเรื่องผู้มีอำนาจจริง ไม่ใช่แค่ความรู้สึกว่าควบคุมชีวิตไม่ได้</p>
   </div>
 
   <h3 class="sub">วัตถุประสงค์</h3>
   <ol class="obj">
-    <li>เพื่อระบุว่าผู้มีสิทธิเลือกตั้งในจังหวัดบุรีรัมย์ให้น้ำหนักระหว่างผู้สมัครที่อิงเครือข่าย (บ้านใหญ่) กับผู้สมัครที่อิงนโยบายอย่างไร</li>
-    <li>เพื่อจำแนกความภักดีต่อเครือข่ายออกจากการประเมินความเสี่ยงของนโยบาย ในฐานะกลไกที่อธิบายการเลือกผู้สมัคร</li>
-    <li>เพื่อศึกษาความสัมพันธ์ระหว่างการรับรู้แหล่งที่มาของการควบคุม มิติผู้มีอำนาจ (Powerful Others) กับรูปแบบการตัดสินใจดังกล่าว</li>
-    <li>เพื่อสำรวจเหตุผลเบื้องหลังรูปแบบการตัดสินใจดังกล่าวผ่านการสัมภาษณ์เชิงลึก (ระยะที่ 2)</li>
+    <li><b>1.1</b>เพื่อระบุว่าผู้มีสิทธิเลือกตั้งในจังหวัดบุรีรัมย์ให้น้ำหนักระหว่างผู้สมัครที่อิงเครือข่าย (บ้านใหญ่) กับผู้สมัครที่อิงนโยบายอย่างไร</li>
+    <li><b>1.2</b>เพื่อจำแนกความภักดีต่อเครือข่ายออกจากการประเมินความเสี่ยงของนโยบาย ในฐานะกลไกที่อธิบายการเลือกผู้สมัคร</li>
+    <li><b>1.3</b>เพื่อศึกษาความสัมพันธ์ระหว่างการรับรู้แหล่งที่มาของการควบคุม มิติผู้มีอำนาจ กับรูปแบบการตัดสินใจดังกล่าว</li>
+    <li><b>1.4</b>เพื่อสำรวจเหตุผลเบื้องหลังรูปแบบการตัดสินใจดังกล่าวผ่านการสัมภาษณ์เชิงลึก (ระยะที่ 2)</li>
   </ol>
 
   <h3 class="sub">สมมติฐาน</h3>
   <div class="tscroll"><table class="hyp">
     <thead><tr><th>รหัส</th><th>แบบจำลอง</th><th>ข้อความสมมติฐาน</th></tr></thead>
     <tbody>
-      <tr class="main"><td>H1a</td><td>logit (Y)</td><td>ผู้ที่มีความเชื่อมิติ Powerful Others สูงกว่า มีแนวโน้มเลือกผู้สมัครที่อิงเครือข่ายมากกว่า (β₁ &gt; 0)</td></tr>
+      <tr class="main"><td>H1a</td><td>โลจิต (Y)</td><td>ผู้ที่เชื่อเรื่องผู้มีอำนาจสูงกว่า มีแนวโน้มเลือกผู้สมัครที่อิงเครือข่ายมากกว่า (β₁ &gt; 0)</td></tr>
       <tr class="main"><td>H1b</td><td>Wald test</td><td>ความสัมพันธ์ดังกล่าวมาจากความเชื่อเรื่องผู้มีอำนาจ ไม่ใช่ความเชื่อเรื่องโชค (β₁ &gt; β₂)</td></tr>
-      <tr><td>H2</td><td>เชิงสำรวจ</td><td>ความสัมพันธ์ของ Powerful Others แรงขึ้นในกลุ่มที่เปราะบางทางเศรษฐกิจ (β₉ &gt; 0)</td></tr>
-      <tr><td>H3</td><td>OLS (zP)</td><td>ความเปราะบางทางเศรษฐกิจและความเป็นชนบทสัมพันธ์ทางบวกกับความเชื่อ Powerful Others</td></tr>
-      <tr><td>H4</td><td>logit (RiskAv)</td><td>ความเชื่อ Powerful Others สูง สัมพันธ์กับการเลือกผลประโยชน์ที่แน่นอน</td></tr>
-      <tr><td>H5</td><td>logit (NetRely)</td><td>ความเชื่อ Powerful Others สูง สัมพันธ์กับการพึ่งผู้นำท้องถิ่นเป็นทางแรก</td></tr>
-      <tr><td>H6</td><td>OLS (zServiceExp)</td><td>ความเชื่อ Powerful Others สูง สัมพันธ์กับการคาดหวังให้ ส.ส. ทำงานบริการพื้นที่ เมื่อควบคุมความรู้เรื่องหน้าที่ ส.ส.</td></tr>
+      <tr><td>H2</td><td>เชิงสำรวจ</td><td>ความสัมพันธ์ของความเชื่อเรื่องผู้มีอำนาจแรงขึ้นในกลุ่มที่เปราะบางทางเศรษฐกิจ (β₉ &gt; 0)</td></tr>
+      <tr><td>H3</td><td>OLS (zP)</td><td>ความเปราะบางทางเศรษฐกิจและความเป็นชนบทสัมพันธ์ทางบวกกับความเชื่อเรื่องผู้มีอำนาจ</td></tr>
+      <tr><td>H4</td><td>โลจิต (RiskAv)</td><td>ความเชื่อเรื่องผู้มีอำนาจสูง สัมพันธ์กับการเลือกผลประโยชน์ที่แน่นอน</td></tr>
+      <tr><td>H5</td><td>โลจิต (NetRely)</td><td>ความเชื่อเรื่องผู้มีอำนาจสูง สัมพันธ์กับการพึ่งผู้นำท้องถิ่นเป็นทางแรก</td></tr>
+      <tr><td>H6</td><td>OLS (zServiceExp)</td><td>ความเชื่อเรื่องผู้มีอำนาจสูง สัมพันธ์กับการคาดหวังให้ ส.ส. ทำงานบริการพื้นที่ เมื่อควบคุมความรู้เรื่องหน้าที่ ส.ส.</td></tr>
     </tbody></table></div>
   <p class="small muted">ทุกสมมติฐานทดสอบความสัมพันธ์ ไม่ใช่ความเป็นเหตุเป็นผล</p>
 
@@ -186,43 +267,42 @@ footer{margin-top:56px;padding-top:18px;border-top:1px solid var(--line);font-si
 <path class="e mod" d="M250 54 C 340 100, 400 150, 452 180" marker-end="url(#arY)"/><text class="lab" x="330" y="128" style="fill:var(--tb)">H2</text>
 <text class="note" x="20" y="350">ตัวแปรควบคุม: อายุ · เพศ · การศึกษา · ความสำคัญของปัญหา · ความอดทนรอ · ประเภท อปท. · วิธีตอบ · อำเภอ</text>
 </svg></div>
-    <figcaption>กรอบแนวคิด เส้นทึบสีน้ำเงินคือคำถามหลัก (H1a, H1b) เส้นประสีเหลืองคือปฏิสัมพันธ์เชิงสำรวจ (H2) เส้นประสีเทาคือกลไกที่ตรวจในการวิเคราะห์คู่ผู้สมัคร</figcaption>
+    <figcaption>กรอบแนวคิด เส้นทึบสีน้ำตาลคือคำถามหลัก (H1a, H1b) เส้นประสีเหลืองคือปฏิสัมพันธ์เชิงสำรวจ (H2) เส้นประสีเทาคือกลไกที่ตรวจจากคู่ผู้สมัคร</figcaption>
   </figure>
 </section>
 
-<section class="s" id="lit">
-  <div class="sh"><span class="no">02</span><h2>ทบทวนวรรณกรรม</h2></div>
-  <p class="prose muted">งาน 14 ชิ้นที่ใช้รองรับข้อคำถามในแบบสอบถาม จัดตามประเด็น ตัวเลขมุมขวาคือจำนวนข้อคำถามหรือตัวแปรที่อ้างงานนั้นในเอกสาร IOC ลิงก์ DOI พาไปหน้าต้นฉบับ บางชิ้นมีฉบับที่อ่านได้ฟรีแยกไว้</p>
-  <div class="lit" id="litlist"></div>
+<section class="sec" id="lit">
+  <h2 class="sh">ทบทวนวรรณกรรม <span>งาน 14 ชิ้นที่รองรับข้อคำถาม</span></h2>
+  <div class="folders" id="folders"></div>
 </section>
 
-<section class="s" id="method">
-  <div class="sh"><span class="no">03</span><h2>ระเบียบวิธีวิจัย</h2></div>
-  <div class="prose"><p>งานวิจัยแบบผสานวิธีที่ทำควบคู่กัน (concurrent mixed methods) ส่วนเชิงปริมาณเป็นการสำรวจที่มีการทดลองเลือกผู้สมัครสมมติฝังอยู่ ส่วนเชิงคุณภาพเป็นการสัมภาษณ์เชิงลึกผู้ตอบบางส่วนที่ยินดีให้ติดต่อ</p></div>
+<section class="sec" id="method">
+  <h2 class="sh">ระเบียบวิธีวิจัย <span>สำรวจก่อน แล้วคุยลึกกับผู้ที่ยินดี</span></h2>
+  <div class="prose"><p>งานวิจัยแบบผสานวิธีที่ทำควบคู่กัน ส่วนเชิงปริมาณเป็นการสำรวจที่มีการเลือกผู้สมัครสมมติฝังอยู่ ส่วนเชิงคุณภาพเป็นการสัมภาษณ์เชิงลึกผู้ตอบบางส่วนที่ยินดีให้ติดต่อ</p></div>
   <div class="phase">
-    <div><span class="k">ระยะที่ 1 · เชิงปริมาณ</span><b>สำรวจด้วยแบบสอบถาม 7 ส่วน</b><p>สัมภาษณ์ตัวต่อตัวหรือตอบเอง ณ ตลาด จุดรวมตัวของชุมชน และการเยี่ยมครัวเรือน ใช้ตอบวัตถุประสงค์ข้อ 1–3</p></div>
-    <div><span class="k">ระยะที่ 2 · เชิงคุณภาพ</span><b>สัมภาษณ์เชิงลึก</b><p>ผู้ตอบที่ยินดี (ข้อ 75) ติดต่อกลับเองผ่านบัตรติดต่อ ระบบไม่บันทึกเบอร์โทรศัพท์ ใช้ตอบวัตถุประสงค์ข้อ 4</p></div>
+    <div><span class="k">ระยะที่ 1 · เชิงปริมาณ</span><b>สำรวจด้วยแบบสอบถาม 7 ส่วน</b><p>สัมภาษณ์ตัวต่อตัวหรือตอบเอง ณ ตลาด จุดรวมตัวของชุมชน และการเยี่ยมครัวเรือน ใช้ตอบวัตถุประสงค์ข้อ 1.1–1.3</p></div>
+    <div><span class="k">ระยะที่ 2 · เชิงคุณภาพ</span><b>สัมภาษณ์เชิงลึก</b><p>ผู้ตอบที่ยินดี (ข้อ 75) ติดต่อกลับเองผ่านบัตรติดต่อ ระบบไม่บันทึกเบอร์โทรศัพท์ ใช้ตอบวัตถุประสงค์ข้อ 1.4</p></div>
   </div>
 
   <h3 class="sub">พื้นที่และการจัดสรรตัวอย่าง</h3>
   <div class="mapwrap">
-    <figure><svg class="minimap" viewBox="14 17 971 1100" role="img" aria-label="แผนที่ 4 อำเภอที่ศึกษาในจังหวัดบุรีรัมย์"><path class="ctx" d="M147.7,1087.0L153.4,1045.7L221.5,1015.9L229.4,1005.7L278.0,925.1L325.2,944.0L332.5,954.7L332.2,1036.1L309.2,1059.0L324.6,1068.9L360.8,1068.4L358.0,1105.5L353.9,1132.0L351.6,1135.2L137.3,1135.2L147.7,1087.0ZM490.2,1127.2L505.6,1135.2L485.7,1135.2L490.2,1127.2Z"/><path class="ctx" d="M611.8,968.9L618.2,980.2L616.2,1001.6L602.6,1003.7L598.1,1015.4L576.2,1030.4L569.5,1023.9L566.5,1027.2L543.0,997.4L501.3,988.6L486.1,978.2L466.3,941.1L465.6,917.3L451.1,902.2L449.9,889.3L475.2,831.4L502.7,812.1L499.9,795.6L513.2,780.0L570.1,747.3L576.3,736.8L560.0,716.3L558.6,701.8L572.9,685.9L585.1,680.9L591.2,666.6L608.8,637.2L615.7,616.0L610.4,578.8L635.1,573.7L644.2,555.3L701.0,526.1L725.1,529.1L746.6,513.7L790.6,526.1L806.8,522.8L804.8,535.1L823.3,529.9L824.2,540.9L812.9,542.1L807.9,568.8L822.3,558.1L827.1,562.9L799.7,593.0L804.9,599.8L820.3,601.3L831.3,613.2L835.4,623.1L826.9,638.0L813.3,648.8L799.6,643.2L797.7,648.6L803.1,648.9L794.3,662.3L789.4,675.7L780.7,684.3L805.4,700.0L805.3,706.4L799.3,703.5L796.0,708.2L810.9,718.3L796.1,724.6L807.9,731.3L794.2,739.2L791.0,749.8L798.9,755.5L801.0,766.9L807.6,774.4L800.4,779.2L803.5,792.8L791.4,808.1L770.0,807.1L767.5,813.8L773.7,816.8L765.7,831.7L774.7,836.9L768.3,844.6L753.6,843.0L760.2,849.0L738.7,869.2L745.7,875.2L736.5,876.1L734.7,891.0L715.9,896.0L703.8,918.0L685.0,924.5L692.9,932.5L686.9,937.8L672.3,931.2L655.8,939.9L651.8,952.1L655.9,956.1L646.7,957.3L647.6,964.2L641.2,959.1L638.8,967.5L625.3,969.1L616.9,963.9L611.8,968.9Z"/><path class="ctx" d="M12.4,1107.0L5.8,1073.8L10.7,1068.2L25.8,1074.6L21.0,1096.0L38.1,1099.9L72.5,1090.5L97.2,1038.1L111.8,987.7L131.0,1002.9L130.8,1036.6L152.2,1047.8L147.7,1087.0L137.3,1135.2L0.0,1135.2L0.0,1107.1L12.4,1107.0Z"/><path class="ctx" d="M275.0,516.3L261.9,518.8L217.1,500.1L203.9,516.3L181.6,524.8L214.2,426.8L235.1,402.7L213.6,394.9L202.4,399.2L185.9,399.6L149.5,370.9L145.4,323.7L153.1,306.9L142.4,292.6L160.2,264.1L138.8,232.0L143.4,218.8L139.1,200.0L182.9,168.4L184.0,143.4L157.4,140.7L142.0,127.1L137.8,100.0L146.9,90.9L147.6,100.6L158.6,94.8L156.1,77.7L164.8,76.5L163.5,67.5L175.2,63.3L172.1,76.7L179.8,82.0L178.4,67.6L182.7,66.0L189.7,72.4L186.1,78.2L195.2,84.7L206.7,65.2L223.3,61.5L215.6,57.9L219.0,52.5L223.5,53.5L236.2,62.2L245.6,51.3L261.2,40.3L267.6,47.3L271.1,29.6L282.1,30.3L284.2,37.5L277.8,45.4L286.1,57.0L292.8,44.5L293.5,58.8L300.8,67.6L305.5,60.9L327.0,65.9L321.7,54.7L335.4,59.1L338.2,49.4L345.9,63.4L331.3,76.8L354.9,91.7L354.8,99.6L344.0,103.4L349.9,110.3L347.6,123.0L323.9,132.5L295.0,164.7L270.0,254.0L247.8,271.7L246.2,292.2L246.5,327.0L267.1,327.1L317.0,302.4L328.9,303.4L325.5,323.6L344.7,329.2L378.4,329.7L393.9,338.3L386.1,392.0L420.2,437.1L418.0,464.5L411.0,476.0L398.2,489.0L387.3,487.9L379.8,490.3L376.1,485.3L354.7,486.7L334.0,479.5L327.0,479.6L318.1,496.0L295.9,492.9L275.0,516.3Z"/><path class="ctx" d="M86.2,867.9L89.7,897.1L84.4,928.6L91.8,950.4L70.2,939.0L30.9,944.6L31.3,932.3L24.4,921.4L20.6,903.6L12.5,892.6L6.4,896.2L0.0,884.8L0.0,445.1L18.0,449.0L60.9,410.8L90.0,414.2L90.1,423.3L97.2,418.4L117.9,422.1L128.3,415.2L158.2,407.9L169.4,387.8L185.9,399.6L202.4,399.2L213.6,394.9L235.1,402.7L214.2,426.8L181.6,524.8L189.1,552.3L196.2,559.1L194.6,582.0L198.8,583.8L192.6,620.4L214.8,655.2L187.0,697.8L174.3,747.8L113.4,782.0L100.7,787.1L92.8,799.1L94.7,826.0L86.2,867.9Z"/><path class="ctx" d="M72.5,1090.5L38.1,1099.9L21.0,1096.0L25.8,1074.6L10.7,1068.2L5.8,1073.8L12.4,1107.0L0.0,1107.1L0.9,884.2L6.4,896.2L12.5,892.6L20.6,903.6L24.4,921.4L31.3,932.3L30.9,944.6L70.2,939.0L91.8,950.4L93.0,969.1L111.8,987.7L97.2,1038.1L72.5,1090.5Z"/><path class="ctx" d="M499.9,795.6L502.7,812.1L475.2,831.4L430.9,805.9L430.9,775.7L410.7,758.1L422.5,733.9L422.1,720.1L436.3,709.6L444.0,679.6L468.5,660.5L466.6,652.0L472.9,625.1L478.6,616.3L488.7,625.1L527.8,624.1L549.7,633.8L549.7,594.9L569.2,569.5L567.5,529.4L649.3,535.8L664.5,545.4L644.2,555.3L635.1,573.7L610.4,578.8L615.7,616.0L608.8,637.2L591.2,666.6L585.1,680.9L572.9,685.9L558.6,701.8L560.0,716.3L576.3,736.8L570.1,747.3L513.2,780.0L499.9,795.6Z"/><path class="ctx" d="M353.9,1132.0L358.0,1105.5L360.8,1068.4L324.6,1068.9L309.2,1059.0L332.2,1036.1L332.5,954.7L342.9,962.0L363.1,961.2L412.3,971.0L448.7,995.3L501.3,988.6L543.0,997.4L566.5,1027.2L554.1,1038.2L555.9,1053.5L579.2,1056.5L591.9,1071.2L586.4,1103.1L579.5,1100.7L583.9,1123.5L575.1,1135.2L505.6,1135.2L490.2,1127.2L485.7,1135.2L351.6,1135.2L353.9,1132.0Z"/><path class="ctx" d="M236.2,62.2L223.5,53.5L219.0,52.5L199.8,28.4L196.2,5.3L186.1,8.4L182.2,0.0L364.9,0.0L366.6,7.9L358.9,9.6L354.2,22.1L365.6,49.4L357.1,62.2L345.9,63.4L338.2,49.4L335.4,59.1L321.7,54.7L327.0,65.9L305.5,60.9L300.8,67.6L293.5,58.8L292.8,44.5L286.1,57.0L277.8,45.4L284.2,37.5L282.1,30.3L271.1,29.6L267.6,47.3L261.2,40.3L245.6,51.3L236.2,62.2Z"/><path class="st" d="M569.2,569.5L549.7,594.9L549.7,633.8L527.8,624.1L488.7,625.1L478.6,616.3L471.8,586.9L393.8,576.2L386.6,562.1L387.3,487.9L398.2,489.0L411.0,476.0L418.0,464.5L420.2,437.1L386.1,392.0L393.9,338.3L425.2,344.0L427.0,373.9L444.3,399.2L452.1,434.7L557.7,473.5L545.4,505.8L565.6,515.0L569.2,569.5Z" fill="color-mix(in oklab, var(--tb) 70%, var(--surface))"/><path class="st" d="M514.1,210.2L513.0,219.8L524.6,218.0L529.7,226.6L532.3,216.2L537.4,222.5L538.6,232.1L534.8,228.7L527.6,235.8L530.2,240.6L518.9,243.8L520.3,251.1L506.1,247.4L508.1,239.3L487.7,239.5L492.0,244.6L487.8,252.8L493.0,252.7L487.8,260.3L491.5,321.8L490.4,332.1L482.0,338.5L425.2,344.0L393.9,338.3L378.4,329.7L344.7,329.2L325.5,323.6L328.9,303.4L317.0,302.4L267.1,327.1L246.5,327.0L246.2,292.2L247.8,271.7L270.0,254.0L295.0,164.7L323.9,132.5L347.6,123.0L349.9,110.3L344.0,103.4L354.8,99.6L354.9,91.7L364.4,91.5L370.5,102.6L396.1,103.2L392.5,93.1L398.6,87.4L410.3,100.4L403.5,120.2L413.8,132.7L416.1,126.5L422.7,128.2L422.8,136.9L413.6,140.7L425.7,145.3L423.9,157.2L435.9,158.4L428.8,162.4L428.5,174.7L445.9,158.5L455.5,164.3L457.9,153.9L465.1,153.3L483.5,160.8L481.0,167.1L469.2,167.0L476.8,174.7L482.4,199.5L487.3,199.6L489.2,189.3L497.0,193.6L503.9,188.5L501.5,205.3L513.2,199.4L520.5,207.9L514.1,210.2Z" fill="color-mix(in oklab, var(--ao) 70%, var(--surface))"/><path class="st" d="M152.2,1047.8L130.8,1036.6L131.0,1002.9L111.8,987.7L93.0,969.1L91.8,950.4L84.4,928.6L89.7,897.1L86.2,867.9L94.7,826.0L92.8,799.1L100.7,787.1L113.4,782.0L174.3,747.8L187.0,697.8L214.8,655.2L192.6,620.4L198.8,583.8L194.6,582.0L196.2,559.1L189.1,552.3L181.6,524.8L203.9,516.3L217.1,500.1L261.9,518.8L275.0,516.3L295.9,492.9L318.1,496.0L327.0,479.6L334.0,479.5L354.7,486.7L376.1,485.3L379.8,490.3L387.3,487.9L386.6,562.1L393.8,576.2L471.8,586.9L478.6,616.3L472.9,625.1L466.6,652.0L468.5,660.5L444.0,679.6L436.3,709.6L422.1,720.1L422.5,733.9L410.7,758.1L430.9,775.7L430.9,805.9L475.2,831.4L449.9,889.3L451.1,902.2L465.6,917.3L466.3,941.1L486.1,978.2L501.3,988.6L448.7,995.3L412.3,971.0L363.1,961.2L342.9,962.0L332.5,954.7L325.2,944.0L278.0,925.1L229.4,1005.7L221.5,1015.9L153.4,1045.7L152.2,1047.8Z" fill="color-mix(in oklab, var(--nk) 70%, var(--surface))"/><path class="st" d="M567.5,529.4L565.6,515.0L545.4,505.8L557.7,473.5L452.1,434.7L444.3,399.2L427.0,373.9L425.2,344.0L482.0,338.5L490.4,332.1L491.5,321.8L487.8,260.3L493.0,252.7L487.8,252.8L492.0,244.6L487.7,239.5L508.1,239.3L506.1,247.4L520.3,251.1L518.9,243.8L530.2,240.6L527.6,235.8L534.8,228.7L538.6,232.1L537.4,222.5L549.0,226.0L559.3,219.4L562.9,229.2L556.7,241.8L570.8,230.9L580.2,236.2L578.7,226.7L593.5,223.9L595.7,231.4L607.3,227.3L601.0,240.8L611.3,252.9L624.8,244.1L635.7,223.3L650.2,224.2L646.1,211.7L654.6,211.6L661.5,201.9L668.7,206.4L667.0,197.2L682.3,200.6L686.6,187.9L697.3,192.8L695.9,183.0L713.9,185.6L711.5,195.7L732.0,194.4L748.0,212.9L752.6,202.9L764.0,203.0L765.7,209.7L748.7,220.3L773.8,239.0L782.2,230.0L788.0,236.2L792.8,227.2L799.8,227.2L808.2,239.7L808.1,222.7L818.2,218.6L813.4,209.5L816.6,201.8L822.9,199.3L827.3,207.4L838.8,201.7L826.4,194.3L835.1,186.2L847.2,199.0L858.4,193.4L869.2,196.9L873.3,208.0L865.3,216.5L872.5,224.0L886.1,223.5L889.7,234.3L897.7,226.2L905.7,239.5L912.6,230.9L913.8,241.4L904.9,253.2L915.6,262.3L894.0,263.8L881.2,258.3L876.1,272.4L867.4,269.1L866.1,280.4L855.5,277.5L850.3,300.9L854.3,311.9L843.4,316.5L826.5,304.8L827.0,312.0L834.7,314.4L820.7,329.8L815.9,353.6L819.9,365.8L807.8,377.9L818.6,383.9L815.9,389.5L803.2,386.0L795.3,392.7L793.1,413.7L808.5,422.6L797.2,444.7L809.5,456.7L797.1,468.2L809.3,483.1L802.3,486.5L803.3,495.6L815.1,510.7L806.8,522.8L790.6,526.1L746.6,513.7L725.1,529.1L701.0,526.1L664.5,545.4L649.3,535.8L567.5,529.4Z" fill="color-mix(in oklab, var(--mg) 70%, var(--surface))"/><text x="479.8" y="481.9">บ้านด่าน</text><text class="n" x="479.8" y="525.9">n=34</text><text x="397.6" y="213.2">แคนดง</text><text class="n" x="397.6" y="257.2">n=36</text><text x="280.6" y="766.9">เมือง</text><text class="n" x="280.6" y="810.9">n=247</text><text x="622" y="359.7">สตึก</text><text class="n" x="622" y="403.7">n=123</text></svg>
+    <figure><svg class="minimap" viewBox="14 17 971 1100" role="img" aria-label="แผนที่ 4 อำเภอที่ศึกษาในจังหวัดบุรีรัมย์"><path class="ctx" d="M147.7,1087.0L153.4,1045.7L221.5,1015.9L229.4,1005.7L278.0,925.1L325.2,944.0L332.5,954.7L332.2,1036.1L309.2,1059.0L324.6,1068.9L360.8,1068.4L358.0,1105.5L353.9,1132.0L351.6,1135.2L137.3,1135.2L147.7,1087.0ZM490.2,1127.2L505.6,1135.2L485.7,1135.2L490.2,1127.2Z"/><path class="ctx" d="M611.8,968.9L618.2,980.2L616.2,1001.6L602.6,1003.7L598.1,1015.4L576.2,1030.4L569.5,1023.9L566.5,1027.2L543.0,997.4L501.3,988.6L486.1,978.2L466.3,941.1L465.6,917.3L451.1,902.2L449.9,889.3L475.2,831.4L502.7,812.1L499.9,795.6L513.2,780.0L570.1,747.3L576.3,736.8L560.0,716.3L558.6,701.8L572.9,685.9L585.1,680.9L591.2,666.6L608.8,637.2L615.7,616.0L610.4,578.8L635.1,573.7L644.2,555.3L701.0,526.1L725.1,529.1L746.6,513.7L790.6,526.1L806.8,522.8L804.8,535.1L823.3,529.9L824.2,540.9L812.9,542.1L807.9,568.8L822.3,558.1L827.1,562.9L799.7,593.0L804.9,599.8L820.3,601.3L831.3,613.2L835.4,623.1L826.9,638.0L813.3,648.8L799.6,643.2L797.7,648.6L803.1,648.9L794.3,662.3L789.4,675.7L780.7,684.3L805.4,700.0L805.3,706.4L799.3,703.5L796.0,708.2L810.9,718.3L796.1,724.6L807.9,731.3L794.2,739.2L791.0,749.8L798.9,755.5L801.0,766.9L807.6,774.4L800.4,779.2L803.5,792.8L791.4,808.1L770.0,807.1L767.5,813.8L773.7,816.8L765.7,831.7L774.7,836.9L768.3,844.6L753.6,843.0L760.2,849.0L738.7,869.2L745.7,875.2L736.5,876.1L734.7,891.0L715.9,896.0L703.8,918.0L685.0,924.5L692.9,932.5L686.9,937.8L672.3,931.2L655.8,939.9L651.8,952.1L655.9,956.1L646.7,957.3L647.6,964.2L641.2,959.1L638.8,967.5L625.3,969.1L616.9,963.9L611.8,968.9Z"/><path class="ctx" d="M12.4,1107.0L5.8,1073.8L10.7,1068.2L25.8,1074.6L21.0,1096.0L38.1,1099.9L72.5,1090.5L97.2,1038.1L111.8,987.7L131.0,1002.9L130.8,1036.6L152.2,1047.8L147.7,1087.0L137.3,1135.2L0.0,1135.2L0.0,1107.1L12.4,1107.0Z"/><path class="ctx" d="M275.0,516.3L261.9,518.8L217.1,500.1L203.9,516.3L181.6,524.8L214.2,426.8L235.1,402.7L213.6,394.9L202.4,399.2L185.9,399.6L149.5,370.9L145.4,323.7L153.1,306.9L142.4,292.6L160.2,264.1L138.8,232.0L143.4,218.8L139.1,200.0L182.9,168.4L184.0,143.4L157.4,140.7L142.0,127.1L137.8,100.0L146.9,90.9L147.6,100.6L158.6,94.8L156.1,77.7L164.8,76.5L163.5,67.5L175.2,63.3L172.1,76.7L179.8,82.0L178.4,67.6L182.7,66.0L189.7,72.4L186.1,78.2L195.2,84.7L206.7,65.2L223.3,61.5L215.6,57.9L219.0,52.5L223.5,53.5L236.2,62.2L245.6,51.3L261.2,40.3L267.6,47.3L271.1,29.6L282.1,30.3L284.2,37.5L277.8,45.4L286.1,57.0L292.8,44.5L293.5,58.8L300.8,67.6L305.5,60.9L327.0,65.9L321.7,54.7L335.4,59.1L338.2,49.4L345.9,63.4L331.3,76.8L354.9,91.7L354.8,99.6L344.0,103.4L349.9,110.3L347.6,123.0L323.9,132.5L295.0,164.7L270.0,254.0L247.8,271.7L246.2,292.2L246.5,327.0L267.1,327.1L317.0,302.4L328.9,303.4L325.5,323.6L344.7,329.2L378.4,329.7L393.9,338.3L386.1,392.0L420.2,437.1L418.0,464.5L411.0,476.0L398.2,489.0L387.3,487.9L379.8,490.3L376.1,485.3L354.7,486.7L334.0,479.5L327.0,479.6L318.1,496.0L295.9,492.9L275.0,516.3Z"/><path class="ctx" d="M86.2,867.9L89.7,897.1L84.4,928.6L91.8,950.4L70.2,939.0L30.9,944.6L31.3,932.3L24.4,921.4L20.6,903.6L12.5,892.6L6.4,896.2L0.0,884.8L0.0,445.1L18.0,449.0L60.9,410.8L90.0,414.2L90.1,423.3L97.2,418.4L117.9,422.1L128.3,415.2L158.2,407.9L169.4,387.8L185.9,399.6L202.4,399.2L213.6,394.9L235.1,402.7L214.2,426.8L181.6,524.8L189.1,552.3L196.2,559.1L194.6,582.0L198.8,583.8L192.6,620.4L214.8,655.2L187.0,697.8L174.3,747.8L113.4,782.0L100.7,787.1L92.8,799.1L94.7,826.0L86.2,867.9Z"/><path class="ctx" d="M72.5,1090.5L38.1,1099.9L21.0,1096.0L25.8,1074.6L10.7,1068.2L5.8,1073.8L12.4,1107.0L0.0,1107.1L0.9,884.2L6.4,896.2L12.5,892.6L20.6,903.6L24.4,921.4L31.3,932.3L30.9,944.6L70.2,939.0L91.8,950.4L93.0,969.1L111.8,987.7L97.2,1038.1L72.5,1090.5Z"/><path class="ctx" d="M499.9,795.6L502.7,812.1L475.2,831.4L430.9,805.9L430.9,775.7L410.7,758.1L422.5,733.9L422.1,720.1L436.3,709.6L444.0,679.6L468.5,660.5L466.6,652.0L472.9,625.1L478.6,616.3L488.7,625.1L527.8,624.1L549.7,633.8L549.7,594.9L569.2,569.5L567.5,529.4L649.3,535.8L664.5,545.4L644.2,555.3L635.1,573.7L610.4,578.8L615.7,616.0L608.8,637.2L591.2,666.6L585.1,680.9L572.9,685.9L558.6,701.8L560.0,716.3L576.3,736.8L570.1,747.3L513.2,780.0L499.9,795.6Z"/><path class="ctx" d="M353.9,1132.0L358.0,1105.5L360.8,1068.4L324.6,1068.9L309.2,1059.0L332.2,1036.1L332.5,954.7L342.9,962.0L363.1,961.2L412.3,971.0L448.7,995.3L501.3,988.6L543.0,997.4L566.5,1027.2L554.1,1038.2L555.9,1053.5L579.2,1056.5L591.9,1071.2L586.4,1103.1L579.5,1100.7L583.9,1123.5L575.1,1135.2L505.6,1135.2L490.2,1127.2L485.7,1135.2L351.6,1135.2L353.9,1132.0Z"/><path class="ctx" d="M236.2,62.2L223.5,53.5L219.0,52.5L199.8,28.4L196.2,5.3L186.1,8.4L182.2,0.0L364.9,0.0L366.6,7.9L358.9,9.6L354.2,22.1L365.6,49.4L357.1,62.2L345.9,63.4L338.2,49.4L335.4,59.1L321.7,54.7L327.0,65.9L305.5,60.9L300.8,67.6L293.5,58.8L292.8,44.5L286.1,57.0L277.8,45.4L284.2,37.5L282.1,30.3L271.1,29.6L267.6,47.3L261.2,40.3L245.6,51.3L236.2,62.2Z"/><path class="st" d="M569.2,569.5L549.7,594.9L549.7,633.8L527.8,624.1L488.7,625.1L478.6,616.3L471.8,586.9L393.8,576.2L386.6,562.1L387.3,487.9L398.2,489.0L411.0,476.0L418.0,464.5L420.2,437.1L386.1,392.0L393.9,338.3L425.2,344.0L427.0,373.9L444.3,399.2L452.1,434.7L557.7,473.5L545.4,505.8L565.6,515.0L569.2,569.5Z" fill="color-mix(in oklab, #c9971e 70%, var(--surface))"/><path class="st" d="M514.1,210.2L513.0,219.8L524.6,218.0L529.7,226.6L532.3,216.2L537.4,222.5L538.6,232.1L534.8,228.7L527.6,235.8L530.2,240.6L518.9,243.8L520.3,251.1L506.1,247.4L508.1,239.3L487.7,239.5L492.0,244.6L487.8,252.8L493.0,252.7L487.8,260.3L491.5,321.8L490.4,332.1L482.0,338.5L425.2,344.0L393.9,338.3L378.4,329.7L344.7,329.2L325.5,323.6L328.9,303.4L317.0,302.4L267.1,327.1L246.5,327.0L246.2,292.2L247.8,271.7L270.0,254.0L295.0,164.7L323.9,132.5L347.6,123.0L349.9,110.3L344.0,103.4L354.8,99.6L354.9,91.7L364.4,91.5L370.5,102.6L396.1,103.2L392.5,93.1L398.6,87.4L410.3,100.4L403.5,120.2L413.8,132.7L416.1,126.5L422.7,128.2L422.8,136.9L413.6,140.7L425.7,145.3L423.9,157.2L435.9,158.4L428.8,162.4L428.5,174.7L445.9,158.5L455.5,164.3L457.9,153.9L465.1,153.3L483.5,160.8L481.0,167.1L469.2,167.0L476.8,174.7L482.4,199.5L487.3,199.6L489.2,189.3L497.0,193.6L503.9,188.5L501.5,205.3L513.2,199.4L520.5,207.9L514.1,210.2Z" fill="color-mix(in oklab, #6a9447 70%, var(--surface))"/><path class="st" d="M152.2,1047.8L130.8,1036.6L131.0,1002.9L111.8,987.7L93.0,969.1L91.8,950.4L84.4,928.6L89.7,897.1L86.2,867.9L94.7,826.0L92.8,799.1L100.7,787.1L113.4,782.0L174.3,747.8L187.0,697.8L214.8,655.2L192.6,620.4L198.8,583.8L194.6,582.0L196.2,559.1L189.1,552.3L181.6,524.8L203.9,516.3L217.1,500.1L261.9,518.8L275.0,516.3L295.9,492.9L318.1,496.0L327.0,479.6L334.0,479.5L354.7,486.7L376.1,485.3L379.8,490.3L387.3,487.9L386.6,562.1L393.8,576.2L471.8,586.9L478.6,616.3L472.9,625.1L466.6,652.0L468.5,660.5L444.0,679.6L436.3,709.6L422.1,720.1L422.5,733.9L410.7,758.1L430.9,775.7L430.9,805.9L475.2,831.4L449.9,889.3L451.1,902.2L465.6,917.3L466.3,941.1L486.1,978.2L501.3,988.6L448.7,995.3L412.3,971.0L363.1,961.2L342.9,962.0L332.5,954.7L325.2,944.0L278.0,925.1L229.4,1005.7L221.5,1015.9L153.4,1045.7L152.2,1047.8Z" fill="color-mix(in oklab, #8a5a44 70%, var(--surface))"/><path class="st" d="M567.5,529.4L565.6,515.0L545.4,505.8L557.7,473.5L452.1,434.7L444.3,399.2L427.0,373.9L425.2,344.0L482.0,338.5L490.4,332.1L491.5,321.8L487.8,260.3L493.0,252.7L487.8,252.8L492.0,244.6L487.7,239.5L508.1,239.3L506.1,247.4L520.3,251.1L518.9,243.8L530.2,240.6L527.6,235.8L534.8,228.7L538.6,232.1L537.4,222.5L549.0,226.0L559.3,219.4L562.9,229.2L556.7,241.8L570.8,230.9L580.2,236.2L578.7,226.7L593.5,223.9L595.7,231.4L607.3,227.3L601.0,240.8L611.3,252.9L624.8,244.1L635.7,223.3L650.2,224.2L646.1,211.7L654.6,211.6L661.5,201.9L668.7,206.4L667.0,197.2L682.3,200.6L686.6,187.9L697.3,192.8L695.9,183.0L713.9,185.6L711.5,195.7L732.0,194.4L748.0,212.9L752.6,202.9L764.0,203.0L765.7,209.7L748.7,220.3L773.8,239.0L782.2,230.0L788.0,236.2L792.8,227.2L799.8,227.2L808.2,239.7L808.1,222.7L818.2,218.6L813.4,209.5L816.6,201.8L822.9,199.3L827.3,207.4L838.8,201.7L826.4,194.3L835.1,186.2L847.2,199.0L858.4,193.4L869.2,196.9L873.3,208.0L865.3,216.5L872.5,224.0L886.1,223.5L889.7,234.3L897.7,226.2L905.7,239.5L912.6,230.9L913.8,241.4L904.9,253.2L915.6,262.3L894.0,263.8L881.2,258.3L876.1,272.4L867.4,269.1L866.1,280.4L855.5,277.5L850.3,300.9L854.3,311.9L843.4,316.5L826.5,304.8L827.0,312.0L834.7,314.4L820.7,329.8L815.9,353.6L819.9,365.8L807.8,377.9L818.6,383.9L815.9,389.5L803.2,386.0L795.3,392.7L793.1,413.7L808.5,422.6L797.2,444.7L809.5,456.7L797.1,468.2L809.3,483.1L802.3,486.5L803.3,495.6L815.1,510.7L806.8,522.8L790.6,526.1L746.6,513.7L725.1,529.1L701.0,526.1L664.5,545.4L649.3,535.8L567.5,529.4Z" fill="color-mix(in oklab, #23847a 70%, var(--surface))"/><text x="479.8" y="481.9">บ้านด่าน</text><text class="n" x="479.8" y="525.9">n=34</text><text x="397.6" y="213.2">แคนดง</text><text class="n" x="397.6" y="257.2">n=36</text><text x="280.6" y="766.9">เมือง</text><text class="n" x="280.6" y="810.9">n=247</text><text x="622" y="359.7">สตึก</text><text class="n" x="622" y="403.7">n=123</text></svg>
       <figcaption>4 อำเภอที่ศึกษา (สี) ท่ามกลางอำเภออื่นของจังหวัด (เทา) ตัวเลขคือจำนวนตัวอย่างที่เก็บตามแผนหลัก</figcaption></figure>
     <div style="display:grid;gap:10px">
       <div class="tscroll"><table>
-        <thead><tr><th>อำเภอ</th><th class="r">ผู้มีอายุ 18+</th><th class="r">สัดส่วน</th><th class="r">อปท.</th><th class="r">เก็บ (440)</th></tr></thead>
-        <tbody><tr><td><span class="sw" style="background:var(--nk)"></span>เมืองบุรีรัมย์</td><td class="r num">176,877</td><td class="r num">56.0%</td><td class="r num">18</td><td class="r num"><b>247</b></td></tr><tr><td><span class="sw" style="background:var(--mg)"></span>สตึก</td><td class="r num">88,078</td><td class="r num">27.9%</td><td class="r num">13</td><td class="r num"><b>123</b></td></tr><tr><td><span class="sw" style="background:var(--tb)"></span>บ้านด่าน</td><td class="r num">24,718</td><td class="r num">7.8%</td><td class="r num">4</td><td class="r num"><b>34</b></td></tr><tr><td><span class="sw" style="background:var(--ao)"></span>แคนดง</td><td class="r num">25,917</td><td class="r num">8.2%</td><td class="r num">5</td><td class="r num"><b>36</b></td></tr><tr><td><b>รวม</b></td><td class="r num"><b>315,590</b></td><td class="r num">100%</td><td class="r num">40</td><td class="r num"><b>440</b></td></tr></tbody>
+        <thead><tr><th>อำเภอ</th><th class="r">ผู้มีอายุ 18 ปีขึ้นไป</th><th class="r">สัดส่วน</th><th class="r">อปท.</th><th class="r">เก็บ (440)</th></tr></thead>
+        <tbody><tr><td><span class="sw" style="background:#8a5a44"></span>เมืองบุรีรัมย์</td><td class="r num">176,877</td><td class="r num">56.0%</td><td class="r num">18</td><td class="r num"><b>247</b></td></tr><tr><td><span class="sw" style="background:#23847a"></span>สตึก</td><td class="r num">88,078</td><td class="r num">27.9%</td><td class="r num">13</td><td class="r num"><b>123</b></td></tr><tr><td><span class="sw" style="background:#c9971e"></span>บ้านด่าน</td><td class="r num">24,718</td><td class="r num">7.8%</td><td class="r num">4</td><td class="r num"><b>34</b></td></tr><tr><td><span class="sw" style="background:#6a9447"></span>แคนดง</td><td class="r num">25,917</td><td class="r num">8.2%</td><td class="r num">5</td><td class="r num"><b>36</b></td></tr><tr><td><b>รวม</b></td><td class="r num"><b>315,590</b></td><td class="r num">100%</td><td class="r num">40</td><td class="r num"><b>440</b></td></tr></tbody>
       </table></div>
-      <p class="small muted">ประชากรจากสถิติทะเบียนราษฎร กรมการปกครอง ธ.ค. 2568 จัดสรรตามสัดส่วน (largest remainder) ลงสี่ช่อง Gen Z/Gen อื่น × ชาย/หญิง ในแต่ละอำเภอ แล้วกระจายลง อปท. ทุกแห่งตามสัดส่วน รายละเอียดราย อปท. อยู่ใน<a href="field/">แผนที่ภาคสนาม</a></p>
+      <p class="small muted">ประชากรจากสถิติทะเบียนราษฎร กรมการปกครอง ธ.ค. 2568 จัดสรรตามสัดส่วนลงสี่ช่อง Gen Z/Gen อื่น × ชาย/หญิง ในแต่ละอำเภอ แล้วกระจายลง อปท. ทุกแห่งตามสัดส่วน รายละเอียดราย อปท. อยู่ใน<a href="field/">แผนที่ภาคสนาม</a></p>
     </div>
   </div>
 
   <h3 class="sub">ขนาดตัวอย่าง</h3>
-  <div class="prose"><p>ใช้สูตรของ Cochran ปรับด้วยประชากรจำกัด (p = 0.5) เป็นสูตรหลัก n₀ = z²p(1−p)/e² ที่ความเชื่อมั่น 95% และคลาดเคลื่อน ±5% ได้ 384 คน ตรงกับตารางของ Krejcie &amp; Morgan (1970) แผนเก็บเผื่อแบบสอบถามที่ใช้ไม่ได้ราว 10%</p></div>
+  <div class="prose"><p>ใช้สูตรของ Cochran ปรับด้วยประชากรจำกัด (p = 0.5) เป็นสูตรหลัก ที่ความเชื่อมั่น 95% และคลาดเคลื่อน ±5% ได้ 384 คน ตรงกับตารางของ Krejcie และ Morgan (1970) แผนเก็บเผื่อแบบสอบถามที่ใช้ไม่ได้ราว 10%</p></div>
   <div class="tiers">
-    <div class="tier"><span class="eyebrow">ต่ำสุด</span><span class="big">271 <small>ใช้ได้ · เก็บ 300</small></span><p>Cochran ความเชื่อมั่น 90% ใช้เมื่อเก็บไม่ทัน</p></div>
-    <div class="tier main"><span class="eyebrow">แผนหลัก</span><span class="big">400 <small>ใช้ได้ · เก็บ 440</small></span><p>Cochran / Krejcie &amp; Morgan 95% (384) ปัดขึ้น</p></div>
-    <div class="tier"><span class="eyebrow">สูงสุด</span><span class="big">800 <small>ใช้ได้ · เก็บ 880</small></span><p>power ≥ 0.80 สำหรับ H1a, H3–H6 (จำลอง) ส่วน H1b ต้องการราว 860 แบบทางเดียว</p></div>
+    <div class="tier"><span class="eb">ต่ำสุด</span><span class="bign">271 <small>ใช้ได้ · เก็บ 300</small></span><p>Cochran ความเชื่อมั่น 90% ใช้เมื่อเก็บไม่ทัน</p></div>
+    <div class="tier main"><span class="eb">แผนหลัก</span><span class="bign">400 <small>ใช้ได้ · เก็บ 440</small></span><p>Cochran และ Krejcie &amp; Morgan ที่ 95% (384) ปัดขึ้น</p></div>
+    <div class="tier"><span class="eb">สูงสุด</span><span class="bign">800 <small>ใช้ได้ · เก็บ 880</small></span><p>อำนาจการทดสอบ ≥ 0.80 สำหรับ H1a และ H3–H6 ส่วน H1b ต้องการราว 860 คน</p></div>
   </div>
 
   <h3 class="sub">แบบสอบถาม</h3>
@@ -239,18 +319,14 @@ footer{margin-top:56px;padding-top:18px;border-top:1px solid var(--line);font-si
     </tbody></table></div>
   <div class="notice acc small">ข้อห้ามที่ใช้ตลอดแบบสอบถาม: <b>ไม่ถามและไม่บันทึกว่าผู้ตอบลงคะแนนให้ผู้สมัครหรือพรรคใด</b> พรรคในคู่ผู้สมัครเป็นพรรคสมมติ A–D ข้อ 43 ใช้ได้เมื่อคณะกรรมการจริยธรรมฯ อนุมัติแล้วเท่านั้น</div>
 
-  <h3 class="sub">การเลือกผู้สมัครสมมติ (conjoint)</h3>
-  <div class="grid2">
-    <div class="card" style="display:grid;gap:8px"><b>แบบที่ 1 · 7 คู่ตายตัว (IOC v1.4)</b><p class="small muted">แต่ละคู่ต่างกันในคุณลักษณะที่ออกแบบไว้ คู่ที่ 1 ให้ตัวแปรตามหลัก Y (เครือข่าย = 1) คู่ที่ 2–7 แยกกลไก: บุญคุณ ความแน่นอน คู่ตรวจความตั้งใจ เงินรายครอบครัวกับโครงการส่วนรวม ความช่วยเหลือแบบมีเงื่อนไข และการตามตัวบุคคลเมื่อย้ายพรรค สลับซ้ายขวา (ชุด A/B) และลำดับคู่ 2–6</p></div>
-    <div class="card" style="display:grid;gap:8px"><b>แบบที่ 2 · สุ่มคุณลักษณะทั้งหมด</b><p class="small muted">ทุกคู่สุ่มอาชีพ ประสบการณ์การเมือง ครอบครัว บทบาทในชุมชน ความสัมพันธ์กับครอบครัวผู้ตอบ ข้อเสนอ วงเงิน ระยะเวลา และความแน่นอนใหม่ วิเคราะห์ด้วย AMCE (Hainmueller และคณะ, 2014) มีข้อจำกัดการสุ่ม 2 ข้อเพื่อความสมจริง: ข้อเสนอแบบช่วยเงินได้ผลทันทีเสมอ และผู้เคยดำรงตำแหน่งต้องมีบทบาทในชุมชน <b>ถ้าใช้แบบนี้เก็บจริง ต้องแก้ IOC โครงร่าง และ EC ให้ตรงกัน</b></p></div>
-  </div>
-  <p class="small muted">ทั้งสองแบบใช้ภาพผู้สมัครวาดขึ้นใหม่ หน้าตาสองคนในคู่ต่างกัน (ผิวสว่างหนึ่งคน ผิวเข้มหนึ่งคน) แต่สุ่มว่าหน้าไหนได้โปรไฟล์ไหน และบันทึกลักษณะภาพไว้กับคำตอบ เพื่อไม่ให้หน้าตาปนกับผลของข้อเสนอ เสื้อผ้าใช้สีกลาง ไม่ตรงกับสีพรรคจริง</p>
+  <h3 class="sub">การเลือกผู้สมัครสมมติ</h3>
+  <div class="prose"><p>ผู้ตอบเลือกผู้สมัคร 7 คู่ที่กำหนดไว้ตายตัวตาม IOC ฉบับที่ 1.4 คู่ที่ 1 ให้ตัวแปรตามหลัก Y (เลือกฝั่งเครือข่าย = 1) คู่ที่ 2–7 แยกกลไกทีละเรื่อง ได้แก่ บุญคุณ ความแน่นอน คู่ตรวจความตั้งใจ เงินรายครอบครัวกับโครงการส่วนรวม ความช่วยเหลือแบบมีเงื่อนไข และการตามตัวบุคคลเมื่อย้ายพรรค ชุด A/B สลับซ้ายขวา และสลับลำดับคู่ที่ 2–6 เพื่อไม่ให้ตำแหน่งหรือลำดับบิดผล ภาพผู้สมัครวาดจากตัวละครในสไลด์ของผู้วิจัย และบันทึกลักษณะภาพไว้กับคำตอบ</p></div>
 
   <h3 class="sub">แบบจำลองหลัก</h3>
   <div class="eq">ln[P/(1−P)] = β<sub>0</sub> + <span class="b1">β<sub>1</sub>zP</span> + β<sub>2</sub>zC + β<sub>3</sub>zI + β<sub>4</sub>zPrec + β<sub>5</sub>LocalGov + β<sub>6</sub>NetRely + β<sub>7</sub>zComm + β<sub>8</sub>Insur<br>
     &nbsp;&nbsp;&nbsp;&nbsp;+ β<sub>9</sub>(zP × zPrec) + β<sub>10</sub>RiskAv + β<sub>11</sub>zProgEff + γ<sub>1</sub>zAge + γ<sub>2</sub>Female + γ<sub>3</sub>zSalience<br>
     &nbsp;&nbsp;&nbsp;&nbsp;+ γ<sub>4</sub>Impatient + γ<sub>5</sub>Educ + Σλ·Mode + Σδ·District</div>
-  <div class="prose small"><p>P คือความน่าจะเป็นที่ผู้ตอบเลือกผู้สมัครที่อิงเครือข่ายในคู่ที่ 1 ตัวแปรที่ขึ้นต้นด้วย z แปลงเป็นค่ามาตรฐาน (ค่าเฉลี่ย 0 ส่วนเบี่ยงเบนมาตรฐาน 1) เพื่อเทียบขนาดสัมประสิทธิ์ข้ามตัวแปรได้ ความคลาดเคลื่อนมาตรฐานจัดกลุ่มตาม อปท. (cluster-robust) H1b ทดสอบ β₁ = β₂ ด้วย Wald test</p></div>
+  <div class="prose small"><p>P คือความน่าจะเป็นที่ผู้ตอบเลือกผู้สมัครที่อิงเครือข่ายในคู่ที่ 1 ตัวแปรที่ขึ้นต้นด้วย z แปลงเป็นค่ามาตรฐาน (ค่าเฉลี่ย 0 ส่วนเบี่ยงเบนมาตรฐาน 1) เพื่อเทียบขนาดสัมประสิทธิ์ข้ามตัวแปรได้ ความคลาดเคลื่อนมาตรฐานจัดกลุ่มตาม อปท. และทดสอบ H1b ด้วย Wald test</p></div>
 
   <h3 class="sub">จริยธรรมการวิจัย</h3>
   <ul class="prose" style="padding-left:20px;margin:0;display:grid;gap:6px">
@@ -259,65 +335,175 @@ footer{margin-top:56px;padding-top:18px;border-top:1px solid var(--line);font-si
     <li>นำเสนอผลในภาพรวมระดับอำเภอ ไม่นำเสนอรายบุคคลหรือรายหมู่บ้าน</li>
     <li>ยังไม่ติดต่อหรือเก็บข้อมูลจากอาสาสมัครจนกว่าคณะกรรมการจริยธรรมการวิจัยในมนุษย์จะอนุมัติ</li>
   </ul>
+
+  <a class="toolcard" href="field/" style="margin-top:12px">
+    <svg width="56" height="56" viewBox="0 0 100 100" aria-hidden="true"><rect x="8" y="8" width="84" height="84" rx="22" fill="var(--s-yellow)"/><circle cx="50" cy="44" r="14" fill="var(--ink)"/><path d="M50 84 L36 52 H64 Z" fill="var(--ink)"/><circle cx="50" cy="44" r="6" fill="var(--s-yellow)"/></svg>
+    <div><h3 style="font-size:1.2rem">แผนที่ภาคสนาม</h3><p>โควตาราย อปท. ทั้ง 40 แห่ง สามระดับขนาดตัวอย่าง ซูมและเจาะจากอำเภอลง อปท. ได้</p></div>
+    <span class="btn">เปิดแผนที่</span>
+  </a>
 </section>
 
-<section class="s" id="tools">
-  <div class="sh"><span class="no">04</span><h2>เครื่องมือ</h2></div>
-  <div class="tools">
-    <a class="tool" href="survey/"><span class="chip warn" style="justify-self:start"><i></i>โหมดตัวอย่าง</span><h3>แบบสอบถามออนไลน์</h3><p>ทำได้ครบ 7 ส่วน รวมคู่ผู้สมัครที่สุ่มคุณลักษณะได้ และเห็นคะแนนความเชื่อ I · P · C ของตัวเองทันทีเมื่อจบ ข้อความรู้เรื่องหน้าที่ ส.ส. ไม่แสดงเฉลย ระบบไม่บันทึกคำตอบจนกว่า EC อนุมัติ</p><span class="go">เปิดแบบสอบถาม →</span></a>
-    <a class="tool" href="field/"><span class="chip" style="justify-self:start">40 อปท. · 39 ตำบล</span><h3>แผนที่ภาคสนาม</h3><p>โควตาราย อปท. สามระดับขนาดตัวอย่าง ซูมและเจาะจากอำเภอลง อปท. ได้ ตำบลที่มี 2 อปท. และวิธีเก็บตามประเภทพื้นที่</p><span class="go">เปิดแผนที่ →</span></a>
-  </div>
-</section>
-
-<section class="s" id="refs">
-  <div class="sh"><span class="no">05</span><h2>บรรณานุกรม</h2></div>
+<section class="sec" id="refs">
+  <h2 class="sh">บรรณานุกรม</h2>
   <ol class="refs" id="reflist"></ol>
 </section>
 
 <footer>
-  <p>เนื้อหาในหน้านี้เป็นโครงร่างที่อยู่ระหว่างพิจารณาของอาจารย์ที่ปรึกษา ผู้ทรงคุณวุฒิ (IOC) และคณะกรรมการจริยธรรมฯ อาจเปลี่ยนแปลงได้</p>
+  <p>เนื้อหาในหน้านี้เป็นโครงร่างที่อยู่ระหว่างพิจารณาของอาจารย์ที่ปรึกษา ผู้ทรงคุณวุฒิ และคณะกรรมการจริยธรรมฯ อาจเปลี่ยนแปลงได้ รูปทรงและป้ายบนปกเป็นภาพประกอบ ไม่ได้แทนพรรคการเมืองใด</p>
   <p class="num">ปรับปรุงล่าสุด 27 ตุลาคม 2569</p>
 </footer>
 </main>
+
 <script>
+/* ---------- cover table ---------- */
+(function(){
+  const table=document.getElementById("table"), cloth=document.getElementById("cloth"), hand=document.getElementById("hand");
+  const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+  // big title: overlap graphemes like the slide's stacked letters
+  const seg=window.Intl&&Intl.Segmenter?new Intl.Segmenter("th",{granularity:"grapheme"}):null;
+  document.querySelectorAll("#bigtitle .ln").forEach(l=>{const t=l.textContent;l.setAttribute("aria-hidden","true");l.innerHTML=(seg?[...seg.segment(t)].map(x=>x.segment):[...t]).map(g=>`<span class="g">${g}</span>`).join("");});
+  document.getElementById("bigtitle").setAttribute("aria-label","การรับรู้แหล่งที่มาของการควบคุม");
+
+  const scallop=(()=>{let d="";for(let i=0;i<=120;i++){const a=i/120*Math.PI*2,r=43+4.5*Math.cos(a*12);d+=(i?"L":"M")+(50+r*Math.cos(a)).toFixed(1)+" "+(50+r*Math.sin(a)).toFixed(1)}return d+"Z"})();
+  const SH={
+    yellow:`<rect x="6" y="6" width="88" height="88" rx="22" fill="var(--s-yellow)"/>`,
+    pink:`<path d="M50 8 C58 33 67 42 92 50 C67 58 58 67 50 92 C42 67 33 58 8 50 C33 42 42 33 50 8Z" fill="var(--s-pink)" stroke="var(--s-pink)" stroke-width="10" stroke-linejoin="round"/>`,
+    blue:`<path d="${scallop}" fill="var(--s-blue)"/>`,
+    red:`<circle cx="50" cy="50" r="46" fill="var(--s-red)"/>`,
+    orange:`<path d="M50 12 L90 84 L10 84 Z" fill="var(--s-orange)" stroke="var(--s-orange)" stroke-width="14" stroke-linejoin="round"/>`,
+    dgreen:`<rect x="4" y="8" width="74" height="44" rx="22" fill="var(--s-dgreen)"/><rect x="22" y="48" width="74" height="44" rx="22" fill="var(--s-dgreen)"/>`,
+    green:`<g fill="var(--s-green)"><circle cx="31" cy="31" r="25"/><circle cx="69" cy="31" r="25"/><circle cx="31" cy="69" r="25"/><circle cx="69" cy="69" r="25"/><rect x="25" y="25" width="50" height="50"/></g>`,
+    navy:`<path d="M50 6 L88 28 L88 72 L50 94 L12 72 L12 28 Z" fill="var(--s-navy)" stroke="var(--s-navy)" stroke-width="10" stroke-linejoin="round"/>`,
+  };
+  const NAME={yellow:"สี่เหลี่ยมสีเหลือง",pink:"ดาวสีชมพู",blue:"วงหยักสีฟ้า",red:"วงกลมสีแดง",orange:"สามเหลี่ยมสีส้ม",dgreen:"รูปทรงสีเขียวเข้ม",green:"ใบโคลเวอร์สีเขียว",navy:"หกเหลี่ยมสีน้ำเงิน"};
+  // generic policy issues (the issue list of item 16), not any party's branded policy
+  const TAGS=[["ค่าครองชีพและราคาสินค้า","yellow"],["พักหนี้ครัวเรือน","red"],["แหล่งน้ำและชลประทาน","blue"],["เบี้ยผู้สูงอายุ","pink"],["ราคาผลผลิตเกษตร","orange"],["การรักษาพยาบาล","dgreen"],["งานในพื้นที่","green"],["ถนน ไฟฟ้า น้ำประปา","navy"]];
+  // layout as fractions of the table [x, y, rotation, size] — desktop mirrors the slide; phone keeps pieces under the title
+  const LAYOUT={
+    wide:{shapes:{yellow:[.01,.04,-14,.17],pink:[.17,-.06,16,.16],blue:[.14,.33,0,.15],red:[.0,.52,0,.14],orange:[.10,.70,-28,.15],dgreen:[.30,.66,22,.15],green:[.46,.62,0,.14],navy:[.63,.58,-20,.155]},
+      tags:[[.0,.27,-4],[.17,.6,-14],[.24,.5,-18],[.36,.40,-8],[.24,.92,8],[.30,.86,12],[.46,.92,-10],[.62,.92,14]]},
+    narrow:{shapes:{yellow:[.03,.02,-12,.22],pink:[.72,.0,14,.19],blue:[.40,.08,0,.2],red:[.03,.38,0,.2],orange:[.68,.30,-24,.2],dgreen:[.36,.40,20,.19],navy:[.6,.6,-18,.2]},
+      tags:[[.24,.29,-6],[.02,.58,8],[.40,.72,-8],[.50,.88,6],[.36,.04,-4]]},
+  };
+  const area=()=>{const r=table.getBoundingClientRect();const narrow=r.width<760;const title=document.querySelector(".titleblock");
+    const top=narrow?title.offsetHeight+28:0;return {w:r.width,h:r.height-top,top,narrow};};
+  const pieces=[];let z=10;
+  function make(){
+    pieces.forEach(p=>p.el.remove());pieces.length=0;
+    const A=area(), L=A.narrow?LAYOUT.narrow:LAYOUT.wide, base=Math.min(A.w,1400);
+    Object.entries(L.shapes).forEach(([k,[fx,fy,rot,sz]],i)=>{
+      const s=Math.round(base*sz*(A.narrow?1:.92));
+      const el=document.createElement("button");el.type="button";el.className="piece drop";el.style.width=el.style.height=s+"px";
+      el.innerHTML=`<svg viewBox="0 0 100 100" aria-hidden="true">${SH[k]}</svg>`;el.setAttribute("aria-label",NAME[k]+" ลากเพื่อย้าย กด Enter เพื่อเก็บ");el.style.animationDelay=(reduce?0:i*55)+"ms";
+      table.appendChild(el);pieces.push({el,x:fx*A.w,y:A.top+fy*A.h,r:rot,kind:"shape",key:k,label:NAME[k]});});
+    TAGS.slice(0,L.tags.length).forEach(([t,k],i)=>{const [fx,fy,rot]=L.tags[i];
+      const el=document.createElement("button");el.type="button";el.className="piece tag drop";
+      el.innerHTML=`<span>${t}</span><svg viewBox="0 0 100 100" aria-hidden="true">${SH[k]}</svg>`;el.setAttribute("aria-label","ป้ายนโยบาย "+t+" ลากเพื่อย้าย กด Enter เพื่อเก็บ");el.style.animationDelay=(reduce?0:(400+i*45))+"ms";
+      table.appendChild(el);pieces.push({el,x:fx*A.w,y:A.top+fy*A.h-20,r:rot,kind:"tag",key:k,label:t});});
+    pieces.forEach(p=>{p.el.style.zIndex=z++;place(p);bind(p);});
+    kept.clear();updateKept();
+    restHand();
+  }
+  function place(p){p.el.style.transform=`translate(${p.x}px,${p.y}px) rotate(${p.r}deg)${p.lift?" scale(1.06)":""}${p.inCloth?" scale(.5)":""}`;}
+  function restHand(){
+    const A=area(), w=hand.offsetWidth||380, h=w*618/624, nav=pieces.find(p=>p.key==="navy"&&p.kind==="shape");
+    const hl=A.w-w+2, ht=A.top+A.h*(A.narrow?.58:.62)-h*.5;
+    hand.style.left=hl+"px";hand.style.top=ht+"px";hand.classList.remove("away");
+    if(nav){const s=nav.el.offsetWidth;nav.x=hl+w*.19-s*.62;nav.y=ht+h*.73-s*.52;place(nav);}
+  }
+  const clothRect=()=>cloth.getBoundingClientRect();
+  function overCloth(cx,cy){const r=clothRect();return cx>r.left+20&&cx<r.right-10&&cy>r.top+10&&cy<r.bottom;}
+  const kept=new Map();
+  function collect(p){
+    const tr=table.getBoundingClientRect(), r=clothRect();
+    p.inCloth=true;p.el.classList.add("in");
+    const n=kept.size;p.x=r.left-tr.left+40+(n%4)*52+Math.random()*10;p.y=r.top-tr.top+20+Math.floor(n/4)*40+Math.random()*8;p.r=(Math.random()-.5)*30;
+    place(p);kept.set(p.el,p);updateKept();setTimeout(()=>p.el.classList.remove("in"),520);
+  }
+  function release(p){
+    kept.delete(p.el);p.inCloth=false;const A=area();p.el.classList.add("in");
+    p.x=A.w*(.25+Math.random()*.4);p.y=A.top+A.h*(.25+Math.random()*.4);p.r=(Math.random()-.5)*24;place(p);updateKept();setTimeout(()=>p.el.classList.remove("in"),520);
+  }
+  function updateKept(){
+    const tags=[...kept.values()].filter(p=>p.kind==="tag").map(p=>p.label);
+    document.getElementById("clothCount").textContent=kept.size?`เก็บแล้ว ${kept.size} ชิ้น · แตะชิ้นบนผ้าเพื่อคืนกลับโต๊ะ`:"ลากรูปทรงหรือป้ายนโยบายมาวางเพื่อเก็บ";
+    const box=document.getElementById("kept");
+    if(tags.length){box.hidden=false;box.innerHTML=`<b>เรื่องที่คุณเก็บไว้</b><span>${tags.join(" · ")}</span><span class="muted">ในแบบสอบถาม ข้อ 16 เราจะถามว่าเรื่องไหนสำคัญกับครัวเรือนของคุณที่สุด</span><a href="survey/">เริ่มทำแบบสอบถาม →</a>`;}
+    else box.hidden=true;
+  }
+  function bind(p){
+    const el=p.el;let ox,oy,lx,ly,lt,vx=0,vy=0,moved=0,raf;
+    el.addEventListener("pointerdown",e=>{if(e.button)return;cancelAnimationFrame(raf);el.setPointerCapture(e.pointerId);el.style.zIndex=z++;
+      const tr=table.getBoundingClientRect();ox=e.clientX-tr.left-p.x;oy=e.clientY-tr.top-p.y;lx=e.clientX;ly=e.clientY;lt=performance.now();moved=0;
+      p.lift=true;el.classList.add("lift");p.r0=p.r;place(p);if(p.key==="navy"&&p.kind==="shape")hand.classList.add("away");});
+    el.addEventListener("pointermove",e=>{if(!p.lift)return;const tr=table.getBoundingClientRect(),now=performance.now(),dt=Math.max(8,now-lt);
+      vx=(e.clientX-lx)/dt*16;vy=(e.clientY-ly)/dt*16;moved+=Math.abs(e.clientX-lx)+Math.abs(e.clientY-ly);lx=e.clientX;ly=e.clientY;lt=now;
+      p.x=e.clientX-tr.left-ox;p.y=e.clientY-tr.top-oy;p.r=p.r0+Math.max(-12,Math.min(12,vx*1.2));place(p);
+      cloth.classList.toggle("hot",overCloth(e.clientX,e.clientY));});
+    const up=e=>{if(!p.lift)return;p.lift=false;el.classList.remove("lift");cloth.classList.remove("hot");
+      if(moved<6){ if(p.inCloth) release(p); else place(p); return; }      // a tap: on the cloth returns the piece
+      if(overCloth(e.clientX,e.clientY)){collect(p);return;}
+      if(p.inCloth){kept.delete(p.el);p.inCloth=false;updateKept();}
+      const A=area();
+      const glide=()=>{vx*=.9;vy*=.9;p.x+=vx;p.y+=vy;p.r=p.r0+(p.r-p.r0)*.88;
+        const W=el.offsetWidth,H=el.offsetHeight;
+        if(p.x<-W*.4||p.x>A.w-W*.6){vx*=-.5;p.x=Math.max(-W*.4,Math.min(A.w-W*.6,p.x));}
+        if(p.y<A.top-H*.3||p.y>A.top+A.h-H*.6){vy*=-.5;p.y=Math.max(A.top-H*.3,Math.min(A.top+A.h-H*.6,p.y));}
+        place(p);if(Math.abs(vx)+Math.abs(vy)>.3&&!reduce)raf=requestAnimationFrame(glide);};
+      glide();};
+    el.addEventListener("pointerup",up);el.addEventListener("pointercancel",up);
+    el.addEventListener("keydown",e=>{const d=e.shiftKey?40:12,m={ArrowLeft:[-d,0],ArrowRight:[d,0],ArrowUp:[0,-d],ArrowDown:[0,d]}[e.key];
+      if(m){e.preventDefault();p.x+=m[0];p.y+=m[1];place(p);}
+      if(e.key==="Enter"||e.key===" "){e.preventDefault();p.inCloth?release(p):collect(p);}});
+  }
+  document.getElementById("reset").onclick=make;
+  let rw=table.offsetWidth;addEventListener("resize",()=>{const w=table.offsetWidth;if(Math.abs(w-rw)>40){rw=w;make();}});
+  make();
+})();
+
+/* ---------- survey shelf ---------- */
+(function(){
+  const P=[["พื้นฐานและพื้นที่อาศัย","ข้อ 1–6","อายุ เพศ อำเภอที่อาศัย และสิทธิเลือกตั้งท้องถิ่น","yellow"],
+    ["เศรษฐกิจของครัวเรือน","ข้อ 7–14","อาชีพ รายได้ หนี้ และเหตุการณ์ที่ทำให้ขาดรายได้","red"],
+    ["การเมืองและผู้แทน","ข้อ 15–28","เรื่องที่อยากให้ ส.ส. แก้ และงานที่ ส.ส. ควรทำ","blue"],
+    ["เลือกผู้สมัครสมมติ","ข้อ 29–39","ผู้สมัคร 7 คู่ในเขตของท่าน ทุกพรรคเป็นพรรคสมมติ","pink"],
+    ["ความเสี่ยงและเวลา","ข้อ 40–43","เลือกระหว่างเงินที่ได้แน่นอนกับโอกาสได้มากกว่า","orange"],
+    ["ความเชื่อเรื่องชีวิต","ข้อ 44–67","24 ข้อ เห็นด้วยหรือไม่ แล้วรู้ผล I · P · C ตอนจบ","dgreen"],
+    ["ชุมชนของท่าน","ข้อ 68–75","คนในชุมชนพึ่งใครเวลาเดือดร้อน","green"]];
+  const ICO={yellow:'<rect x="6" y="6" width="88" height="88" rx="22" fill="var(--s-yellow)"/>',red:'<circle cx="50" cy="50" r="46" fill="var(--s-red)"/>',blue:'<circle cx="50" cy="50" r="44" fill="var(--s-blue)"/>',pink:'<path d="M50 8 C58 33 67 42 92 50 C67 58 58 67 50 92 C42 67 33 58 8 50 C33 42 42 33 50 8Z" fill="var(--s-pink)" stroke="var(--s-pink)" stroke-width="10" stroke-linejoin="round"/>',orange:'<path d="M50 12 L90 84 L10 84 Z" fill="var(--s-orange)" stroke="var(--s-orange)" stroke-width="14" stroke-linejoin="round"/>',dgreen:'<rect x="4" y="8" width="74" height="44" rx="22" fill="var(--s-dgreen)"/><rect x="22" y="48" width="74" height="44" rx="22" fill="var(--s-dgreen)"/>',green:'<g fill="var(--s-green)"><circle cx="31" cy="31" r="25"/><circle cx="69" cy="31" r="25"/><circle cx="31" cy="69" r="25"/><circle cx="69" cy="69" r="25"/><rect x="25" y="25" width="50" height="50"/></g>'};
+  const sh=document.getElementById("shelf");
+  sh.innerHTML=`<a class="pc start" href="survey/"><span class="k">7 ส่วน · 75 ข้อ</span><h3>เริ่มตอบตั้งแต่ต้น</h3><p>ไม่ต้องบอกชื่อ ข้ามข้อที่ไม่สบายใจได้ และไม่มีคำถามว่าท่านเลือกผู้สมัครหรือพรรคใด เมื่อจบจะเห็นคะแนนความเชื่อของตัวเองทันที</p><span class="btn">เริ่มทำแบบสอบถาม</span></a>`+
+    P.map(([t,r,d,k],i)=>`<a class="pc" href="survey/#p${i+1}"><svg class="ico" viewBox="0 0 100 100" aria-hidden="true">${ICO[k]}</svg><span class="k">ส่วนที่ ${i+1} · ${r}</span><h3>${t}</h3><p>${d}</p><span class="go">ดูส่วนนี้ ›</span></a>`).join("");
+  const step=()=>Math.min(sh.clientWidth*.8,620);
+  document.getElementById("shL").onclick=()=>sh.scrollBy({left:-step(),behavior:"smooth"});
+  document.getElementById("shR").onclick=()=>sh.scrollBy({left:step(),behavior:"smooth"});
+})();
+
+/* ---------- literature folders + references ---------- */
 const LIT = [{"k":"K2000","s":"Kitschelt (2000)","m":"งานเชิงแนวคิด นิยามความสัมพันธ์แบบอุปถัมภ์ (การแลกเปลี่ยนผลประโยชน์ทางวัตถุแบบมีเงื่อนไขที่มุ่งไปยังรายบุคคล) เทียบกับแบบนโยบาย (ชุดนโยบายที่ให้ประโยชน์ทั้งผู้สนับสนุนและผู้ไม่สนับสนุน) ไม่มีข้อมูลเชิงประจักษ์","ref":"Kitschelt, H. (2000). Linkages between citizens and politicians in democratic polities. *Comparative Political Studies, 33*(6–7), 845–879.","url":"https://doi.org/10.1177/001041400003300607","uses":9},{"k":"S2005","s":"Stokes (2005)","m":"แบบจำลองเชิงรูปนัยประกอบข้อมูลสำรวจผู้เลือกตั้งในอาร์เจนตินา พบว่ากลไกพรรคฝังตัวในเครือข่ายทางสังคมเพื่อคาดเดาการลงคะแนนของรายบุคคล และการซื้อเสียงได้ผลกับผู้มีรายได้น้อย","ref":"Stokes, S. C. (2005). Perverse accountability: A formal model of machine politics with evidence from Argentina. *American Political Science Review, 99*(3), 315–325.","url":"https://doi.org/10.1017/S0003055405051683","uses":4},{"k":"RW2023","s":"Rains & Wibbels (2023)","m":"สำรวจครัวเรือนในชุมชนแออัด 223 แห่งในอินเดีย ใช้ความเป็นแรงงานในระบบหรือนอกระบบ (job formality) อธิบายความชอบโครงการที่ส่งผ่านนายหน้าการเมือง พบว่าแรงงานในระบบชอบน้อยกว่า จึงตีความว่าระบบอุปถัมภ์ทำหน้าที่เป็นประกันนอกระบบ","ref":"Rains, E., & Wibbels, E. (2023). Informal work, risk, and clientelism: Evidence from 223 slums across India. *British Journal of Political Science, 53*(1), 1–24.","url":"https://doi.org/10.1017/S0007123422000011","uses":9},{"k":"GS2024","s":"Gherghina & Saikkonen (2024)","m":"การทดลองแบบ conjoint ในโรมาเนีย (เก็บข้อมูลปี 2021) ให้ผู้ตอบเลือกระหว่างผู้สมัครสมมติที่มีคุณลักษณะต่างกัน พบว่าผู้ตอบลงโทษผู้สมัครที่เสนอผลประโยชน์แบบอุปถัมภ์ ขนาดการลงโทษขึ้นกับวิธีเจาะจงผู้รับ และลดลงมากเมื่อผู้สมัครเป็นพรรคเดียวกับผู้ตอบ","ref":"Gherghina, S., & Saikkonen, I. (2024). Partisanship and tolerance for clientelism: Evidence from a conjoint experiment in Romania. *Political Studies, 72*(3), 1250–1266.","url":"https://doi.org/10.1177/00323217231178994","uses":8},{"k":"KT1979","s":"Kahneman & Tversky (1979)","m":"ให้ผู้ตอบเลือกระหว่างผลตอบแทนที่แน่นอนกับทางเลือกที่มีความน่าจะเป็น (hypothetical choice problems) พบว่าคนให้น้ำหนักผลที่แน่นอนสูงกว่าผลที่เป็นเพียงความน่าจะเป็น (certainty effect) และเลี่ยงความเสี่ยงในด้านได้","ref":"Kahneman, D., & Tversky, A. (1979). Prospect theory: An analysis of decision under risk. *Econometrica, 47*(2), 263–291.","url":"https://doi.org/10.2307/1914185","open":"https://www.fermatslibrary.com/s/prospect-theory-an-analysis-of-decision-under-risk","uses":3},{"k":"KV2008","s":"Keefer & Vlaicu (2008)","m":"แบบจำลองเชิงรูปนัยประกอบกรณีข้ามประเทศและเชิงประวัติศาสตร์ เมื่อนักการเมืองให้คำสัญญาที่น่าเชื่อถือกับผู้เลือกตั้งทั้งหมดไม่ได้ จะพึ่งผู้อุปถัมภ์ ทำให้การโอนผลประโยชน์เฉพาะกลุ่มเพิ่มขึ้นและสินค้าสาธารณะลดลง","ref":"Keefer, P., & Vlaicu, R. (2008). Democracy, credibility, and clientelism. *Journal of Law, Economics, and Organization, 24*(2), 371–406.","url":"https://doi.org/10.1093/jleo/ewm054","open":"https://openknowledge.worldbank.org/entities/publication/9fddb9d4-bce8-5f9b-a8b9-dfccc3ab717d/full","uses":3},{"k":"C2007","s":"Caplan (2007)","m":"เปรียบเทียบความเชื่อด้านเศรษฐกิจของประชาชนกับนักเศรษฐศาสตร์จากการสำรวจ Survey of Americans and Economists on the Economy พบว่าความเชื่อของผู้เลือกตั้งคลาดเคลื่อนอย่างเป็นระบบ ไม่ใช่สุ่ม","ref":"Caplan, B. (2007). *The myth of the rational voter: Why democracies choose bad policies*. Princeton University Press.","url":"https://press.princeton.edu/books/paperback/9780691138732/the-myth-of-the-rational-voter","uses":6},{"k":"R1966","s":"Rotter (1966)","m":"แบบวัด Internal–External (I–E) แบบบังคับเลือก แยกความเชื่อว่าผลที่เกิดขึ้นมาจากการกระทำของตนกับจากปัจจัยภายนอก แต่รวมโชคและผู้มีอำนาจไว้ในมิติภายนอกเดียวกัน","ref":"Rotter, J. B. (1966). Generalized expectancies for internal versus external control of reinforcement. *Psychological Monographs: General and Applied, 80*(1), 1–28.","url":"https://doi.org/10.1037/h0092976","uses":24},{"k":"L1981","s":"Levenson (1981)","m":"แบบวัด IPC 24 ข้อ แยกเป็นสามมิติ คือ Internality, Powerful Others และ Chance มิติละ 8 ข้อ ตอบแบบมาตรา −3 ถึง +3 ไม่มีจุดกึ่งกลาง บวก 24 ได้คะแนนมิติละ 0–48 ตรวจสอบกับกลุ่มนักศึกษา ผู้ป่วย และนักเคลื่อนไหวในสหรัฐอเมริกา","ref":"Levenson, H. (1981). Differentiating among internality, powerful others, and chance. In H. M. Lefcourt (Ed.), *Research with the locus of control construct* (Vol. 1, pp. 15–63). Academic Press.","url":"https://doi.org/10.1016/B978-0-12-443201-7.50006-3","uses":26},{"k":"HF2014","s":"Haushofer & Fehr (2014)","m":"บทความทบทวนหลักฐาน ความยากจนก่อให้เกิดความเครียดและอารมณ์ด้านลบ ซึ่งอาจนำไปสู่การตัดสินใจแบบมองระยะสั้นและหลีกเลี่ยงความเสี่ยง และผู้มีรายได้น้อยควบคุมสภาพชีวิตของตนได้น้อยกว่า","ref":"Haushofer, J., & Fehr, E. (2014). On the psychology of poverty. *Science, 344*(6186), 862–867.","url":"https://doi.org/10.1126/science.1232491","uses":6},{"k":"CM1996","s":"Callahan & McCargo (1996)","m":"การศึกษาภาคสนามการเลือกตั้ง ก.ค. 2538 ใน 6 จังหวัดภาคตะวันออกเฉียงเหนือ (สัมภาษณ์ผู้สมัคร ผู้จัดการหาเสียง หัวคะแนน ผู้เลือกตั้ง อาสาสมัครพอลวอทช์ และเจ้าหน้าที่รัฐ ร่วมกับการสังเกตการณ์)","ref":"Callahan, W. A., & McCargo, D. (1996). Vote-buying in Thailand's Northeast: The July 1995 general election. *Asian Survey, 36*(4), 376–392.","url":"https://doi.org/10.2307/2645405","open":"https://thaipolitics.leeds.ac.uk/wp-content/uploads/sites/87/2022/02/callahan-and-mccargo-as-1996_compressed.pdf","uses":17},{"k":"Ch2010","s":"Chattharakul (2010)","m":"สังเกตการณ์แบบมีส่วนร่วมในการหาเสียงของผู้สมัครหนึ่งรายในชานเมืองกรุงเทพฯ พบว่าเครือข่ายหัวคะแนนที่ตั้งอยู่บนความสัมพันธ์ส่วนตัวระยะยาวยังเป็นปัจจัยสำคัญที่สุดในการชนะ และอยู่ร่วมกับการตลาดการเมือง (political hybridisation)","ref":"Chattharakul, A. (2010). Thai electoral campaigning: Vote-canvassing networks and hybrid voting. *Journal of Current Southeast Asian Affairs, 29*(4), 67–95.","url":"https://doi.org/10.1177/186810341002900404","uses":4},{"k":"W2008","s":"Walker (2008)","m":"ชาติพันธุ์วรรณนาหมู่บ้านหนึ่งในเชียงใหม่ พ.ศ. 2546–2549 พบว่าผู้เลือกตั้งชนบทประเมินผู้สมัครด้วย “ธรรมนูญชนบท” คือ ความเป็นคนในพื้นที่ การดูแลเขตเลือกตั้ง และการบริหารที่เข้มแข็งโปร่งใส โดยเงินเป็นเพียงส่วนหนึ่งของความช่วยเหลือที่คาดหวัง","ref":"Walker, A. (2008). The rural constitution and the everyday politics of elections in Northern Thailand. *Journal of Contemporary Asia, 38*(1), 84–105.","url":"https://doi.org/10.1080/00472330701651978","open":"https://www.newmandala.org/wp-content/uploads/2008/07/walker-2008.pdf","uses":9},{"k":"CS2025","s":"Chambers & Supajakwattana (2025)","m":"วิเคราะห์ผลการเลือกตั้งนายกองค์การบริหารส่วนจังหวัด พ.ศ. 2567–2568 ในภาคเหนือตอนล่าง ผู้สมัครที่บ้านใหญ่สนับสนุนชนะทั้ง 9 จังหวัด และพรรคการเมืองได้ผลดีที่สุดเมื่อจับมือกับบ้านใหญ่","ref":"Chambers, P., & Supajakwattana, [อักษรย่อชื่อ]. (2025). [ชื่อบทความ]. *ISEAS Perspective*, 2025/28. ISEAS–Yusof Ishak Institute.","url":"https://www.iseas.edu.sg/wp-content/uploads/2025/03/ISEAS_Perspective_2025_28.pdf","uses":2}];
-const THEMES = [
-  ["แนวคิดระบบอุปถัมภ์", "ตัวแปรตามมาจากไหน", ["K2000", "S2005", "KV2008"]],
-  ["ความเสี่ยงและความเปราะบาง", "ทำไมความแน่นอนจึงมีค่า", ["RW2023", "KT1979", "HF2014"]],
-  ["ผู้เลือกตั้งและการทดลอง", "วิธีวัดและอคติในการตอบ", ["GS2024", "C2007"]],
-  ["การรับรู้แหล่งที่มาของการควบคุม", "ตัวแปรอิสระหลัก", ["R1966", "L1981"]],
-  ["บริบทการเมืองไทยและอีสาน", "ความสมจริงของโปรไฟล์และพื้นที่", ["CM1996", "W2008", "Ch2010", "CS2025"]],
-];
-const USE = {
-  K2000: "นิยามสองขั้วของตัวแปรตาม: ความช่วยเหลือรายบุคคลแบบมีเงื่อนไข เทียบนโยบายที่ให้ประโยชน์ส่วนรวม",
-  S2005: "กลไกที่ความช่วยเหลือผูกกับการสนับสนุน ใช้ออกแบบคู่ “ช่วยเฉพาะผู้สนับสนุน” และวัดรายได้",
-  KV2008: "ความน่าเชื่อถือของคำสัญญาเชิงนโยบาย ใช้วัด zProgEff และคู่ความแน่นอน",
-  RW2023: "รายได้ที่ผันผวนทำให้ระบบอุปถัมภ์เป็นเหมือนประกัน ใช้สร้าง zPrec และ H2",
-  KT1979: "รูปแบบโจทย์ผลแน่นอนเทียบผลที่มีความน่าจะเป็น ใช้ในข้อ 41 และคู่ที่ 3",
-  HF2014: "ความยากจนสัมพันธ์กับการรับรู้ว่าควบคุมชีวิตได้น้อย เป็นฐานของ H3",
-  GS2024: "ใช้ผู้สมัครสมมติวัดความยอมรับระบบอุปถัมภ์ และเหตุผลของคำถามฉายภาพข้อ 31ก",
-  C2007: "ความเชื่อของผู้เลือกตั้งคลาดเคลื่อนอย่างเป็นระบบ จึงแยกวัดความรู้เรื่องหน้าที่ ส.ส. (ข้อ 25–28)",
-  R1966: "แนวคิดความคาดหวังทั่วไปเรื่องการควบคุม ต้นทางของ locus of control",
-  L1981: "แบบวัด IPC 24 ข้อ สามมิติ I · P · C ใช้ทั้งส่วนที่ 6",
-  CM1996: "บุญคุณ เครือข่ายญาติ และงานบุญงานศพ ใช้สร้างโปรไฟล์ฝั่งเครือข่ายและคู่ที่ 2",
-  W2008: "“ธรรมนูญชนบท” ความคาดหวังต่อผู้แทนในพื้นที่ ใช้กับข้อ 19–24 และความเป็นชนบท",
-  Ch2010: "เครือข่ายหัวคะแนนอยู่ร่วมกับการตลาดของพรรค ใช้กับพื้นที่อาศัยและข้อ 39",
-  CS2025: "บ้านใหญ่ยังชนะในการเลือกตั้งล่าสุด ยืนยันว่าทางเลือกฝั่งเครือข่ายสมจริง",
-};
-const md = s => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/\*(.+?)\*/g, "<i>$1</i>");
-const by = Object.fromEntries(LIT.map(l => [l.k, l]));
-const incomplete = l => /\[[^\]]*\]/.test(l.ref);
-const cleanRef = l => md(l.ref.replace(/,? \[อักษรย่อชื่อ\]/, "").replace(/\[ชื่อบทความ\]\. /, ""));
-document.getElementById("litlist").innerHTML = THEMES.map(([t, sub, ks]) => `<div class="theme"><h3>${t} <small>${sub}</small></h3><div class="works">${ks.map(k => {
-  const l = by[k];
-  return `<article class="work"><div class="wh"><b>${md(l.s)}</b><span class="uses" title="จำนวนครั้งที่อ้างในเอกสาร IOC">${l.uses} ข้อ</span></div>
-    <p class="use">${USE[k]}</p><p class="m">${md(l.m)}</p>
-    <div class="links">${l.url ? `<a href="${l.url}" target="_blank" rel="noopener">${l.url.includes("doi.org") ? "DOI" : "ต้นฉบับ"} ↗</a>` : ""}${l.open ? `<a href="${l.open}" target="_blank" rel="noopener">ฉบับอ่านฟรี ↗</a>` : ""}${incomplete(l) ? `<span class="chip warn">บรรณานุกรมยังไม่ครบ</span>` : ""}</div></article>`;
-}).join("")}</div></div>`).join("");
-const extra = [{ ref: "Hainmueller, J., Hopkins, D. J., & Yamamoto, T. (2014). Causal inference in conjoint analysis: Understanding multidimensional choices via stated preference experiments. *Political Analysis, 22*(1), 1–30.", url: "https://doi.org/10.1093/pan/mpt024" },
-               { ref: "Krejcie, R. V., & Morgan, D. W. (1970). Determining sample size for research activities. *Educational and Psychological Measurement, 30*(3), 607–610.", url: "https://doi.org/10.1177/001316447003000308" }];
-const all = LIT.map(l => ({ ref: l.ref, url: l.url, inc: incomplete(l), l })).concat(extra).sort((a, b) => a.ref.localeCompare(b.ref, "en"));
-document.getElementById("reflist").innerHTML = all.map(r => `<li>${r.l ? cleanRef(r.l) : md(r.ref)} ${r.url ? `<a href="${r.url}" target="_blank" rel="noopener">${r.url.replace("https://", "")}</a>` : ""}${r.inc ? ` <span class="chip warn">ยังไม่ครบ</span>` : ""}</li>`).join("");
+(function(){
+  const THEMES=[["แนวคิดระบบอุปถัมภ์","ตัวแปรตามมาจากไหน",["K2000","S2005","KV2008"],"#5b3a2b"],
+    ["ความเสี่ยงและความเปราะบาง","ทำไมความแน่นอนจึงมีค่า",["RW2023","KT1979","HF2014"],"#2f5a4a"],
+    ["ผู้เลือกตั้งและการทดลอง","วิธีวัดและอคติในการตอบ",["GS2024","C2007"],"#6a5a8a"],
+    ["การรับรู้แหล่งที่มาของการควบคุม","ตัวแปรอิสระหลัก",["R1966","L1981"],"#5f7c8a"],
+    ["บริบทการเมืองไทยและอีสาน","ความสมจริงของโปรไฟล์และพื้นที่",["CM1996","W2008","Ch2010","CS2025"],"#8a5a2b"]];
+  const USE={K2000:"นิยามสองขั้วของตัวแปรตาม: ความช่วยเหลือรายบุคคลแบบมีเงื่อนไข เทียบนโยบายที่ให้ประโยชน์ส่วนรวม",S2005:"กลไกที่ความช่วยเหลือผูกกับการสนับสนุน ใช้ออกแบบคู่ “ช่วยเฉพาะผู้สนับสนุน” และวัดรายได้",KV2008:"ความน่าเชื่อถือของคำสัญญาเชิงนโยบาย ใช้วัด zProgEff และคู่ความแน่นอน",RW2023:"รายได้ที่ผันผวนทำให้ระบบอุปถัมภ์เป็นเหมือนประกัน ใช้สร้าง zPrec และ H2",KT1979:"รูปแบบโจทย์ผลแน่นอนเทียบผลที่มีความน่าจะเป็น ใช้ในข้อ 41 และคู่ที่ 3",HF2014:"ความยากจนสัมพันธ์กับการรับรู้ว่าควบคุมชีวิตได้น้อย เป็นฐานของ H3",GS2024:"ใช้ผู้สมัครสมมติวัดความยอมรับระบบอุปถัมภ์ และเหตุผลของคำถามฉายภาพข้อ 31ก",C2007:"ความเชื่อของผู้เลือกตั้งคลาดเคลื่อนอย่างเป็นระบบ จึงแยกวัดความรู้เรื่องหน้าที่ ส.ส. (ข้อ 25–28)",R1966:"แนวคิดความคาดหวังทั่วไปเรื่องการควบคุม ต้นทางของ locus of control",L1981:"แบบวัด IPC 24 ข้อ สามมิติ I · P · C ใช้ทั้งส่วนที่ 6",CM1996:"บุญคุณ เครือข่ายญาติ และงานบุญงานศพ ใช้สร้างโปรไฟล์ฝั่งเครือข่ายและคู่ที่ 2",W2008:"“ธรรมนูญชนบท” ความคาดหวังต่อผู้แทนในพื้นที่ ใช้กับข้อ 19–24 และความเป็นชนบท",Ch2010:"เครือข่ายหัวคะแนนอยู่ร่วมกับการตลาดของพรรค ใช้กับพื้นที่อาศัยและข้อ 39",CS2025:"บ้านใหญ่ยังชนะในการเลือกตั้งล่าสุด ยืนยันว่าทางเลือกฝั่งเครือข่ายสมจริง"};
+  const md=s=>s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/\*(.+?)\*/g,"<i>$1</i>");
+  const by=Object.fromEntries(LIT.map(l=>[l.k,l]));
+  const inc=l=>/\[[^\]]*\]/.test(l.ref);
+  const cleanRef=l=>md(l.ref.replace(/,? \[อักษรย่อชื่อ\]/,"").replace(/\[ชื่อบทความ\]\. /,""));
+  const F=document.getElementById("folders");
+  F.innerHTML=`<div class="ftabs" role="tablist" aria-label="ประเด็นวรรณกรรม">${THEMES.map(([t,,,c],i)=>`<button class="ftab" role="tab" id="ft${i}" aria-controls="fp${i}" aria-selected="${i===0}" style="--c:${c}">${t}</button>`).join("")}</div>`+
+    THEMES.map(([t,sub,ks,c],i)=>`<div class="fpanel" role="tabpanel" id="fp${i}" aria-labelledby="ft${i}" style="--c:${c}" ${i?"hidden":""}><p class="lead">${sub}</p>${ks.map(k=>{const l=by[k];
+      return `<div class="row"><div class="paper"><span class="tag">งานวิจัย</span><b>${md(l.s)}</b><span class="ref">${cleanRef(l)}</span><span class="uses">อ้างในเอกสาร IOC ${l.uses} ครั้ง</span></div>
+      <div class="find"><span class="tag">ข้อค้นพบ</span><p>${md(l.m)}</p><p class="use">${USE[k]}</p><div class="links">${l.url?`<a href="${l.url}" target="_blank" rel="noopener">${l.url.includes("doi.org")?"DOI":"ต้นฉบับ"} ↗</a>`:""}${l.open?`<a href="${l.open}" target="_blank" rel="noopener">ฉบับอ่านฟรี ↗</a>`:""}${inc(l)?`<span class="chip warn">บรรณานุกรมยังไม่ครบ</span>`:""}</div></div></div>`}).join("")}</div>`).join("");
+  const tabs=[...F.querySelectorAll(".ftab")];
+  tabs.forEach((b,i)=>b.onclick=()=>{tabs.forEach((x,j)=>{x.setAttribute("aria-selected",i===j);document.getElementById("fp"+j).hidden=i!==j;});});
+  F.querySelector(".ftabs").addEventListener("keydown",e=>{const i=tabs.indexOf(document.activeElement);if(i<0)return;const n=e.key==="ArrowRight"?i+1:e.key==="ArrowLeft"?i-1:null;if(n==null)return;const t=tabs[(n+tabs.length)%tabs.length];t.focus();t.click();});
+  const extra=[{ref:"Krejcie, R. V., & Morgan, D. W. (1970). Determining sample size for research activities. *Educational and Psychological Measurement, 30*(3), 607–610.",url:"https://doi.org/10.1177/001316447003000308"}];
+  const all=LIT.map(l=>({ref:l.ref,url:l.url,inc:inc(l),l})).concat(extra).sort((a,b)=>a.ref.localeCompare(b.ref,"en"));
+  document.getElementById("reflist").innerHTML=all.map(r=>`<li>${r.l?cleanRef(r.l):md(r.ref)} ${r.url?`<a href="${r.url}" target="_blank" rel="noopener">${r.url.replace("https://","")}</a>`:""}${r.inc?` <span class="chip warn">ยังไม่ครบ</span>`:""}</li>`).join("");
+})();
 </script>
 </body>
 </html>
