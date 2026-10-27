@@ -1,4 +1,4 @@
-/* Web survey (IOC v1.4). Demo mode saves nothing; live mode posts one JSON record to CONFIG.endpoint after EC approval.
+/* Web survey (IOC v1.5). Demo mode saves nothing; live mode posts one JSON record to CONFIG.endpoint after EC approval.
    Knowledge items 25–28 carry no answer key in this file on purpose: scoring happens only in analysis. */
 (function () {
   "use strict";
@@ -22,7 +22,7 @@
 
   const st = {
     screen: "intro", part: 0, ans: {}, txt: {}, warned: {},
-    meta: { id: (crypto.randomUUID ? crypto.randomUUID() : String(Date.now())).slice(0, 8), version: R() < .5 ? "A" : "B", order: R() < .5 ? 1 : 2, design: "fixed", mode: null, venue: null, started: null, enumerator: null, seq: null, cdate: null, code: null },
+    meta: { id: crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2, 12), version: R() < .5 ? "A" : "B", order: R() < .5 ? 1 : 2, design: "fixed", mode: null, venue: null, started: null, enumerator: null, collector: null, cdate: null, code: null },
     cj: { stage: "intro", i: 0, tasks: null, fails: 0, follow: {} },
   };
 
@@ -32,15 +32,16 @@
   const beYear = iso => +iso.slice(0, 4) + 543;
   const ddmmOf = iso => iso.slice(8, 10) + iso.slice(5, 7);
   const genFromAge = a => a <= 29 ? "Z" : a <= 45 ? "Y" : a <= 61 ? "X" : "B";
-  const seqKey = () => `seq.${st.meta.enumerator}.${ddmmOf(st.meta.cdate || todayISO())}`;
+  /** Preview of the code in demo mode only. With the back end connected, the server issues the code when the form arrives. */
   function makeCode() {
     const iso = st.meta.cdate || todayISO(), y = st.ans["1"];
     const gen = y ? genFromAge(beYear(iso) - y) : "Z";
     let lc = LGU_CODE[st.ans["4"]];
     if (!lc) { const d = st.ans["3"] || {}; const L = S.lgus.filter(l => l.d === d.a && d.t && l.t.includes(d.t)); lc = L.length === 1 ? L[0].code : "U00"; }
     const online = st.meta.mode === 2;
-    return `${gen}${lc}-${ddmmOf(iso)}-${online ? "9" : (st.meta.enumerator || 1)}${online ? "??" : String(st.meta.seq || 1).padStart(2, "0")}`;
+    return `${gen}${lc}-${ddmmOf(iso)}-${online ? "9" : (st.meta.enumerator || 1)}${online ? "01" : "01"}`;
   }
+  const refOf = (id = st.meta.id) => String(id).replace(/-/g, "").slice(0, 8).toUpperCase();
   const validPhone = p => /^0\d{8,9}$/.test(String(p || "").replace(/\D/g, ""));
 
   /* ---------- helpers for item text ---------- */
@@ -200,13 +201,9 @@
         <fieldset class="q" id="venue-q" ${st.meta.mode === 2 ? "hidden" : ""}><legend class="qh"><span class="qt">สถานที่พบผู้ตอบ <em class="muted">(ผู้เก็บข้อมูลเลือก)</em></span></legend><div class="opts row">
           ${[[1, "ตลาดหรือจุดที่คนพลุกพล่าน"], [2, "จุดรวมตัวของชุมชน (สภากาแฟ)"], [3, "เยี่ยมครัวเรือน"]].map(([c, t]) => `<label class="opt"><input type="radio" name="venue" value="${c}" ${st.meta.venue === c ? "checked" : ""}><span class="box"></span><span class="ot">${t}</span></label>`).join("")}</div></fieldset>
 
-        <fieldset class="q" id="enum-q" ${st.meta.mode === 2 || st.meta.mode == null ? "hidden" : ""}><legend class="qh"><span class="qt">ข้อมูลผู้เก็บ <em class="muted">(ใช้สร้างรหัสผู้ตอบ)</em></span></legend>
-          <div class="grid3">
-            <label class="fld"><span>เลขผู้เก็บข้อมูล</span><select name="enum"><option value="">เลือก</option>${[1, 2, 3, 4, 5, 6, 7, 8].map(n => `<option value="${n}" ${st.meta.enumerator === n ? "selected" : ""}>${n}</option>`).join("")}</select></label>
-            <label class="fld"><span>วันที่เก็บ</span><input class="txt" type="date" name="cdate" value="${st.meta.cdate || todayISO()}"></label>
-            <label class="fld"><span>ฟอร์มชุดที่ของวันนี้</span><input class="txt num" type="number" min="1" max="99" name="seq" value="${st.meta.seq || ""}"></label>
-          </div>
-          <p class="small muted">ผู้เก็บแต่ละคนนับเลขชุดของตัวเองต่อวัน เริ่มที่ 1 ระบบจำเลขล่าสุดของเครื่องนี้ไว้ให้ ถ้าคีย์จากฟอร์มกระดาษ ให้ใส่วันที่ เลขผู้เก็บ และเลขชุดตามรหัสที่เขียนบนฟอร์ม</p></fieldset>
+        <fieldset class="q" id="enum-q" ${st.meta.mode === 2 || st.meta.mode == null ? "hidden" : ""}><legend class="qh"><span class="qt">ผู้เก็บข้อมูล <em class="muted">(ต้องเข้าสู่ระบบ ระบบออกรหัสผู้ตอบให้ตอนส่ง)</em></span></legend>
+          <div id="who"></div>
+        </fieldset>
       </div>
       ${!DEMO && !TESTRUN && store.get("done", false) ? `<div class="notice">เครื่องนี้เคยส่งคำตอบแบบตอบเองออนไลน์ไปแล้ว ถ้าเป็นผู้ตอบคนใหม่ ให้ผู้เก็บข้อมูลเลือก “ผู้เก็บข้อมูลอ่านให้ฟัง” หรือใช้อีกเครื่อง</div>` : ""}
       <p class="consent">การกด “เริ่มตอบ” ถือว่าท่านยินยอมเข้าร่วมการวิจัย (ความยินยอมโดยการกระทำ)</p>
@@ -214,28 +211,51 @@
     </section>`;
     app.onchange = e => {
       const t = e.target;
-      if (t.name === "mode") { st.meta.mode = +t.value; $("#venue-q").hidden = st.meta.mode === 2; $("#enum-q").hidden = st.meta.mode === 2; if (st.meta.mode === 2) st.meta.venue = 4; else if (st.meta.venue === 4) st.meta.venue = null; }
+      if (t.name === "mode") { st.meta.mode = +t.value; $("#venue-q").hidden = st.meta.mode === 2; $("#enum-q").hidden = st.meta.mode === 2; if (st.meta.mode === 2) st.meta.venue = 4; else if (st.meta.venue === 4) st.meta.venue = null; renderWho(); }
       if (t.name === "venue") st.meta.venue = +t.value;
-      if (t.name === "enum") { st.meta.enumerator = +t.value || null; const sq = $('input[name="seq"]'); if (st.meta.enumerator) { st.meta.seq = store.get(seqKey(), 0) + 1; sq.value = st.meta.seq; } }
-      if (t.name === "cdate") { st.meta.cdate = t.value; if (st.meta.enumerator) { st.meta.seq = store.get(seqKey(), 0) + 1; $('input[name="seq"]').value = st.meta.seq; } }
-      if (t.name === "seq") st.meta.seq = Math.max(1, Math.min(99, +t.value || 1));
+      if (t.name === "cdate") st.meta.cdate = t.value;
     };
+    renderWho();
     $("#start").onclick = () => {
       if (st.meta.mode == null) st.meta.mode = 2, st.meta.venue = 4;
       if (st.meta.mode !== 2) {
-        if (!DEMO && (!st.meta.enumerator || !st.meta.seq)) { toast("เลือกเลขผู้เก็บข้อมูลและเลขชุดก่อนเริ่ม"); return; }
-        st.meta.enumerator = st.meta.enumerator || 1; st.meta.cdate = st.meta.cdate || todayISO();
-        st.meta.seq = st.meta.seq || store.get(seqKey(), 0) + 1;
+        const se = Auth.get();
+        if (!se || se.user.mustChange) { toast("ผู้เก็บข้อมูลต้องเข้าสู่ระบบก่อนเริ่ม"); $("#who").scrollIntoView({ block: "center" }); return; }
+        if (!se.user.enumerator) { toast("บัญชีนี้ยังไม่มีเลขผู้เก็บข้อมูล ติดต่อผู้วิจัย"); return; }
+        if (st.meta.venue == null) { toast("เลือกสถานที่พบผู้ตอบก่อนเริ่ม"); return; }
+        st.meta.enumerator = se.user.enumerator; st.meta.collector = se.user.username; st.meta.cdate = st.meta.cdate || todayISO();
       } else st.meta.cdate = todayISO();
       st.meta.started = new Date().toISOString(); st.t0 = performance.now();
       st.screen = "part"; st.part = 0; render();
     };
   }
 
+  /* ---------- enumerator sign-in inside the intro ---------- */
+  function renderWho() {
+    const el = $("#who"); if (!el || st.meta.mode === 2 || st.meta.mode == null) return;
+    const se = Auth.get();
+    if (!se || se.user.mustChange) {
+      Auth.form(el, { lead: "ใช้ชื่อผู้ใช้ที่ผู้วิจัยสร้างให้ เลขผู้เก็บข้อมูลผูกกับบัญชี ไม่ต้องเลือกเอง", onDone: () => { renderWho(); chips(); flush(); },
+        demo: { label: "ทดลองด้วยบัญชีสาธิต (ผู้เก็บเลข 1)", user: { username: "demo", name: "ผู้เก็บสาธิต", role: "enumerator", enumerator: 1 } } });
+      return;
+    }
+    const u = se.user, sent = store.get("sent", []).filter(x => x.by === u.username).slice(0, 8);
+    el.innerHTML = `<div class="whobox">
+      <div class="whotop"><span class="avatar" aria-hidden="true">${esc((u.name || u.username).slice(0, 1))}</span>
+        <div><b>${esc(u.name || u.username)}</b><p class="small muted">${esc(u.username)} · ${u.enumerator ? "ผู้เก็บเลข " + u.enumerator : "ยังไม่มีเลขผู้เก็บ"}${se.demo ? " · บัญชีสาธิต" : ""}</p></div>
+        <button type="button" class="btn ghost small" id="logout">ออกจากระบบ</button></div>
+      ${u.enumerator ? "" : `<div class="notice small">บัญชีนี้ดูข้อมูลได้แต่เก็บข้อมูลไม่ได้ เพราะยังไม่มีเลขผู้เก็บ ให้ผู้ดูแลกำหนดเลขให้ในหน้าหลังบ้าน</div>`}
+      <label class="fld" style="max-width:220px"><span>วันที่เก็บข้อมูล</span><input class="txt" type="date" name="cdate" value="${st.meta.cdate || todayISO()}" max="${todayISO()}"></label>
+      <p class="small muted">คีย์ฟอร์มกระดาษย้อนหลัง ให้ใส่วันที่ที่ผู้ตอบกรอกจริง ระบบออกรหัสผู้ตอบให้หลังส่งสำเร็จ แล้วเขียนรหัสนั้นลงมุมขวาบนของฟอร์มกระดาษ</p>
+      ${sent.length ? `<details class="sent"><summary>ส่งจากเครื่องนี้ล่าสุด ${sent.length} ชุด</summary><table><thead><tr><th>เวลา</th><th>เลขอ้างอิง</th><th>รหัสผู้ตอบ</th></tr></thead><tbody>${sent.map(x => `<tr><td class="num">${esc(new Date(x.at).toLocaleString("th-TH", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }))}</td><td class="num">${esc(x.ref)}</td><td class="num"><b>${esc(x.code)}</b></td></tr>`).join("")}</tbody></table></details>` : ""}
+    </div>`;
+    $("#logout").onclick = () => { Auth.clear(); renderWho(); chips(); };
+  }
+
   function partHead(i, extra = "") {
     const P = PARTS[i];
     const m = P.title.replace("(ข้อ 15–28)", "(ข้อ 16–28)").match(/^ส่วนที่ (\d) (.+?) \((ข้อ .+)\)$/);
-    const bar = st.meta.code && st.meta.mode !== 2 ? `<p class="codebar">รหัสผู้ตอบ <b class="num">${st.meta.code}</b><span>เขียนรหัสนี้ไว้มุมขวาบนของฟอร์มกระดาษ</span></p>` : "";
+    const bar = st.meta.mode != null && st.meta.mode !== 2 ? `<p class="codebar">เลขอ้างอิงฟอร์ม <b class="num">${refOf()}</b><span>รหัสผู้ตอบจะออกหลังส่ง</span></p>` : "";
     return `${progress()}<header class="phead">${bar}<p class="eyebrow">ส่วนที่ ${m[1]} · ${m[3]}</p><h2>${m[2]}</h2>${extra}</header>`;
   }
 
@@ -340,7 +360,6 @@
       const y = st.ans["1"], d = st.ans["3"];
       const out = (y && y > 2551) || st.ans["5"] === 3 || st.ans["5ก"] === 2;
       if (out) { st.screen = "out"; return render(); }
-      st.meta.code = makeCode();
     }
     if (st.part === 3) return cjAdvance();
     if (st.part === 6) return finish();
@@ -579,7 +598,7 @@
   function record() {
     const sc = scores();
     return {
-      meta: { id: st.meta.id, code: st.meta.code, test: DEMO || TESTRUN, enumerator: st.meta.mode === 2 ? 9 : st.meta.enumerator, cdate: st.meta.cdate, collectedBE: beYear(st.meta.cdate || todayISO()), started: st.meta.started, finished: new Date().toISOString(), seconds: Math.round((performance.now() - (st.t0 || 0)) / 1000), mode: st.meta.mode, venue: st.meta.venue, design: st.meta.design, version: st.meta.version, order: st.meta.order, instrument: "IOC v1.4" },
+      meta: { id: st.meta.id, code: null, test: DEMO || TESTRUN, enumerator: st.meta.mode === 2 ? 9 : st.meta.enumerator, collector: st.meta.mode === 2 ? "" : st.meta.collector, cdate: st.meta.cdate, collectedBE: beYear(st.meta.cdate || todayISO()), started: st.meta.started, finished: new Date().toISOString(), seconds: Math.round((performance.now() - (st.t0 || 0)) / 1000), mode: st.meta.mode, venue: st.meta.venue, design: st.meta.design, version: st.meta.version, order: st.meta.order, instrument: "IOC v1.5" },
       answers: { ...st.ans }, text: { ...st.txt },
       conjoint: (st.cj.tasks || []).map((t, i) => ({ task: i + 1, pair: t.k, item: t.n, chosen: t.choice, ms: t.at, left: strip(t.L, t.design), right: strip(t.Rt, t.design) })),
       ipc: { I: sc.I, P: sc.P, C: sc.C, complete: sc.complete },
@@ -594,54 +613,58 @@
     return o;
   }
 
-  /* ---------- sending: an outbox in this browser, so a lost signal in the field does not lose an interview ---------- */
+  /* ---------- sending: an outbox in this browser, so a lost signal in the field does not lose an interview.
+     The server issues the respondent code when the record arrives; interviewer forms go with the collector's sign-in token. ---------- */
   const outbox = () => store.get("outbox", []);
-  async function post(rec) {
-    const r = await fetch(CONFIG.endpoint, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(rec) });
-    return r.json();
+  function remember(rec, code) {
+    const sent = store.get("sent", []).filter(x => x.ref !== refOf(rec.meta.id));
+    sent.unshift({ ref: refOf(rec.meta.id), code, at: Date.now(), by: rec.meta.collector || "", test: !!rec.meta.test });
+    store.set("sent", sent.slice(0, 200));
   }
+  let flushing = false;
   async function flush() {
-    const keep = [];
+    if (flushing) return; flushing = true;
+    const se = Auth.get(), keep = [];
     for (const it of outbox()) {
-      const mine = it.rec.meta.id === st.meta.id;
-      try {
-        const j = await post(it.rec);
-        if (j.ok) { if (mine) st.send = { state: "ok", code: j.code, flag: j.flag }; if (it.rec.meta.mode === 2 && !TESTRUN) store.set("done", true); }
-        else if (mine) { st.send = { state: "rejected", error: j.error, dup: j.dup, next: j.next }; }          // the current interview is fixed on screen
-        else keep.push(Object.assign(it, { error: j.error }));
-      } catch (e) { keep.push(it); if (mine) st.send = { state: "queued" }; }
+      const mine = it.rec.meta.id === st.meta.id, needSign = it.rec.meta.mode !== 2;
+      if (needSign && (!se || se.demo || se.user.username !== it.rec.meta.collector)) {          // wait for the person who collected it to sign in
+        keep.push(it); if (mine) st.send = { state: "login" }; continue;
+      }
+      const j = await Auth.api("submit", { rec: it.rec });
+      if (j.ok) { remember(it.rec, j.code); if (mine) st.send = { state: "ok", code: j.code, flag: j.flag }; if (it.rec.meta.mode === 2 && !TESTRUN) store.set("done", true); }
+      else if (j.offline || j.auth) { keep.push(it); if (mine) st.send = { state: j.auth ? "login" : "queued" }; }
+      else if (mine) st.send = { state: "rejected", error: j.error };          // the current interview stays on screen
+      else keep.push(Object.assign(it, { error: j.error }));
     }
-    store.set("outbox", keep); chips();
+    store.set("outbox", keep); flushing = false; chips();
     if (st.screen === "done") sendBox();
   }
   function finish() {
-    st.meta.code = makeCode();
+    if (DEMO) st.meta.code = makeCode();
     const rec = record();
     st.rec = rec;
-    if (st.meta.mode !== 2 && st.meta.enumerator) store.set(seqKey(), Math.max(store.get(seqKey(), 0), st.meta.seq || 0));
     if (!DEMO && CONFIG.endpoint) { store.set("outbox", outbox().concat([{ rec }])); st.send = { state: "sending" }; flush(); }
     st.screen = "done"; render();
   }
   function sendBox() {
     const el = $("#sendbox"); if (!el) return;
-    const s = st.send || {};
-    if (s.state === "ok") el.innerHTML = `<div class="notice acc"><b>บันทึกแล้ว</b> · รหัสผู้ตอบ <b class="num">${esc(s.code)}</b>${s.flag ? `<br><span class="small">ระบบติดธง: ${esc(s.flag)} ผู้วิจัยจะตรวจสอบภายหลัง</span>` : ""}</div>`;
+    const s = st.send || {}, paper = st.meta.mode === 0, ref = refOf();
+    if (DEMO) el.innerHTML = `<div class="notice acc small">โหมดตัวอย่าง: เมื่อเปิดเก็บจริง ระบบจะออกรหัสผู้ตอบให้หลังส่ง เช่น <b class="num">${esc(st.meta.code)}</b></div>`;
+    else if (s.state === "ok") el.innerHTML = `<div class="notice acc"><b>บันทึกแล้ว</b> · รหัสผู้ตอบ <b class="num big-code">${esc(s.code)}</b>${paper ? `<br><span class="small">เขียนรหัสนี้ที่มุมขวาบนของฟอร์มกระดาษ</span>` : ""}${s.flag ? `<br><span class="small">ระบบติดธง: ${esc(s.flag)} ผู้วิจัยจะตรวจสอบภายหลัง</span>` : ""}</div>`;
     else if (s.state === "sending") el.innerHTML = `<div class="notice acc">กำลังส่งคำตอบ…</div>`;
-    else if (s.state === "queued") el.innerHTML = `<div class="notice"><b>ยังส่งไม่ได้</b> คำตอบเก็บไว้ในเครื่องนี้แล้ว ระบบจะส่งให้เองเมื่อเปิดหน้าแบบสอบถามครั้งถัดไป หรือกดส่งอีกครั้งเมื่อมีสัญญาณ <button type="button" class="btn" id="resend">ส่งอีกครั้ง</button></div>`;
-    else if (s.state === "rejected") el.innerHTML = `<div class="notice"><b>ระบบไม่รับคำตอบนี้</b> ${esc(s.error || "")}${s.dup ? `<div class="inrow" style="margin-top:8px"><label class="fld"><span>เปลี่ยนเลขชุดเป็น</span><input class="txt short num" type="number" min="1" max="99" id="newseq" value="${s.next || (st.meta.seq || 0) + 1}"></label><button type="button" class="btn primary" id="fixseq">ส่งด้วยเลขชุดใหม่</button></div>` : ""}</div>`;
+    else if (s.state === "queued") el.innerHTML = `<div class="notice"><b>ยังส่งไม่ได้</b> คำตอบเก็บไว้ในเครื่องนี้แล้ว ระบบจะส่งให้เองเมื่อมีสัญญาณ ${paper ? `เขียนเลขอ้างอิง <b class="num">${ref}</b> บนฟอร์มกระดาษไว้ก่อน รหัสผู้ตอบจะขึ้นในรายการ “ส่งจากเครื่องนี้”` : ""} <button type="button" class="btn" id="resend">ส่งอีกครั้ง</button></div>`;
+    else if (s.state === "login") el.innerHTML = `<div class="notice"><b>ต้องเข้าสู่ระบบก่อนส่ง</b> คำตอบเก็บไว้ในเครื่องนี้แล้ว (เลขอ้างอิง <b class="num">${ref}</b>) ให้ผู้เก็บที่สัมภาษณ์ชุดนี้เข้าสู่ระบบ แล้วระบบจะส่งให้เอง<div id="relogin" style="margin-top:10px"></div></div>`;
+    else if (s.state === "rejected") el.innerHTML = `<div class="notice"><b>ระบบไม่รับคำตอบนี้</b> ${esc(s.error || "")} <span class="small">(เลขอ้างอิง ${ref})</span></div>`;
     const rs = $("#resend"); if (rs) rs.onclick = () => { st.send = { state: "sending" }; sendBox(); flush(); };
-    const fx = $("#fixseq"); if (fx) fx.onclick = () => {
-      st.meta.seq = Math.max(1, Math.min(99, +$("#newseq").value || 1)); st.meta.code = makeCode(); st.rec.meta.code = st.meta.code;
-      store.set(seqKey(), Math.max(store.get(seqKey(), 0), st.meta.seq));
-      store.set("outbox", outbox().filter(x => x.rec.meta.id !== st.meta.id).concat([{ rec: st.rec }])); st.send = { state: "sending" }; sendBox(); flush();
-    };
+    const rl = $("#relogin"); if (rl) Auth.form(rl, { onDone: () => { st.send = { state: "sending" }; sendBox(); flush(); } });
   }
   function chips() {
     const el = $("#chips"); if (!el) return;
     const n = outbox().length;
     el.innerHTML = (DEMO ? `<span class="chip warn"><i></i>โหมดตัวอย่าง · ไม่บันทึกคำตอบ</span><span class="chip">รอ EC อนุมัติก่อนเปิดเก็บจริง</span>`
       : TESTRUN ? `<span class="chip warn"><i></i>โหมดทดสอบระบบ · บันทึกเป็นข้อมูลทดสอบ</span>` : `<span class="chip mint"><i></i>เก็บข้อมูลจริง</span>`) +
-      (n ? `<span class="chip warn">รอส่ง ${n} ชุด</span>` : "");
+      (n ? `<span class="chip warn">รอส่ง ${n} ชุด</span>` : "") +
+      (Auth.get() ? `<span class="chip">เข้าสู่ระบบ: ${esc(Auth.get().user.username)}</span>` : "");
   }
 
   function renderDone() {
@@ -694,6 +717,7 @@
   window.__survey = { st, scores, record, makeCode };     // for testing
   chips();
   if (!DEMO && CONFIG.endpoint && outbox().length) flush();
+  window.addEventListener("online", () => { if (!DEMO && outbox().length) flush(); });
   const jump = (DEMO || TESTRUN) && location.hash.match(/^#p([1-7])$/);
   if (jump) { st.meta.mode = 2; st.meta.venue = 4; st.meta.started = new Date().toISOString(); st.t0 = performance.now(); st.screen = "part"; st.part = +jump[1] - 1; if (st.part === 3) st.cj.stage = "intro"; }
   render();

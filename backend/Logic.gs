@@ -46,6 +46,29 @@ function nextFreeSeq(existingCodes, key) {
   return null;
 }
 
+/** LGU code from item 4 (name of the LGU), else from item 3 when the tambon belongs to one LGU only, else U00. */
+function lguCodeFor(answers, lgus) {
+  var name = answers && answers["4"];
+  for (var i = 0; i < lgus.length; i++) if (lgus[i].n === name) return lgus[i].code;
+  var d = (answers && answers["3"]) || {};
+  if (d.a && d.t) {
+    var hit = lgus.filter(function (l) { return l.d === d.a && l.t.indexOf(d.t) >= 0; });
+    if (hit.length === 1) return hit[0].code;
+  }
+  return "U00";
+}
+
+/** Code issued by the server: Gen from birth year at the collection date, LGU from the answers, set = next free number. */
+function issueCode(rec, lgus, cdateISO, enumerator, existingCodes) {
+  var y = +(rec.answers && rec.answers["1"]);
+  if (!y) throw new Error("ไม่มีปีเกิด (ข้อ 1) จึงออกรหัสไม่ได้");
+  if (y > 2551) throw new Error("ผู้ตอบเกิดหลังปี 2551 ไม่มีสิทธิเลือกตั้ง");
+  var be = +cdateISO.slice(0, 4) + 543, ddmm = cdateISO.slice(8, 10) + cdateISO.slice(5, 7);
+  var seq = nextFreeSeq(existingCodes, ddmm + "-" + enumerator + "00");
+  if (!seq) throw new Error("เลขชุดของผู้เก็บ " + enumerator + " วันนี้เต็ม 99 ชุดแล้ว");
+  return genFromAge(be - y) + lguCodeFor(rec.answers, lgus) + "-" + ddmm + "-" + enumerator + ("0" + seq).slice(-2);
+}
+
 /** Uniqueness key: date + enumerator + set. Gen and LGU only describe the respondent. */
 function codeKey(code) { var m = CODE_RE.exec(code); return m ? m[4] + m[5] + "-" + m[6] + m[7] : code; }
 
@@ -73,7 +96,7 @@ function findLikelyDuplicate(rec, others) {
 /** Flatten one record into a column map for the responses sheet. Contact details never go here. */
 function flattenRecord(rec) {
   var row = {}, m = rec.meta || {};
-  row.code = m.code; row.test = m.test ? 1 : 0; row.started = m.started; row.finished = m.finished; row.seconds = m.seconds;
+  row.code = m.code; row.rid = m.id; row.collector = m.collector || ""; row.test = m.test ? 1 : 0; row.started = m.started; row.finished = m.finished; row.seconds = m.seconds;
   row.mode = m.mode; row.venue = m.venue; row.enumerator = m.enumerator; row.version = m.version; row.order = m.order;
   var A = rec.answers || {};
   Object.keys(A).forEach(function (k) {
@@ -96,4 +119,4 @@ function rowForHeader(header, obj) {
 /** Quota cell of a respondent: 0 Gen Z ชาย · 1 Gen Z หญิง · 2 รุ่นอื่น ชาย · 3 รุ่นอื่น หญิง (sex 3 = ไม่ระบุ → -1) */
 function quotaCell(gen, sex) { if (sex !== 1 && sex !== 2) return -1; return (gen === "Z" ? 0 : 2) + (sex === 2 ? 1 : 0); }
 
-if (typeof module !== "undefined") module.exports = { CODE_RE: CODE_RE, genFromAge: genFromAge, checkCode: checkCode, nextOnlineSeq: nextOnlineSeq, codeKey: codeKey, nextFreeSeq: nextFreeSeq, sameAnswerShare: sameAnswerShare, findLikelyDuplicate: findLikelyDuplicate, flattenRecord: flattenRecord, rowForHeader: rowForHeader, quotaCell: quotaCell };
+if (typeof module !== "undefined") module.exports = { lguCodeFor: lguCodeFor, issueCode: issueCode, CODE_RE: CODE_RE, genFromAge: genFromAge, checkCode: checkCode, nextOnlineSeq: nextOnlineSeq, codeKey: codeKey, nextFreeSeq: nextFreeSeq, sameAnswerShare: sameAnswerShare, findLikelyDuplicate: findLikelyDuplicate, flattenRecord: flattenRecord, rowForHeader: rowForHeader, quotaCell: quotaCell };

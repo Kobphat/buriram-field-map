@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>หลังบ้าน · เข้าสู่ระบบ</title>
+<meta name="description" content="เข้าสู่ระบบสำหรับผู้วิจัยและผู้เก็บข้อมูล ข้อมูลคำตอบเปิดดูได้หลังเข้าสู่ระบบเท่านั้น">
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kanit:wght@500;600;700&family=IBM+Plex+Sans+Thai:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="../assets/site.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect x='1' y='1' width='6' height='6' rx='1.5' fill='%23fed257'/%3E%3Crect x='9' y='1' width='6' height='6' rx='1.5' fill='%23fbb1d1'/%3E%3Crect x='1' y='9' width='6' height='6' rx='1.5' fill='%2335b4ec'/%3E%3Crect x='9' y='9' width='6' height='6' rx='1.5' fill='%2328bd6b'/%3E%3C/svg%3E">
+<style>
+/* Layout: sign-in gate → (admin) field-office console: status strip, district progress against quota, tabs; (enumerator) own account and sent codes */
+main.wrap{display:grid;gap:18px;padding-top:24px}
+.gate{display:grid;grid-template-columns:1.1fr 1fr;gap:28px;align-items:start;padding:32px 0}
+.gate h1{font-size:clamp(1.6rem,1.2rem + 1.6vw,2.3rem);color:var(--brown)}
+.gate .lead{color:var(--muted);margin-top:10px;max-width:46ch}
+.gate ul{margin:16px 0 0;padding:0;list-style:none;display:grid;gap:10px}
+.gate li{display:grid;grid-template-columns:28px 1fr;gap:10px;align-items:start;font-size:.95rem}
+.gate li b.k{width:28px;height:28px;border-radius:8px;display:grid;place-items:center;font-family:var(--f-display);font-size:.85rem}
+@media (max-width:820px){.gate{grid-template-columns:1fr;padding:12px 0}}
+.head{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;justify-content:space-between}
+.head h1{font-size:1.4rem}
+.who{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.btn.sm{padding:6px 14px;min-height:36px;font-size:.88rem}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:14px 16px;display:grid;gap:2px}
+.stat b{font-family:var(--f-mono);font-size:1.7rem;font-weight:500;line-height:1.2}
+.stat span{font-size:.84rem;color:var(--muted)}
+.stat .bar{height:6px;border-radius:3px;background:var(--sunk);overflow:hidden;margin-top:6px}.stat .bar i{display:block;height:100%;background:var(--ink)}
+@media (max-width:760px){.stats{grid-template-columns:1fr 1fr}}
+.dists{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+@media (max-width:900px){.dists{grid-template-columns:1fr 1fr}}@media (max-width:520px){.dists{grid-template-columns:1fr}}
+.dist{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:14px 16px;display:grid;gap:8px}
+.dist .top{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.cells{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.cell{display:grid;gap:3px;font-size:.74rem;color:var(--muted)}
+.cell .m{height:34px;border-radius:8px;background:var(--sunk);position:relative;overflow:hidden}
+.cell .m i{position:absolute;inset:auto 0 0 0;background:var(--mg);opacity:.85}
+.cell.o .m i{background:var(--nk)}
+.cell .v{font-family:var(--f-mono);color:var(--ink);font-size:.78rem}
+.cell.full .v{color:var(--mint-ink);font-weight:600}
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);overflow-x:auto;scrollbar-width:none}
+.tab{appearance:none;border:0;background:none;font:inherit;padding:10px 14px;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap}
+.tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--ink);font-weight:600}
+.panel{display:grid;gap:12px}.panel[hidden]{display:none}
+.tools{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.tools input:not([type=checkbox]),.tools select{font:inherit;border:1px solid var(--line2);border-radius:10px;padding:7px 10px;min-height:40px;background:var(--surface);color:var(--ink)}
+.tscroll{max-height:70vh}
+.tscroll th{position:sticky;top:0;z-index:1}
+td,th{white-space:nowrap;padding:8px 12px}
+tr.click{cursor:pointer}tr.click:hover td{background:var(--mint-soft)}
+.flag{color:var(--warn);font-weight:600}
+.prog{display:inline-block;width:70px;height:6px;border-radius:3px;background:var(--sunk);vertical-align:middle;margin-left:6px;overflow:hidden}.prog i{display:block;height:100%;background:var(--ink)}
+.empty{padding:28px;text-align:center;color:var(--muted)}
+.danger-zone{border:1px solid #e6b7b9;background:#fdf3f3;border-radius:16px;padding:14px 16px;display:grid;gap:8px}
+.form-row{display:grid;grid-template-columns:1fr 1.3fr 1fr .8fr auto;gap:10px;align-items:end}
+.form-row label{display:grid;gap:4px;font-size:.84rem;color:var(--muted)}
+@media (max-width:860px){.form-row{grid-template-columns:1fr 1fr}.form-row .btn{grid-column:1/-1}}
+.st-on{color:var(--good);font-weight:600}.st-off{color:var(--bad)}
+.temp{font-family:var(--f-mono);font-size:1.5rem;letter-spacing:.06em;background:var(--mint);border:1px solid var(--mint-line);color:var(--mint-ink);border-radius:12px;padding:10px 14px;text-align:center}
+dialog{border:0;border-radius:18px;padding:0;max-width:min(720px,94vw);width:100%;box-shadow:0 30px 80px -30px rgba(0,0,0,.5)}
+dialog::backdrop{background:rgba(20,18,16,.35)}
+dialog .in{padding:18px;display:grid;gap:10px}
+dialog pre{font-family:var(--f-mono);font-size:.76rem;background:var(--sunk);border-radius:10px;padding:10px;max-height:60vh;overflow:auto;white-space:pre-wrap;word-break:break-all;margin:0}
+#msg:empty{display:none}
+#loginbox .login{max-width:none}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}@media (max-width:820px){.grid2{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<nav class="site-nav" aria-label="เมนูหลัก"><div class="wrap"><a class="brand" href="../"><i aria-hidden="true"><b style="background:#fed257"></b><b style="background:#fbb1d1"></b><b style="background:#35b4ec"></b><b style="background:#28bd6b"></b></i>ระบบอุปถัมภ์ · บุรีรัมย์</a><ul><li><a class="nl" href="../#intro">บทนำ</a></li><li><a class="nl" href="../#lit">วรรณกรรม</a></li><li><a class="nl" href="../#method">ระเบียบวิธี</a></li><li><a class="nl" href="../field/">แผนที่ภาคสนาม</a></li><li><a class="nl" href="../codes/">บัตรรหัส</a></li><li><a class="nl cta" href="../survey/">แบบสอบถาม</a></li><li><a class="nl" href="../admin/" aria-current="page">เข้าสู่ระบบ</a></li></ul></div></nav>
+<main class="wrap" id="root" aria-live="polite"></main>
+<dialog id="dlg"><div class="in"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><h3 id="dlgT"></h3><button class="btn sm" id="dlgX">ปิด</button></div><div id="dlgB"></div></div></dialog>
+<script src="../assets/config.js"></script>
+<script>window.LGU_DATA = {"lgus":[{"code":"N01","n":"ทน.บุรีรัมย์","d":"เมืองบุรีรัมย์","k":"nk","t":["ในเมือง","อิสาณ","เสม็ด"],"target":{"300":[4,4,14,16],"440":[7,5,20,24],"880":[13,11,40,47]}},{"code":"M02","n":"ทม.ชุมเห็ด","d":"เมืองบุรีรัมย์","k":"mg","t":["ชุมเห็ด"],"target":{"300":[2,1,6,7],"440":[2,2,8,10],"880":[5,4,17,20]}},{"code":"M03","n":"ทม.บ้านบัว","d":"เมืองบุรีรัมย์","k":"mg","t":["บ้านบัว"],"target":{"300":[1,1,3,4],"440":[1,1,5,5],"880":[2,2,9,10]}},{"code":"M04","n":"ทม.สวายจีก","d":"เมืองบุรีรัมย์","k":"mg","t":["สวายจีก"],"target":{"300":[1,1,3,4],"440":[1,1,5,5],"880":[3,3,10,11]}},{"code":"T05","n":"ทต.หลักเขต","d":"เมืองบุรีรัมย์","k":"tb","t":["หลักเขต"],"target":{"300":[1,1,2,2],"440":[1,1,3,3],"880":[2,2,6,6]}},{"code":"T06","n":"ทต.หนองตาด","d":"เมืองบุรีรัมย์","k":"tb","t":["หนองตาด"],"target":{"300":[1,1,3,4],"440":[1,1,5,5],"880":[3,3,10,11]}},{"code":"T07","n":"ทต.บัวทอง","d":"เมืองบุรีรัมย์","k":"tb","t":["บัวทอง"],"target":{"300":[0,0,2,2],"440":[1,1,3,3],"880":[2,1,6,6]}},{"code":"T08","n":"ทต.กระสัง","d":"เมืองบุรีรัมย์","k":"tb","t":["กระสัง"],"target":{"300":[1,1,2,3],"440":[1,1,3,4],"880":[2,2,7,7]}},{"code":"A09","n":"อบต.เสม็ด","d":"เมืองบุรีรัมย์","k":"ao","t":["เสม็ด"],"target":{"300":[1,1,4,4],"440":[1,1,5,6],"880":[3,3,11,11]}},{"code":"A10","n":"อบต.สะแกโพรง","d":"เมืองบุรีรัมย์","k":"ao","t":["สะแกโพรง"],"target":{"300":[1,1,4,4],"440":[2,2,6,6],"880":[3,3,12,12]}},{"code":"A11","n":"อบต.บ้านยาง","d":"เมืองบุรีรัมย์","k":"ao","t":["บ้านยาง"],"target":{"300":[1,1,4,4],"440":[2,2,6,6],"880":[3,5,11,13]}},{"code":"A12","n":"อบต.พระครู","d":"เมืองบุรีรัมย์","k":"ao","t":["พระครู"],"target":{"300":[0,0,2,2],"440":[1,1,3,3],"880":[2,1,6,7]}},{"code":"A13","n":"อบต.ถลุงเหล็ก","d":"เมืองบุรีรัมย์","k":"ao","t":["ถลุงเหล็ก"],"target":{"300":[0,0,2,2],"440":[1,1,3,3],"880":[1,1,5,5]}},{"code":"A14","n":"อบต.ลุมปุ๊ก","d":"เมืองบุรีรัมย์","k":"ao","t":["ลุมปุ๊ก"],"target":{"300":[1,1,3,3],"440":[1,1,4,4],"880":[2,2,8,8]}},{"code":"A15","n":"อบต.สองห้อง","d":"เมืองบุรีรัมย์","k":"ao","t":["สองห้อง"],"target":{"300":[1,1,2,2],"440":[1,1,3,3],"880":[2,2,6,7]}},{"code":"A16","n":"อบต.สะแกซำ","d":"เมืองบุรีรัมย์","k":"ao","t":["สะแกซำ"],"target":{"300":[1,1,3,3],"440":[1,1,5,5],"880":[2,2,9,9]}},{"code":"A17","n":"อบต.กลันทา","d":"เมืองบุรีรัมย์","k":"ao","t":["กลันทา"],"target":{"300":[0,0,2,2],"440":[1,1,3,3],"880":[1,1,6,7]}},{"code":"A18","n":"อบต.เมืองฝาง","d":"เมืองบุรีรัมย์","k":"ao","t":["เมืองฝาง"],"target":{"300":[1,1,2,2],"440":[1,1,3,4],"880":[2,2,7,7]}},{"code":"T19","n":"ทต.สตึก","d":"สตึก","k":"tb","t":["สตึก","นิคม"],"target":{"300":[1,1,3,3],"440":[1,1,5,5],"880":[2,2,9,10]}},{"code":"T20","n":"ทต.ศรีสตึก","d":"สตึก","k":"tb","t":["สตึก"],"target":{"300":[1,1,2,2],"440":[1,1,3,4],"880":[2,2,7,7]}},{"code":"T21","n":"ทต.ดอนมนต์","d":"สตึก","k":"tb","t":["ดอนมนต์"],"target":{"300":[0,0,2,2],"440":[1,1,3,3],"880":[1,1,5,5]}},{"code":"T22","n":"ทต.สะแก","d":"สตึก","k":"tb","t":["สะแก"],"target":{"300":[1,0,2,2],"440":[1,1,3,3],"880":[2,2,7,7]}},{"code":"A23","n":"อบต.นิคม","d":"สตึก","k":"ao","t":["นิคม"],"target":{"300":[1,1,3,3],"440":[1,1,4,4],"880":[2,2,9,9]}},{"code":"A24","n":"อบต.ทุ่งวัง","d":"สตึก","k":"ao","t":["ทุ่งวัง"],"target":{"300":[1,1,2,3],"440":[1,1,4,4],"880":[2,2,7,8]}},{"code":"A25","n":"อบต.เมืองแก","d":"สตึก","k":"ao","t":["เมืองแก"],"target":{"300":[1,1,4,4],"440":[1,1,5,5],"880":[3,2,10,11]}},{"code":"A26","n":"อบต.หนองใหญ่","d":"สตึก","k":"ao","t":["หนองใหญ่"],"target":{"300":[1,1,3,3],"440":[1,1,4,4],"880":[2,2,8,8]}},{"code":"A27","n":"อบต.ร่อนทอง","d":"สตึก","k":"ao","t":["ร่อนทอง"],"target":{"300":[1,1,4,4],"440":[1,1,5,5],"880":[3,3,10,11]}},{"code":"A28","n":"อบต.ชุมแสง","d":"สตึก","k":"ao","t":["ชุมแสง"],"target":{"300":[1,1,3,3],"440":[1,1,4,5],"880":[2,3,9,9]}},{"code":"A29","n":"อบต.ท่าม่วง","d":"สตึก","k":"ao","t":["ท่าม่วง"],"target":{"300":[0,0,2,2],"440":[1,1,3,3],"880":[1,1,5,6]}},{"code":"A30","n":"อบต.สนามชัย","d":"สตึก","k":"ao","t":["สนามชัย"],"target":{"300":[0,0,2,2],"440":[1,1,3,3],"880":[2,1,6,6]}},{"code":"A31","n":"อบต.กระสัง","d":"สตึก","k":"ao","t":["กระสัง"],"target":{"300":[0,0,1,1],"440":[1,0,2,2],"880":[1,1,4,4]}},{"code":"T32","n":"ทต.บ้านด่าน","d":"บ้านด่าน","k":"tb","t":["บ้านด่าน"],"target":{"300":[1,1,3,4],"440":[1,1,5,5],"880":[3,3,10,12]}},{"code":"T33","n":"ทต.ปราสาท","d":"บ้านด่าน","k":"tb","t":["ปราสาท"],"target":{"300":[1,1,3,3],"440":[1,1,4,4],"880":[2,2,7,8]}},{"code":"A34","n":"อบต.วังเหนือ","d":"บ้านด่าน","k":"ao","t":["วังเหนือ"],"target":{"300":[0,0,1,1],"440":[1,0,2,2],"880":[1,1,4,4]}},{"code":"A35","n":"อบต.โนนขวาง","d":"บ้านด่าน","k":"ao","t":["โนนขวาง"],"target":{"300":[0,0,2,2],"440":[1,1,2,3],"880":[1,1,5,5]}},{"code":"T36","n":"ทต.แคนดง","d":"แคนดง","k":"tb","t":["แคนดง"],"target":{"300":[0,0,2,2],"440":[0,0,2,2],"880":[1,1,5,5]}},{"code":"T37","n":"ทต.หัวฝาย","d":"แคนดง","k":"tb","t":["หัวฝาย"],"target":{"300":[1,1,2,2],"440":[1,1,3,3],"880":[2,2,7,7]}},{"code":"A38","n":"อบต.แคนดง","d":"แคนดง","k":"ao","t":["แคนดง"],"target":{"300":[0,1,2,2],"440":[1,1,3,3],"880":[1,2,5,6]}},{"code":"A39","n":"อบต.ดงพลอง","d":"แคนดง","k":"ao","t":["ดงพลอง"],"target":{"300":[1,1,2,2],"440":[1,1,3,3],"880":[2,2,6,6]}},{"code":"A40","n":"อบต.สระบัว","d":"แคนดง","k":"ao","t":["สระบัว"],"target":{"300":[0,0,2,2],"440":[1,1,3,3],"880":[1,1,5,5]}}],"district":{"300":{"เมืองบุรีรัมย์":[18,17,63,70],"สตึก":[9,8,33,34],"บ้านด่าน":[2,2,9,10],"แคนดง":[2,3,10,10]},"440":{"เมืองบุรีรัมย์":[27,25,93,102],"สตึก":[13,12,48,50],"บ้านด่าน":[4,3,13,14],"แคนดง":[4,4,14,14]},"880":{"เมืองบุรีรัมย์":[53,50,186,204],"สตึก":[25,24,96,101],"บ้านด่าน":[7,7,26,29],"แคนดง":[7,8,28,29]}}};</script>
+<script src="../assets/auth.js"></script>
+<script>
+(function () {
+  "use strict";
+  var $ = function (s, el) { return (el || document).querySelector(s); }, esc = Auth.esc, root = $("#root");
+  var DIST = ["เมืองบุรีรัมย์", "สตึก", "บ้านด่าน", "แคนดง"], CELL = ["Gen Z ชาย", "Gen Z หญิง", "รุ่นอื่น ชาย", "รุ่นอื่น หญิง"];
+  var RE = /^([ZYXB])([NMTAU])(\d{2})-(\d{2})(\d{2})-([1-9])(\d{2})$/;
+  var D = null, CONTACTS = null, USERS = null, TIER = 440, TAB = "pl";
+  var demo = function () { var s = Auth.get(); return !!(s && s.demo); };
+
+  /* ---------- API, or invented data when the page is not connected yet ---------- */
+  function api(action, body) {
+    if (!demo()) return Auth.api(action, body);
+    return Promise.resolve(DEMO_API(action, body || {}));
+  }
+  var DEMO_STATE = null;
+  function DEMO_API(a, b) {
+    if (!DEMO_STATE) DEMO_STATE = demoData();
+    var S = DEMO_STATE;
+    if (a === "data") return { ok: true, rows: S.rows, lgus: LGU_DATA.lgus, district: LGU_DATA.district, contacts: S.contacts.length, accept: false, deleteBy: "2570-06-30", sheetUrl: "#", me: Auth.get().user };
+    if (a === "users") return { ok: true, users: S.users };
+    if (a === "contacts") return { ok: true, contacts: S.contacts };
+    if (a === "detail") return { ok: true, json: JSON.stringify({ answers: { "1": 2530, "2": 2, "3": { a: "สตึก", t: "สตึก" }, "4": "ทต.สตึก", "16": 3, "31": 2 }, ipc: { I: 28, P: 31, C: 17 } }) };
+    if (a === "mine") return { ok: true, rows: S.rows.slice(0, 6).map(function (r) { return { code: r.code, ref: "A1B2C3D4", received: r.received, test: true }; }) };
+    if (a === "addUser" || a === "resetPassword") return { ok: true, username: b.username, tempPassword: "demo1-pass2" };
+    return { ok: false, error: "โหมดตัวอย่าง: คำสั่งนี้ใช้ได้เมื่อเชื่อมหลังบ้านแล้ว" };
+  }
+  function demoData() {
+    var L = LGU_DATA.lgus, rows = [], seq = {}, now = new Date();
+    for (var i = 0; i < 132; i++) {
+      var l = L[Math.floor(Math.random() * L.length)], d = new Date(now.getTime() - Math.floor(Math.random() * 6) * 864e5);
+      var ddmm = ("0" + d.getDate()).slice(-2) + ("0" + (d.getMonth() + 1)).slice(-2), en = 1 + Math.floor(Math.random() * 4), k = ddmm + en;
+      seq[k] = (seq[k] || 0) + 1; var g = "ZYXB"[Math.floor(Math.random() * 4)];
+      rows.push({ code: g + l.code + "-" + ddmm + "-" + en + ("0" + seq[k]).slice(-2), collector: "enum" + en, received: d.toISOString(), test: true, flag: Math.random() < .02 ? "อาจซ้ำกับ …" : "", sex: 1 + Math.floor(Math.random() * 2), district: l.d, tambon: l.t[0], mode: Math.random() < .7 ? 1 : 0, I: 10 + Math.floor(Math.random() * 30), P: 5 + Math.floor(Math.random() * 35), C: 5 + Math.floor(Math.random() * 35), phase2: Math.random() < .25 });
+    }
+    var contacts = rows.filter(function (r) { return r.phase2; }).map(function (r) { return { code: r.code, phone: "08" + Math.floor(10000000 + Math.random() * 89999999), time: "เย็น", consented: r.received, deleteBy: "2570-06-30" }; });
+    var users = [{ username: "kobphat", name: "กอบพัชร์", role: "admin", enumerator: 1, active: true, lastLogin: now.toISOString() }, { username: "woranista", name: "วรนิษฐา", role: "admin", enumerator: 2, active: true, lastLogin: now.toISOString() },
+      { username: "advisor", name: "อาจารย์ที่ปรึกษา", role: "admin", enumerator: 0, active: true, lastLogin: "" }, { username: "enum3", name: "ผู้ช่วยวิจัย 3", role: "enumerator", enumerator: 3, active: true, lastLogin: "" }, { username: "enum4", name: "ผู้ช่วยวิจัย 4", role: "enumerator", enumerator: 4, active: false, lastLogin: "" }];
+    return { rows: rows, contacts: contacts, users: users };
+  }
+
+  function msg(t, bad) { var m = $("#msg"); if (!m) return; m.textContent = t || ""; m.style.color = bad ? "var(--bad)" : "var(--muted)"; }
+  function fail(j) { if (j.auth) return start(); msg(j.error || "ทำรายการไม่สำเร็จ", true); }
+  function parse(code) { var m = RE.exec(code); return m ? { gen: m[1], lgu: m[2] + m[3], ddmm: m[4] + m[5], en: m[6], seq: m[7] } : null; }
+  function cellOf(r, p) { if (r.sex !== 1 && r.sex !== 2) return -1; return (p.gen === "Z" ? 0 : 2) + (r.sex === 2 ? 1 : 0); }
+  function stat(v, l, f, color) { return '<div class="stat"><b' + (color ? ' style="color:' + color + '"' : '') + '>' + v + '</b><span>' + l + '</span>' + (f != null ? '<div class="bar"><i style="width:' + Math.min(100, f * 100).toFixed(1) + '%"></i></div>' : '') + '</div>'; }
+  function dialog(title, html) { $("#dlgT").textContent = title; $("#dlgB").innerHTML = html; $("#dlg").showModal(); }
+  $("#dlgX").onclick = function () { $("#dlg").close(); };
+
+  /* ---------- gate ---------- */
+  function start() {
+    var s = Auth.get();
+    if (!s || s.user.mustChange) return gate();
+    if (s.user.role === "admin") return loadAdmin();
+    return enumeratorView();
+  }
+  function gate() {
+    root.innerHTML = '<section class="gate"><div><p class="small muted">หลังบ้าน · แบบสอบถามบุรีรัมย์</p><h1>เข้าสู่ระบบ</h1>' +
+      '<p class="lead">คำตอบของผู้ตอบแบบสอบถามเก็บอยู่ใน Google Sheet ของผู้วิจัย หน้านี้เปิดให้ดูได้เฉพาะบัญชีที่ผู้วิจัยสร้างให้</p><ul>' +
+      '<li><b class="k" style="background:var(--s-yellow)">1</b><span><b>ผู้วิจัยและอาจารย์ที่ปรึกษา</b> ดูความคืบหน้าตามโควตา รายการคำตอบ ดาวน์โหลดชุดข้อมูล และจัดการบัญชี</span></li>' +
+      '<li><b class="k" style="background:var(--s-blue)">2</b><span><b>ผู้เก็บข้อมูล</b> เข้าสู่ระบบก่อนเก็บ ระบบรู้เลขผู้เก็บจากบัญชี และออกรหัสผู้ตอบให้ตอนส่ง ดูได้เฉพาะรหัสที่ตัวเองส่ง ไม่เห็นคำตอบ</span></li>' +
+      '<li><b class="k" style="background:var(--s-green)">3</b><span><b>ผู้ตอบออนไลน์</b> ไม่ต้องเข้าสู่ระบบ ตอบได้ที่หน้าแบบสอบถาม</span></li></ul></div>' +
+      '<div class="card" id="loginbox"></div></section>';
+    Auth.form($("#loginbox"), { title: "บัญชีผู้วิจัยหรือผู้เก็บข้อมูล", onDone: start,
+      demo: { label: "ดูตัวอย่างหลังบ้าน (ข้อมูลสมมติ)", user: { username: "demo-admin", name: "ผู้ดูแลสาธิต", role: "admin", enumerator: 1 } } });
+  }
+  function headBar(title, sub) {
+    var s = Auth.get(), u = s.user;
+    return '<header class="head"><div><h1>' + title + '</h1><p class="small muted">' + sub + '</p></div><div class="who">' +
+      (s.demo ? '<span class="chip warn"><i></i>ข้อมูลสมมติ</span>' : '') + '<span class="chip">' + esc(u.name || u.username) + ' · ' + (u.role === "admin" ? "ผู้ดูแล" : "ผู้เก็บข้อมูล") + (u.enumerator ? " เลข " + u.enumerator : "") + '</span>' +
+      '<button class="btn sm" id="pw">เปลี่ยนรหัสผ่าน</button><button class="btn sm" id="out">ออกจากระบบ</button></div></header><p id="msg" class="small" role="status"></p>';
+  }
+  function wireHead() {
+    $("#out").onclick = function () { Auth.clear(); DEMO_STATE = null; D = CONTACTS = USERS = null; start(); };
+    $("#pw").onclick = function () {
+      if (demo()) return msg("โหมดตัวอย่าง: เปลี่ยนรหัสผ่านได้เมื่อเชื่อมหลังบ้านแล้ว", true);
+      dialog("เปลี่ยนรหัสผ่าน", '<form class="login" id="cpw"><label class="fld"><span>รหัสผ่านเดิม</span><input class="txt" type="password" name="o" autocomplete="current-password"></label><label class="fld"><span>รหัสผ่านใหม่ (อย่างน้อย 8 ตัว)</span><input class="txt" type="password" name="n" autocomplete="new-password"></label><label class="fld"><span>พิมพ์รหัสผ่านใหม่อีกครั้ง</span><input class="txt" type="password" name="n2" autocomplete="new-password"></label><p class="err small" role="alert"></p><div class="row"><button class="btn primary">บันทึก</button></div></form>');
+      var f = $("#cpw"); f.onsubmit = function (e) { e.preventDefault(); var er = $(".err", f);
+        if (f.n.value.length < 8) return er.textContent = "รหัสผ่านใหม่ต้องยาวอย่างน้อย 8 ตัว"; if (f.n.value !== f.n2.value) return er.textContent = "รหัสผ่านใหม่สองช่องไม่ตรงกัน";
+        Auth.changePassword(f.o.value, f.n.value).then(function (j) { if (!j.ok) { er.textContent = j.error; if (j.auth) { $("#dlg").close(); start(); } return; } $("#dlg").close(); msg("เปลี่ยนรหัสผ่านแล้ว เครื่องอื่นที่เคยเข้าไว้จะต้องเข้าสู่ระบบใหม่"); }); };
+    };
+  }
+
+  /* ---------- enumerator ---------- */
+  function enumeratorView() {
+    var u = Auth.get().user;
+    root.innerHTML = headBar("บัญชีผู้เก็บข้อมูล", "ดูได้เฉพาะรหัสผู้ตอบที่บัญชีนี้ส่ง ไม่มีคำตอบหรือเบอร์โทร") +
+      '<div class="grid2"><div class="card" style="display:grid;gap:10px"><h3>เริ่มเก็บข้อมูล</h3><p class="small muted">' + (u.enumerator ? "บัญชีนี้เป็นผู้เก็บเลข <b>" + u.enumerator + "</b> ทุกฟอร์มที่ส่งจะได้รหัสที่มีเลขนี้" : "บัญชีนี้ยังไม่มีเลขผู้เก็บ ติดต่อผู้วิจัย") + '</p><div><a class="btn primary" href="../survey/">ไปหน้าแบบสอบถาม</a></div></div>' +
+      '<div class="card small" style="display:grid;gap:6px"><b>เขียนรหัสลงฟอร์มกระดาษ</b><p class="muted">ฟอร์มที่ผู้ตอบกรอกเอง ให้คีย์เข้าหน้าแบบสอบถามแบบ “คีย์จากฟอร์มกระดาษ” เมื่อส่งสำเร็จ ระบบจะออกรหัส ให้เขียนรหัสนั้นที่มุมขวาบนของฟอร์ม ถ้ายังส่งไม่ได้ ให้เขียนเลขอ้างอิงไว้ก่อน แล้วจับคู่กับรายการด้านล่าง</p></div></div>' +
+      '<section class="panel"><div class="tools"><h3>ฟอร์มที่บัญชีนี้ส่งแล้ว</h3><button class="btn sm" id="rl">รีเฟรช</button></div><div class="tscroll"><table><thead><tr><th>รับเมื่อ</th><th>รหัสผู้ตอบ</th><th>เลขอ้างอิง</th></tr></thead><tbody id="mb"><tr><td colspan="3" class="empty">กำลังโหลด…</td></tr></tbody></table></div></section>';
+    wireHead();
+    var load = function () { api("mine").then(function (j) { if (!j.ok) return fail(j);
+      $("#mb").innerHTML = j.rows.length ? j.rows.map(function (r) { return '<tr><td class="num">' + esc((r.received || "").replace("T", " ").slice(0, 16)) + '</td><td class="num"><b>' + esc(r.code) + '</b>' + (r.test ? ' <span class="chip">ทดสอบ</span>' : '') + '</td><td class="num">' + esc(String(r.ref).replace(/-/g, "").slice(0, 8).toUpperCase()) + '</td></tr>'; }).join("") : '<tr><td colspan="3" class="empty">ยังไม่มีฟอร์มที่ส่ง</td></tr>'; }); };
+    $("#rl").onclick = load; load();
+  }
+
+  /* ---------- admin ---------- */
+  function loadAdmin() {
+    root.innerHTML = headBar("หลังบ้านแบบสอบถาม", "ระบบอุปถัมภ์ · บุรีรัมย์ · ข้อมูลจาก Google Sheet ของผู้วิจัย") + '<p class="empty">กำลังโหลดข้อมูล…</p>';
+    wireHead();
+    api("data").then(function (j) { if (!j.ok) return fail(j); D = j; renderAdmin(); });
+  }
+  function rows() { return D.rows.filter(function (r) { return $("#showTest").checked || !r.test; }).map(function (r) { r.p = parse(r.code); return r; }).filter(function (r) { return r.p; }); }
+  function renderAdmin() {
+    root.innerHTML = headBar("หลังบ้านแบบสอบถาม", "ระบบอุปถัมภ์ · บุรีรัมย์ · ข้อมูลจาก Google Sheet ของผู้วิจัย") +
+      '<div class="tools"><span class="chip ' + (D.accept ? "mint" : "warn") + '"><i></i>' + (D.accept ? "เปิดรับข้อมูลจริงแล้ว" : "ยังไม่เปิดรับข้อมูลจริง (รับเฉพาะข้อมูลทดสอบ)") + '</span>' +
+      '<label class="chip"><input type="checkbox" id="showTest"' + (D.accept ? "" : " checked") + '> แสดงข้อมูลทดสอบ</label>' +
+      '<label class="chip">เป้า <select id="tier" style="border:0;background:none;font:inherit;color:inherit;min-height:0;padding:0"><option value="300">300</option><option value="440" selected>440</option><option value="880">880</option></select></label>' +
+      '<button class="btn sm" id="reload">รีเฟรช</button></div>' +
+      '<section class="stats" id="stats"></section><section class="dists" id="dists" aria-label="ความคืบหน้ารายอำเภอ"></section>' +
+      '<nav class="tabs" role="tablist">' + [["pl", "ราย อปท."], ["pr", "รายการคำตอบ"], ["pe", "ผู้เก็บ × วัน"], ["pc", "ผู้ยินดีให้สัมภาษณ์"], ["pu", "บัญชีผู้ใช้"], ["px", "ดาวน์โหลดข้อมูล"], ["ps", "ตั้งค่าและทดสอบ"]].map(function (t) { return '<button class="tab" role="tab" aria-selected="' + (t[0] === TAB) + '" data-p="' + t[0] + '">' + t[1] + '</button>'; }).join("") + '</nav>' +
+      ["pl", "pr", "pe", "pc", "pu", "px", "ps"].map(function (k) { return '<section class="panel" id="' + k + '"' + (k === TAB ? "" : " hidden") + '></section>'; }).join("");
+    wireHead();
+    $("#tier").value = String(TIER);
+    $("#reload").onclick = loadAdmin; $("#showTest").onchange = draw; $("#tier").onchange = function () { TIER = +this.value; draw(); };
+    document.querySelectorAll(".tab").forEach(function (t) { t.onclick = function () { TAB = t.dataset.p; document.querySelectorAll(".tab").forEach(function (x) { x.setAttribute("aria-selected", x === t); $("#" + x.dataset.p).hidden = x !== t; }); if (TAB === "pu") renderUsers(); }; });
+    draw();
+  }
+  function draw() {
+    var R = rows(), today = new Date(), dd = ("0" + today.getDate()).slice(-2) + ("0" + (today.getMonth() + 1)).slice(-2);
+    var nToday = R.filter(function (r) { return r.p.ddmm === dd; }).length, flags = R.filter(function (r) { return r.flag; }).length;
+    $("#stats").innerHTML = stat(R.length, "เก็บแล้ว จากเป้า " + TIER, R.length / TIER) + stat(nToday, "เก็บวันนี้ (" + dd.slice(0, 2) + "/" + dd.slice(2) + ")") +
+      stat(R.filter(function (r) { return r.phase2; }).length, "ยินดีให้สัมภาษณ์รอบ 2 · มีเบอร์ " + D.contacts) + stat(flags, "ธงอาจตอบซ้ำ", null, flags ? "var(--warn)" : "");
+    var byL = {}; D.lgus.forEach(function (l) { byL[l.code] = [0, 0, 0, 0]; });
+    R.forEach(function (r) { var c = cellOf(r, r.p); if (c >= 0 && byL[r.p.lgu]) byL[r.p.lgu][c]++; });
+    $("#dists").innerHTML = DIST.map(function (d) {
+      var tgt = D.district[TIER][d], got = [0, 0, 0, 0]; D.lgus.filter(function (l) { return l.d === d; }).forEach(function (l) { byL[l.code].forEach(function (v, i) { got[i] += v; }); });
+      var tot = got.reduce(function (a, b) { return a + b; }, 0), T = tgt.reduce(function (a, b) { return a + b; }, 0);
+      return '<div class="dist"><div class="top"><h3>อ.' + d + '</h3><span class="num">' + tot + ' / ' + T + '</span></div><div class="cells">' +
+        CELL.map(function (n, i) { var f = Math.min(1, tgt[i] ? got[i] / tgt[i] : 0); return '<div class="cell' + (i > 1 ? " o" : "") + (got[i] >= tgt[i] ? " full" : "") + '"><div class="m"><i style="height:' + (f * 100).toFixed(0) + '%"></i></div><span class="v">' + got[i] + '/' + tgt[i] + '</span><span>' + n + '</span></div>'; }).join("") + '</div></div>';
+    }).join("");
+    $("#pl").innerHTML = '<p class="small muted">เป้าราย อปท. ตามแผนที่ภาคสนาม (เป้า ' + TIER + ') · ช่องเป็น ได้/เป้า · ' + R.filter(function (r) { return r.p.lgu === "U00"; }).length + ' ชุดไม่ทราบ อปท. (U00)</p><div class="tscroll"><table><thead><tr><th>รหัส</th><th>อปท.</th><th>อำเภอ</th>' + CELL.map(function (c) { return '<th class="r">' + c + '</th>'; }).join("") + '<th class="r">รวม</th></tr></thead><tbody>' +
+      D.lgus.map(function (l) { var t = l.target[TIER], g = byL[l.code], G = g.reduce(function (a, b) { return a + b; }, 0), TT = t.reduce(function (a, b) { return a + b; }, 0);
+        return '<tr><td class="num">' + l.code + '</td><td>' + esc(l.n) + '</td><td>' + esc(l.d) + '</td>' + t.map(function (v, i) { return '<td class="r num"' + (g[i] >= v && v ? ' style="color:var(--mint-ink);font-weight:600"' : '') + '>' + g[i] + '/' + v + '</td>'; }).join("") +
+        '<td class="r num">' + G + '/' + TT + '<span class="prog"><i style="width:' + Math.min(100, TT ? G / TT * 100 : 0).toFixed(0) + '%"></i></span></td></tr>'; }).join("") + '</tbody></table></div>';
+    var SEX = { 1: "ชาย", 2: "หญิง", 3: "ไม่ระบุ" }, MODE = { 0: "กระดาษ", 1: "อ่านให้ฟัง", 2: "ออนไลน์" };
+    $("#pr").innerHTML = '<div class="tools"><input id="q" placeholder="ค้นหารหัส ตำบล ผู้เก็บ หรือธง" aria-label="ค้นหา"><span class="small muted">แตะแถวเพื่อดูคำตอบทั้งหมด</span></div><div class="tscroll"><table><thead><tr><th>รหัส</th><th>รับเมื่อ</th><th>อำเภอ</th><th>ตำบล</th><th>รุ่น</th><th>เพศ</th><th>วิธีตอบ</th><th>ผู้เก็บ</th><th class="r">I</th><th class="r">P</th><th class="r">C</th><th>ธง</th></tr></thead><tbody id="rb"></tbody></table></div>';
+    var drawR = function () { var q = ($("#q").value || "").trim(); var L = R.filter(function (r) { return !q || (r.code + " " + r.tambon + " " + r.flag + " " + r.collector).indexOf(q) >= 0; }).sort(function (a, b) { return b.received < a.received ? -1 : 1; });
+      $("#rb").innerHTML = L.length ? L.slice(0, 500).map(function (r) { return '<tr class="click" data-code="' + esc(r.code) + '"><td class="num">' + esc(r.code) + (r.test ? ' <span class="chip">ทดสอบ</span>' : '') + '</td><td class="num">' + esc((r.received || "").replace("T", " ").slice(0, 16)) + '</td><td>' + esc(r.district) + '</td><td>' + esc(r.tambon) + '</td><td>' + r.p.gen + '</td><td>' + (SEX[r.sex] || "-") + '</td><td>' + (MODE[r.mode] || "-") + '</td><td>' + (r.p.en === "9" ? "ออนไลน์" : esc(r.collector || r.p.en)) + '</td><td class="r num">' + esc(r.I) + '</td><td class="r num">' + esc(r.P) + '</td><td class="r num">' + esc(r.C) + '</td><td class="flag">' + esc(r.flag) + '</td></tr>'; }).join("") : '<tr><td colspan="12" class="empty">ยังไม่มีคำตอบ</td></tr>'; };
+    drawR(); $("#q").oninput = drawR;
+    $("#rb").onclick = function (e) { var tr = e.target.closest("tr[data-code]"); if (!tr) return; var c = tr.dataset.code; dialog(c, "<pre>กำลังโหลด…</pre>"); api("detail", { code: c }).then(function (j) { var t = j.json; try { t = JSON.stringify(JSON.parse(t), null, 1); } catch (x) {} $("#dlgB").innerHTML = "<pre>" + esc(t || "ไม่พบ") + "</pre>"; }); };
+    var days = [], en = {}; R.forEach(function (r) { if (days.indexOf(r.p.ddmm) < 0) days.push(r.p.ddmm); var k = r.p.en; (en[k] = en[k] || {})[r.p.ddmm] = (en[k][r.p.ddmm] || 0) + 1; });
+    days.sort(function (a, b) { return (a.slice(2) + a.slice(0, 2)) < (b.slice(2) + b.slice(0, 2)) ? -1 : 1; });
+    var ens = Object.keys(en).sort();
+    $("#pe").innerHTML = ens.length ? '<div class="tscroll"><table><thead><tr><th>ผู้เก็บ</th>' + days.map(function (d) { return '<th class="r num">' + d.slice(0, 2) + '/' + d.slice(2) + '</th>'; }).join("") + '<th class="r">รวม</th></tr></thead><tbody>' +
+      ens.map(function (k) { var s = 0; return '<tr><td>' + (k === "9" ? "ออนไลน์ (9)" : "ผู้เก็บ " + k) + '</td>' + days.map(function (d) { var v = en[k][d] || 0; s += v; return '<td class="r num">' + (v || "") + '</td>'; }).join("") + '<td class="r num"><b>' + s + '</b></td></tr>'; }).join("") + '</tbody></table></div>' : '<p class="empty">ยังไม่มีคำตอบ</p>';
+    renderContacts(); renderExport(); renderSettings(); if (TAB === "pu") renderUsers();
+  }
+  function renderContacts() {
+    var P = $("#pc");
+    if (!CONTACTS) { P.innerHTML = '<p class="small muted">เบอร์โทรเก็บแยกจากคำตอบ เปิดดูเมื่อจำเป็น ทุกครั้งที่เปิดจะถูกบันทึกในชีต “บันทึกระบบ” พร้อมชื่อผู้ใช้</p><div><button class="btn primary" id="openC">แสดงรายชื่อ ' + D.contacts + ' คน</button></div>';
+      $("#openC").onclick = function () { api("contacts").then(function (j) { if (!j.ok) return fail(j); CONTACTS = j.contacts; renderContacts(); }); }; return; }
+    var by = {}; D.rows.forEach(function (r) { by[r.code] = r; });
+    P.innerHTML = '<div class="tools"><label class="small">เรียงตาม <select id="srt"><option value="P">คะแนน P สูงไปต่ำ</option><option value="code">รหัส</option></select></label><span class="small muted">แตะเบอร์เพื่อแสดงเต็ม</span></div><div class="tscroll"><table><thead><tr><th>รหัส</th><th>อำเภอ</th><th>รุ่น</th><th class="r">I</th><th class="r">P</th><th class="r">C</th><th>เบอร์</th><th>เวลาที่สะดวก</th><th>ลบภายใน</th></tr></thead><tbody id="cb"></tbody></table></div>';
+    var drawC = function () { var k = $("#srt").value; var L = CONTACTS.map(function (c) { var r = by[c.code] || {}; return Object.assign({}, c, { d: r.district, P: r.P, I: r.I, C: r.C, test: r.test }); }).filter(function (c) { return $("#showTest").checked || !c.test; });
+      L.sort(function (a, b) { return k === "P" ? (+b.P || 0) - (+a.P || 0) : a.code < b.code ? -1 : 1; });
+      $("#cb").innerHTML = L.length ? L.map(function (c) { var p = c.phone, m = p.length > 4 ? p.slice(0, 3) + "-xxx-" + p.slice(-4) : p; return '<tr><td class="num">' + esc(c.code) + '</td><td>' + esc(c.d) + '</td><td>' + esc(c.code[0]) + '</td><td class="r num">' + esc(c.I) + '</td><td class="r num">' + esc(c.P) + '</td><td class="r num">' + esc(c.C) + '</td><td><button class="btn sm num" data-full="' + esc(p) + '">' + esc(m) + '</button></td><td>' + esc(c.time) + '</td><td class="num">' + esc(c.deleteBy) + '</td></tr>'; }).join("") : '<tr><td colspan="9" class="empty">ยังไม่มีผู้ให้เบอร์</td></tr>'; };
+    drawC(); $("#srt").onchange = drawC; $("#cb").onclick = function (e) { var b = e.target.closest("button[data-full]"); if (b) b.textContent = b.dataset.full; };
+  }
+  function renderUsers() {
+    var P = $("#pu");
+    if (!USERS) { P.innerHTML = '<p class="empty">กำลังโหลดบัญชี…</p>'; api("users").then(function (j) { if (!j.ok) return fail(j); USERS = j.users; renderUsers(); }); return; }
+    var me = Auth.get().user.username;
+    P.innerHTML = '<div class="card" style="display:grid;gap:10px"><h3>เพิ่มบัญชี</h3><form class="form-row" id="add" autocomplete="off">' +
+      '<label>ชื่อผู้ใช้ (a–z 0–9 . _ -)<input class="txt" name="username" required pattern="[a-z0-9._\\-]{3,20}" autocapitalize="none" spellcheck="false"></label>' +
+      '<label>ชื่อที่แสดง<input class="txt" name="name" placeholder="เช่น ผู้ช่วยวิจัย 3"></label>' +
+      '<label>สิทธิ์<select name="role"><option value="enumerator">ผู้เก็บข้อมูล</option><option value="admin">ผู้ดูแล (ดูข้อมูลได้)</option></select></label>' +
+      '<label>เลขผู้เก็บ<select name="enumerator"><option value="">ไม่มี</option>' + [1, 2, 3, 4, 5, 6, 7, 8].map(function (n) { return '<option>' + n + '</option>'; }).join("") + '</select></label>' +
+      '<button class="btn primary">สร้างบัญชี</button></form><p class="small muted">ระบบสร้างรหัสผ่านชั่วคราวให้ แสดงครั้งเดียว ส่งให้เจ้าของบัญชีทางช่องทางส่วนตัว เจ้าของบัญชีต้องตั้งรหัสใหม่ตอนเข้าครั้งแรก ผู้ดูแลที่จะเก็บข้อมูลด้วยให้กำหนดเลขผู้เก็บไว้ด้วย</p></div>' +
+      '<div class="tscroll"><table><thead><tr><th>ชื่อผู้ใช้</th><th>ชื่อ</th><th>สิทธิ์</th><th>เลขผู้เก็บ</th><th>สถานะ</th><th>เข้าล่าสุด</th><th></th></tr></thead><tbody>' +
+      USERS.map(function (u) { return '<tr data-u="' + esc(u.username) + '"><td class="num">' + esc(u.username) + (u.username === me ? ' <span class="chip">คุณ</span>' : '') + '</td><td>' + esc(u.name) + '</td><td>' + (u.role === "admin" ? "ผู้ดูแล" : "ผู้เก็บข้อมูล") + '</td>' +
+        '<td><select data-k="enumerator" aria-label="เลขผู้เก็บ">' + ['<option value="0">-</option>'].concat([1, 2, 3, 4, 5, 6, 7, 8].map(function (n) { return '<option value="' + n + '"' + (u.enumerator === n ? " selected" : "") + '>' + n + '</option>'; })).join("") + '</select></td>' +
+        '<td class="' + (u.active ? "st-on" : "st-off") + '">' + (u.active ? "ใช้งาน" : "ปิด") + (u.mustChange ? ' <span class="chip warn">รอตั้งรหัส</span>' : '') + '</td><td class="num small">' + esc((u.lastLogin || "-").replace("T", " ").slice(0, 16)) + '</td>' +
+        '<td><button class="btn sm" data-a="reset">ตั้งรหัสชั่วคราว</button> ' + (u.username === me ? '' : '<button class="btn sm" data-a="toggle">' + (u.active ? "ปิดบัญชี" : "เปิดบัญชี") + '</button>') + '</td></tr>'; }).join("") + '</tbody></table></div>';
+    var showTemp = function (j, what) { dialog(what, '<p>ชื่อผู้ใช้ <b class="num">' + esc(j.username) + '</b></p><div class="temp" id="tp">' + esc(j.tempPassword) + '</div><p class="small muted">รหัสนี้แสดงครั้งเดียว ส่งให้เจ้าของบัญชีทางช่องทางส่วนตัว ไม่ต้องเก็บไว้ที่อื่น เจ้าของบัญชีจะถูกให้ตั้งรหัสใหม่ตอนเข้าครั้งแรก</p><div><button class="btn" id="cp">คัดลอก</button></div>');
+      $("#cp").onclick = function () { try { navigator.clipboard.writeText(j.tempPassword); this.textContent = "คัดลอกแล้ว"; } catch (x) {} }; };
+    $("#add").onsubmit = function (e) { e.preventDefault(); var f = e.target;
+      api("addUser", { username: f.username.value.trim().toLowerCase(), name: f.name.value.trim(), role: f.role.value, enumerator: +f.enumerator.value || 0 }).then(function (j) { if (!j.ok) return fail(j); msg(""); USERS = null; renderUsers(); showTemp(j, "สร้างบัญชีแล้ว"); }); };
+    P.querySelector("tbody").onclick = function (e) { var b = e.target.closest("button[data-a]"); if (!b) return; var name = b.closest("tr").dataset.u, u = USERS.filter(function (x) { return x.username === name; })[0];
+      if (b.dataset.a === "reset") { if (!confirm("ตั้งรหัสผ่านชั่วคราวใหม่ให้ " + name + "? รหัสเดิมใช้ไม่ได้ทันที")) return; api("resetPassword", { username: name }).then(function (j) { if (!j.ok) return fail(j); USERS = null; renderUsers(); showTemp(j, "รหัสผ่านชั่วคราวใหม่"); }); }
+      if (b.dataset.a === "toggle") api("setUser", { username: name, active: !u.active }).then(function (j) { if (!j.ok) return fail(j); msg((u.active ? "ปิด" : "เปิด") + "บัญชี " + name + " แล้ว"); USERS = null; renderUsers(); }); };
+    P.querySelector("tbody").onchange = function (e) { var s = e.target.closest("select[data-k]"); if (!s) return; var name = s.closest("tr").dataset.u;
+      api("setUser", { username: name, enumerator: +s.value || 0 }).then(function (j) { if (!j.ok) { fail(j); USERS = null; return renderUsers(); } msg("เปลี่ยนเลขผู้เก็บของ " + name + " แล้ว"); USERS = null; renderUsers(); }); };
+  }
+  function renderExport() {
+    $("#px").innerHTML = '<div class="card" style="display:grid;gap:12px"><h3>ดาวน์โหลดชุดข้อมูล</h3><p class="small muted">ไฟล์ CSV (UTF-8 เปิดด้วย Excel, Stata, R ได้) หนึ่งแถวต่อผู้ตอบ ใช้รหัสผู้ตอบเป็นตัวระบุ ไม่มีชื่อ ไม่มีเบอร์โทร ทุกครั้งที่ดาวน์โหลดถูกบันทึกในชีต “บันทึกระบบ”</p>' +
+      '<label class="small"><input type="checkbox" id="xt"> รวมข้อมูลทดสอบ</label><div class="tools"><button class="btn primary" data-w="responses">คำตอบทั้งหมด (responses.csv)</button><button class="btn" data-w="conjoint">การเลือกคู่ผู้สมัคร (conjoint.csv)</button></div>' +
+      '<p class="small muted">คอลัมน์: code, rid (เลขอ้างอิงฟอร์ม), collector, received, test, flag, started, finished, seconds, mode, venue, enumerator, version, order, q1 … q76, ipc_I, ipc_P, ipc_C</p></div>';
+    $("#px").onclick = function (e) { var b = e.target.closest("button[data-w]"); if (!b) return;
+      if (demo()) return msg("โหมดตัวอย่าง: ดาวน์โหลดได้เมื่อเชื่อมหลังบ้านแล้ว", true);
+      b.disabled = true; api("exportCsv", { which: b.dataset.w, includeTest: $("#xt").checked }).then(function (j) { b.disabled = false; if (!j.ok) return fail(j);
+        var a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([j.csv], { type: "text/csv;charset=utf-8" })); a.download = j.name; a.click(); msg("ดาวน์โหลด " + j.rows + " แถว"); }); };
+  }
+  function renderSettings() {
+    $("#ps").innerHTML = '<div class="card" style="display:grid;gap:8px"><h3>ข้อมูลทดสอบ</h3><p class="small muted">ใช้ทดสอบระบบก่อน EC อนุมัติ ทุกแถวมีค่า test = 1 และลบออกได้ทั้งหมด</p><div class="tools"><button class="btn" id="seed">สร้างข้อมูลทดสอบ 30 ชุด</button><button class="btn" id="clr">ลบข้อมูลทดสอบทั้งหมด</button></div></div>' +
+      '<div class="danger-zone"><h3>ลบเบอร์ติดต่อทั้งหมด</h3><p class="small">ทำเมื่อสัมภาษณ์รอบ 2 เสร็จ ตามที่แจ้งคณะกรรมการจริยธรรมฯ' + (D.deleteBy ? ' (กำหนดภายใน ' + esc(D.deleteBy) + ')' : '') + ' ลบแล้วกู้คืนไม่ได้ พิมพ์ <b>ลบเบอร์ทั้งหมด</b> เพื่อยืนยัน</p><div class="tools"><input id="cf" placeholder="ลบเบอร์ทั้งหมด" aria-label="ข้อความยืนยัน"><button class="btn" id="del" disabled style="color:var(--bad)">ลบเบอร์ ' + D.contacts + ' รายการ</button></div></div>' +
+      '<p class="small muted">การเปิดรับข้อมูลจริง: เจ้าของสคริปต์ตั้งค่า ACCEPT = 1 ใน Script properties หลัง EC อนุมัติ</p>';
+    $("#seed").onclick = function () { msg("กำลังสร้างข้อมูลทดสอบ…"); api("seedTest", { n: 30 }).then(function (j) { if (!j.ok) return fail(j); msg("สร้างแล้ว " + j.made + " ชุด"); loadAdmin(); }); };
+    $("#clr").onclick = function () { msg("กำลังลบข้อมูลทดสอบ…"); api("clearTest").then(function (j) { if (!j.ok) return fail(j); msg("ลบแล้ว " + j.deleted + " ชุด"); loadAdmin(); }); };
+    $("#cf").oninput = function () { $("#del").disabled = $("#cf").value !== "ลบเบอร์ทั้งหมด"; };
+    $("#del").onclick = function () { api("deleteContacts", { confirm: $("#cf").value }).then(function (j) { if (!j.ok) return fail(j); msg("ลบเบอร์แล้ว " + j.deleted + " รายการ"); CONTACTS = null; loadAdmin(); }); };
+  }
+  start();
+})();
+</script>
+</body>
+</html>

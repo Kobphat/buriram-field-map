@@ -68,3 +68,23 @@ th{font-family:var(--f-display);font-weight:500;color:var(--muted);font-size:.84
 td.r,th.r{text-align:right}
 .tscroll{overflow-x:auto;border:1px solid var(--line);border-radius:var(--r);background:var(--surface)}
 .tscroll table th:first-child,.tscroll table td:first-child{padding-left:16px}
+
+/* sign-in box (survey intro and /admin/) */
+.login{display:grid;gap:12px;max-width:420px}
+.login h3{font-size:1.15rem}
+.login .fld{display:grid;gap:4px;font-size:.88rem;color:var(--muted)}
+.login .txt,.form-row .txt,.form-row select{font:inherit;color:var(--ink);background:var(--surface);border:1px solid var(--line2);border-radius:10px;padding:9px 12px;min-height:44px;width:100%}
+.login .txt:focus,.form-row .txt:focus,.form-row select:focus{outline:2px solid var(--focus);outline-offset:1px;border-color:transparent}
+.login .pw{position:relative;display:block}
+.login .pw .txt{padding-right:72px}
+.login .eye{position:absolute;right:6px;top:50%;transform:translateY(-50%);border:0;background:var(--sunk);color:var(--muted);font:inherit;font-size:.8rem;border-radius:8px;padding:5px 10px;cursor:pointer}
+.login .row{display:flex;gap:8px;flex-wrap:wrap}
+.login .err{color:var(--bad);min-height:1.2em}
+.login .err:empty{display:none}
+.whobox{display:grid;gap:12px}
+.whotop{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.whotop .btn{margin-left:auto}
+.avatar{width:40px;height:40px;border-radius:50%;background:var(--mint);color:var(--mint-ink);display:grid;place-items:center;font-family:var(--f-display);font-weight:600;font-size:1.1rem;flex:none}
+details.sent summary{cursor:pointer;font-size:.9rem;color:var(--muted)}
+details.sent table{margin-top:8px;font-size:.85rem}
+.big-code{font-size:1.25rem;letter-spacing:.04em}
