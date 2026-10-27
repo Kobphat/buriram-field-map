@@ -10,7 +10,6 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kanit:wght@500;600;700&family=IBM+Plex+Sans+Thai:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <link rel="stylesheet" href="../assets/site.css">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect x='1' y='1' width='6' height='6' rx='1.5' fill='%23fed257'/%3E%3Crect x='9' y='1' width='6' height='6' rx='1.5' fill='%23fbb1d1'/%3E%3Crect x='1' y='9' width='6' height='6' rx='1.5' fill='%2335b4ec'/%3E%3Crect x='9' y='9' width='6' height='6' rx='1.5' fill='%2328bd6b'/%3E%3C/svg%3E">
 <style>
 /* Layout: sign-in gate → (admin) field-office console: status strip, district progress against quota, tabs; (enumerator) own account and sent codes */
 main.wrap{display:grid;gap:18px;padding-top:24px}
@@ -69,9 +68,13 @@ dialog pre{font-family:var(--f-mono);font-size:.76rem;background:var(--sunk);bor
 #loginbox .login{max-width:none}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}@media (max-width:820px){.grid2{grid-template-columns:1fr}}
 </style>
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="../assets/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="../assets/apple-touch-icon.png">
+<meta name="theme-color" content="#f7f7f4">
 </head>
 <body>
-<nav class="site-nav" aria-label="เมนูหลัก"><div class="wrap"><a class="brand" href="../"><i aria-hidden="true"><b style="background:#fed257"></b><b style="background:#fbb1d1"></b><b style="background:#35b4ec"></b><b style="background:#28bd6b"></b></i>ระบบอุปถัมภ์ · บุรีรัมย์</a><ul><li><a class="nl" href="../#intro">บทนำ</a></li><li><a class="nl" href="../#lit">วรรณกรรม</a></li><li><a class="nl" href="../#method">ระเบียบวิธี</a></li><li><a class="nl" href="../field/">แผนที่ภาคสนาม</a></li><li><a class="nl" href="../codes/">บัตรรหัส</a></li><li><a class="nl cta" href="../survey/">แบบสอบถาม</a></li><li><a class="nl" href="../admin/" aria-current="page">เข้าสู่ระบบ</a></li></ul></div></nav>
+<nav class="site-nav" aria-label="เมนูหลัก"><div class="wrap"><a class="brand" href="../"><img class="logo" src="../assets/logo.svg" alt="" width="33" height="22">ระบบอุปถัมภ์ · บุรีรัมย์</a><ul><li><a class="nl" href="../#intro">บทนำ</a></li><li><a class="nl" href="../#lit">วรรณกรรม</a></li><li><a class="nl" href="../#method">ระเบียบวิธี</a></li><li><a class="nl" href="../field/">แผนที่ภาคสนาม</a></li><li><a class="nl" href="../codes/">บัตรรหัส</a></li><li><a class="nl cta" href="../survey/">แบบสอบถาม</a></li><li><a class="nl" href="../admin/" aria-current="page">เข้าสู่ระบบ</a></li></ul></div></nav>
 <main class="wrap" id="root" aria-live="polite"></main>
 <dialog id="dlg"><div class="in"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><h3 id="dlgT"></h3><button class="btn sm" id="dlgX">ปิด</button></div><div id="dlgB"></div></div></dialog>
 <script src="../assets/config.js"></script>
