@@ -1,0 +1,789 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+<title>แผนภาคสนามบุรีรัมย์</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@500;600;700&family=IBM+Plex+Sans+Thai:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: field-sheet tool — header with sample-size tier + live quota totals, tab bar, then zoomable map + drill-down panel (stacks on phone) */
+:root{
+  --bg:#f3f4ef; --surface:#ffffff; --sunk:#e9ebe3; --ink:#1c221e; --muted:#5a645d; --line:#d3d8cd; --line2:#b9c0b3;
+  --accent:#23497e; --accent-ink:#ffffff; --warn:#a4561a; --bad:#a32a2a; --good:#2f7a45; --focus:#c2410c;
+  --nk:#3d4197; --mg:#16807f; --tb:#c98f1f; --ao:#6a9447;
+  --nk2:#9b9ed6; --mg2:#86c6c4; --tb2:#ebc777; --ao2:#b4cf98;
+  --ctx:#e3e5dd; --ctx-line:#c7ccbf; --p0:#eef0e8; --p1:#c9e1c4; --p2:#8fc28c; --p3:#4f9a5b; --p4:#24683a;
+  --f-display:"Bai Jamjuree","IBM Plex Sans Thai",Tahoma,sans-serif;
+  --f-body:"IBM Plex Sans Thai",Tahoma,"Noto Sans Thai",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#141815; --surface:#1d221e; --sunk:#252b26; --ink:#e7ebe4; --muted:#a2ab9f; --line:#343b35; --line2:#4a524b;
+  --accent:#8fb1e8; --accent-ink:#0f1a2b; --warn:#e3a066; --bad:#ef8a8a; --good:#7fcf95; --focus:#fb923c;
+  --nk:#8e93ee; --mg:#4cc2bf; --tb:#e6b54f; --ao:#9cc979;
+  --nk2:#3d4180; --mg2:#1f5d5c; --tb2:#7a5a1c; --ao2:#41592e;
+  --ctx:#232824; --ctx-line:#3a413b; --p0:#232824; --p1:#2b4a33; --p2:#3c7049; --p3:#5ea56c; --p4:#93dba2;
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#141815; --surface:#1d221e; --sunk:#252b26; --ink:#e7ebe4; --muted:#a2ab9f; --line:#343b35; --line2:#4a524b;
+  --accent:#8fb1e8; --accent-ink:#0f1a2b; --warn:#e3a066; --bad:#ef8a8a; --good:#7fcf95; --focus:#fb923c;
+  --nk:#8e93ee; --mg:#4cc2bf; --tb:#e6b54f; --ao:#9cc979;
+  --nk2:#3d4180; --mg2:#1f5d5c; --tb2:#7a5a1c; --ao2:#41592e;
+  --ctx:#232824; --ctx-line:#3a413b; --p0:#232824; --p1:#2b4a33; --p2:#3c7049; --p3:#5ea56c; --p4:#93dba2;
+  color-scheme:dark}
+*{box-sizing:border-box}
+html,body{background:var(--bg);color:var(--ink)}
+body{font-family:var(--f-body);font-size:15px;line-height:1.6;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 48px}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+.wrap{max-width:1320px;margin:0 auto}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;line-height:1.25;margin:0}
+h1{font-size:clamp(1.45rem,1.1rem + 1.4vw,2.1rem);font-weight:700;letter-spacing:-.01em}
+h2{font-size:1.3rem;font-weight:600}
+h3{font-size:1.05rem;font-weight:600}
+p{margin:0}
+.num,.mono{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.eyebrow{font-size:.75rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2.5px solid var(--accent);outline-offset:2px;border-radius:4px}
+a{color:var(--accent)}
+
+header.top{padding-block:22px 14px;display:grid;gap:14px}
+.titlerow{display:flex;flex-wrap:wrap;gap:10px 24px;align-items:flex-end;justify-content:space-between}
+.titlerow p{color:var(--muted);max-width:66ch}
+.sync{display:inline-flex;align-items:center;gap:8px;font-size:.82rem;padding:4px 10px;border:1px solid var(--line);border-radius:999px;background:var(--surface);white-space:nowrap}
+.sync i{width:8px;height:8px;border-radius:50%;background:var(--line2);display:inline-block}
+.sync.on i{background:var(--good)} .sync.off i{background:var(--warn)}
+.tiers{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.tier{border:1.5px solid var(--line);background:var(--surface);border-radius:10px;padding:9px 12px;text-align:left;cursor:pointer;display:grid;gap:1px;min-width:0}
+.tier b{font-family:var(--f-display);font-size:1rem}
+.tier .tn{font-family:var(--f-mono);font-size:1.15rem}
+.tier span{font-size:.78rem;color:var(--muted)}
+.tier .tnote{font-size:inherit;color:inherit}
+.tier .tn{color:var(--ink)}
+.tier[aria-pressed="true"]{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.cells{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.cell{background:var(--surface);padding:10px 14px;display:grid;gap:2px;min-width:0}
+.cell .lab{font-size:.78rem;color:var(--muted)}
+.cell .big{font-family:var(--f-mono);font-size:1.35rem;font-weight:500;font-variant-numeric:tabular-nums}
+.cell .big small{font-size:.8rem;color:var(--muted);font-weight:400}
+.bar{height:5px;background:var(--sunk);border-radius:3px;overflow:hidden}
+.bar>span{display:block;height:100%;background:var(--good);width:0;transition:width .3s}
+.cell.total{background:var(--sunk)}
+
+nav.tabs{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);border-bottom:1px solid var(--line);display:flex;gap:2px;overflow-x:auto;scrollbar-width:none;margin-bottom:16px}
+nav.tabs button{border:0;background:none;padding:10px 14px;font-weight:500;color:var(--muted);border-bottom:2.5px solid transparent;white-space:nowrap;cursor:pointer}
+nav.tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+
+.mapview{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:18px;align-items:start}
+.mapbox{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px;position:sticky;top:calc(env(safe-area-inset-top,0px) + 58px)}
+.maptools{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;align-items:center}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.seg button{border:0;background:var(--surface);padding:5px 10px;font-size:.84rem;cursor:pointer}
+.seg button+button{border-left:1px solid var(--line)}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.mapframe{position:relative;border-radius:8px;overflow:hidden;background:var(--sunk)}
+svg#map{width:100%;height:min(74vh,760px);display:block;touch-action:none;cursor:grab;user-select:none;-webkit-user-select:none}
+svg#map.dragging{cursor:grabbing}
+.zoomctl{position:absolute;right:10px;top:10px;display:grid;gap:4px}
+.zoomctl button{width:34px;height:34px;border-radius:8px;border:1px solid var(--line2);background:var(--surface);font-size:1.1rem;line-height:1;cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.maphint{position:absolute;left:10px;bottom:8px;font-size:.74rem;color:var(--muted);background:var(--surface);opacity:.92;padding:2px 8px;border-radius:6px;pointer-events:none;max-width:calc(100% - 20px)}
+.ctx{fill:var(--ctx);stroke:var(--ctx-line);stroke-width:1}
+.ctxlbl{font:500 14px var(--f-body);fill:var(--muted);text-anchor:middle;opacity:.75;pointer-events:none}
+.tam{stroke:var(--surface);stroke-width:1;cursor:pointer;transition:opacity .2s}
+.tam:hover{opacity:.82}
+.tam.dim{opacity:.28}
+.tam.sel{stroke:var(--ink);stroke-width:3}
+.dhalo{fill:none;stroke:var(--surface);stroke-width:7;pointer-events:none;stroke-linejoin:round}
+.dline{fill:none;stroke:var(--ink);stroke-width:2.4;pointer-events:none;stroke-linejoin:round}
+.dline.on{stroke:var(--focus);stroke-width:4}
+.tl{font:500 11px var(--f-body);fill:var(--ink);text-anchor:middle;pointer-events:none;paint-order:stroke;stroke:var(--surface);stroke-width:3px;stroke-linejoin:round}
+.tn{font:600 11px var(--f-mono);text-anchor:middle;pointer-events:none}
+.pill{fill:var(--ink);opacity:.86}
+.pilltx{fill:var(--bg)}
+.dl{font:700 19px var(--f-display);fill:var(--ink);text-anchor:middle;pointer-events:none;paint-order:stroke;stroke:var(--surface);stroke-width:5px;stroke-linejoin:round}
+.dn{font:600 13px var(--f-mono);fill:var(--ink);text-anchor:middle;pointer-events:none;paint-order:stroke;stroke:var(--surface);stroke-width:4px}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:.82rem;margin-top:8px;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.sw{width:14px;height:14px;border-radius:3px;display:inline-block;border:1px solid var(--line)}
+
+.panel{display:grid;gap:14px;min-width:0}
+.crumbs{display:flex;flex-wrap:wrap;gap:4px 6px;align-items:center;font-size:.86rem}
+.crumbs button{border:0;background:none;padding:2px 4px;color:var(--accent);cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+.crumbs span.cur{font-weight:600}
+.crumbs i{color:var(--muted);font-style:normal}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;display:grid;gap:12px;min-width:0}
+.card.hint{background:var(--sunk);border-style:dashed}
+.chip{display:inline-flex;align-items:center;gap:6px;font-size:.78rem;font-weight:600;padding:2px 9px;border-radius:999px;color:#fff;white-space:nowrap}
+.chip.nk{background:var(--nk)} .chip.mg{background:var(--mg)} .chip.tb{background:var(--tb);color:#1c1a12} .chip.ao{background:var(--ao);color:#121a0d}
+.lhead{display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px}
+.lhead h3{font-size:1.2rem}
+.kv{display:flex;flex-wrap:wrap;gap:4px 18px;font-size:.88rem;color:var(--muted)}
+.kv b{color:var(--ink);font-family:var(--f-mono);font-weight:500}
+.qgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.q{border:1px solid var(--line);border-radius:10px;padding:10px;display:grid;gap:6px;min-width:0}
+.q .qt{display:flex;justify-content:space-between;align-items:baseline;gap:6px;font-size:.84rem}
+.q .qn{font-family:var(--f-mono);font-size:1.25rem;font-variant-numeric:tabular-nums}
+.q .qn small{font-size:.8rem;color:var(--muted)}
+.q.full{border-color:var(--good)} .q.over{border-color:var(--bad)}
+.q .pop{font-size:.74rem;color:var(--muted)}
+.plus{border:1px solid var(--accent);background:var(--accent);color:var(--accent-ink);border-radius:8px;padding:6px 0;font-weight:600;cursor:pointer;width:100%}
+.plus.ghost{background:transparent;color:var(--accent)}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.venues{display:flex;flex-wrap:wrap;gap:6px}
+.venues button{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:4px 11px;font-size:.84rem;cursor:pointer}
+.venues button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.mix{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+.mix div{background:var(--sunk);border-radius:8px;padding:8px;display:grid;min-width:0}
+.mix b{font-family:var(--f-mono);font-size:1.1rem;font-weight:500}
+.mix span{font-size:.76rem;color:var(--muted)}
+.links{display:flex;flex-wrap:wrap;gap:6px}
+.links a{font-size:.84rem;text-decoration:none;border:1px solid var(--line);border-radius:6px;padding:3px 9px;background:var(--surface)}
+.links a:hover{border-color:var(--accent)}
+ul.tips{margin:0;padding-left:1.1em;display:grid;gap:4px;font-size:.9rem}
+.note{font-size:.86rem;border-left:3px solid var(--warn);padding:6px 10px;background:var(--sunk);border-radius:0 6px 6px 0}
+.note.info{border-left-color:var(--accent)}
+.parts{width:100%;font-size:.88rem;border-collapse:collapse}
+.parts td{padding:3px 10px 3px 0;white-space:normal;text-align:left;border:0}
+.parts td.num{text-align:right}
+.dcards{display:grid;gap:8px}
+.dcard{border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:var(--surface);cursor:pointer;text-align:left;display:grid;gap:4px;width:100%}
+.dcard:hover{border-color:var(--accent)}
+.dcard .top{display:flex;justify-content:space-between;gap:8px;align-items:baseline;flex-wrap:wrap}
+.dcard .top b{font-family:var(--f-display);font-size:1.05rem}
+.lgulist{display:grid}
+.lgurow{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:10px;align-items:center;border:0;border-top:1px solid var(--line);background:none;padding:6px 2px;text-align:left;cursor:pointer;width:100%}
+.lgurow:hover{background:var(--sunk)}
+.lgurow .c{font-size:.76rem;color:var(--muted);font-family:var(--f-mono)}
+
+.tblwrap{overflow-x:auto;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+table.big{border-collapse:collapse;width:100%;font-size:.88rem}
+table.big th,table.big td{padding:7px 10px;text-align:right;white-space:nowrap;border-bottom:1px solid var(--line)}
+table.big th:first-child,table.big td:first-child,table.big th.l,table.big td.l{text-align:left}
+table.big thead th{position:sticky;top:0;background:var(--sunk);font-weight:600;font-size:.8rem;color:var(--muted)}
+tbody tr.lg{cursor:pointer} tbody tr.lg:hover td{background:var(--sunk)}
+tr.dist td{background:var(--sunk);font-weight:600}
+tr.grand td{font-weight:700;border-top:2px solid var(--line2)}
+td.num{font-family:var(--f-mono)}
+.tbar{display:inline-block;width:56px;height:6px;background:var(--sunk);border-radius:3px;vertical-align:middle;margin-left:6px;overflow:hidden}
+.tbar span{display:block;height:100%;background:var(--good)}
+.btn{border:1px solid var(--line2);background:var(--surface);border-radius:8px;padding:6px 12px;cursor:pointer;font-size:.88rem}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.mini{width:100%;height:auto;max-height:260px;background:var(--sunk);border-radius:8px}
+.mini .m-ctx{fill:var(--ctx);stroke:var(--ctx-line);stroke-width:1.5}
+.mini .m-t{stroke:var(--surface);stroke-width:1.5}
+.mini .edge{fill:none;stroke:var(--bad);stroke-width:5;stroke-dasharray:10 6;stroke-linecap:round}
+.mini text{font:600 15px var(--f-body);fill:var(--ink);text-anchor:middle;paint-order:stroke;stroke:var(--sunk);stroke-width:4px}
+.splitbar{display:flex;height:22px;border-radius:6px;overflow:hidden;font-size:.74rem;font-weight:600}
+.splitbar span{display:flex;align-items:center;justify-content:center;color:#fff;min-width:0;overflow:hidden;white-space:nowrap}
+.prose{display:grid;gap:18px;max-width:78ch}
+.prose ol,.prose ul{margin:0;padding-left:1.3em;display:grid;gap:6px}
+.script{background:var(--sunk);border-radius:10px;padding:12px 14px;display:grid;gap:6px;font-size:.93rem}
+.script b{font-family:var(--f-display)}
+.plan-in{display:flex;flex-wrap:wrap;gap:12px 20px;align-items:end}
+.plan-in label{display:grid;gap:4px;font-size:.84rem;color:var(--muted)}
+.plan-in input{font:inherit;font-family:var(--f-mono);width:84px;padding:6px 8px;border:1px solid var(--line2);border-radius:8px;background:var(--surface);color:var(--ink)}
+.days{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px}
+.day{border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:var(--surface);display:grid;gap:6px;min-width:0}
+.day h3{font-size:.98rem;display:flex;justify-content:space-between;gap:8px}
+.day ul{margin:0;padding:0;list-style:none;display:grid;gap:3px;font-size:.86rem}
+.day li{display:flex;justify-content:space-between;gap:8px}
+.dot{width:9px;height:9px;border-radius:2px;display:inline-block;margin-right:6px;vertical-align:middle}
+footer{margin-top:36px;font-size:.8rem;color:var(--muted);display:grid;gap:6px;max-width:90ch}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(18px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:9px 14px;border-radius:10px;font-size:.88rem;display:flex;gap:12px;align-items:center;z-index:20;max-width:calc(100% - 32px)}
+.toast button{background:none;border:1px solid var(--bg);color:var(--bg);border-radius:6px;padding:2px 8px;cursor:pointer}
+[hidden]{display:none!important}
+@media (max-width:900px){
+  .mapview{grid-template-columns:minmax(0,1fr)}
+  .mapbox{position:static}
+  svg#map{height:58vh}
+  .grid2{grid-template-columns:minmax(0,1fr)}
+}
+@media (max-width:620px){
+  .cells{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .cell.total{grid-column:1/-1}
+  .tier span{display:none}
+  .tier .tnote{display:none}
+  .tier .tn{display:block;font-size:1rem}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+<header class="top">
+  <div class="titlerow">
+    <div style="display:grid;gap:6px">
+      <span class="eyebrow">แผนเก็บข้อมูลภาคสนาม · ทะเบียนราษฎร ธ.ค. 2568</span>
+      <h1>แผนภาคสนามบุรีรัมย์</h1>
+      <p>4 อำเภอ · 39 ตำบล · 40 อปท. · จัดสรรตัวอย่างตามสัดส่วนประชากรอายุ 18 ปีขึ้นไป โควตาหลักอยู่ที่ระดับอำเภอ (Gen Z / Gen อื่น × ชาย / หญิง) และกระจายลง อปท. ตามสัดส่วนเพื่อให้อนุมานได้ทุกประเภท อปท.</p>
+    </div>
+    <span class="sync" id="sync"><i></i><span>กำลังเชื่อมตัวนับร่วม…</span></span>
+  </div>
+  <div class="tiers" id="tiers" role="group" aria-label="ขนาดตัวอย่าง"></div>
+  <div class="cells" id="cells"></div>
+</header>
+
+<nav class="tabs" role="tablist" aria-label="มุมมอง">
+  <button role="tab" data-v="map" aria-selected="true">แผนที่และโควตา</button>
+  <button role="tab" data-v="quota" aria-selected="false">ตารางสัดส่วน</button>
+  <button role="tab" data-v="split" aria-selected="false">ตำบลที่มี 2 อปท.</button>
+  <button role="tab" data-v="method" aria-selected="false">วิธีเก็บและกฎภาคสนาม</button>
+  <button role="tab" data-v="plan" aria-selected="false">ตารางวันลงพื้นที่</button>
+</nav>
+
+<main>
+<section id="v-map" class="mapview">
+  <div class="mapbox">
+    <div class="maptools">
+      <div class="seg" id="zoomseg" role="group" aria-label="ไปที่อำเภอ"></div>
+      <div class="seg" id="modeseg" role="group" aria-label="ระบายสีตาม">
+        <button aria-pressed="true" data-m="type">ประเภท อปท.</button>
+        <button aria-pressed="false" data-m="prog">ความคืบหน้า</button>
+      </div>
+    </div>
+    <div class="mapframe">
+      <svg id="map" role="img" aria-label="แผนที่ 4 อำเภอที่เก็บข้อมูล ซูมและเลื่อนได้ แตะอำเภอเพื่อดูภาพรวม แล้วแตะตำบลเพื่อดู อปท."></svg>
+      <div class="zoomctl">
+        <button id="zin" aria-label="ซูมเข้า">+</button>
+        <button id="zout" aria-label="ซูมออก">−</button>
+        <button id="zall" aria-label="กลับภาพรวม 4 อำเภอ" style="font-size:.85rem">⤢</button>
+      </div>
+      <span class="maphint">ลากเพื่อเลื่อน · หมุนล้อหรือถ่างนิ้วเพื่อซูม · แตะอำเภอเพื่อเจาะลง</span>
+    </div>
+    <div class="legend" id="legend"></div>
+  </div>
+  <div class="panel">
+    <nav class="crumbs" id="crumbs" aria-label="ตำแหน่งที่ดูอยู่"></nav>
+    <div id="panel" class="panel"></div>
+  </div>
+</section>
+
+<section id="v-quota" hidden>
+  <div class="prose" style="max-width:none;gap:12px;margin-bottom:16px">
+    <h2>สัดส่วนตัวอย่าง 3 ระดับ รายอำเภอ</h2>
+    <p class="muted" style="max-width:80ch">โควตาหลักคือช่อง อำเภอ × Gen × เพศ ซึ่งต้องเก็บให้ครบ ส่วนตัวเลขราย อปท. เป็นการกระจายตามสัดส่วนในแต่ละอำเภอ เพื่อให้ทุกประเภท อปท. มีผู้ตอบพออนุมานได้ คลาดได้ ±1–2 ชุดต่อแห่ง ตัวเลขทุกระดับคือจำนวนที่<b>เก็บจริง</b> ซึ่งเผื่อแบบสอบถามไม่สมบูรณ์ไว้ 10%</p>
+  </div>
+  <div class="tblwrap" style="margin-bottom:22px"><table class="big" id="tiertable"></table></div>
+  <div class="row" style="justify-content:space-between;margin-bottom:12px">
+    <h2 id="lgutitle">ราย อปท.</h2>
+    <div class="row"><button class="btn" id="copytsv">คัดลอกตาราง (วางใน Excel ได้)</button><button class="btn" id="dlcsv" hidden>ดาวน์โหลด CSV</button></div>
+  </div>
+  <div class="tblwrap"><table class="big" id="qtable"></table></div>
+</section>
+
+<section id="v-split" hidden>
+  <div class="prose" style="max-width:none;margin-bottom:16px">
+    <p style="max-width:78ch">มี 4 ตำบลที่พื้นที่แบ่งให้ อปท. 2 แห่ง เทศบาลมักอยู่รอบตัวเมือง ตลาด และที่ว่าการอำเภอ ส่วนหมู่บ้านรอบนอกมักเป็น อบต. ไฟล์ขอบเขตที่มีเป็นระดับตำบล จึงไม่มีเส้นแบ่งเทศบาลจริง แผนที่ย่อยด้านล่างแสดงรูปตำบลจริงและแนวที่เขตเทศบาลน่าจะติดอยู่ (เส้นประสีแดง) <b>ใช้เป็นแนวทาง อย่าใช้เป็นเส้นเขต</b> สิ่งที่ตัดสินคือคำตอบข้อ 4 ของแบบสอบถาม</p>
+    <div class="script"><b>ข้อ 4 ในแบบสอบถาม (ใช้ทุกพื้นที่ จำเป็นมากใน 4 ตำบลนี้)</b>
+      <span>“ในการเลือกตั้งผู้บริหารท้องถิ่น ท่านมีสิทธิเลือก <u>นายกเทศมนตรี</u> หรือ <u>นายก อบต.</u> ของที่ไหน” แล้วถามข้อ 3 ว่า “บ้านอยู่หมู่ที่เท่าไร หรือชุมชนอะไร”</span>
+      <span class="muted">นายกเทศมนตรี → นับเข้าเทศบาล · นายก อบต. → นับเข้า อบต. · ถามเฉพาะสิทธิ ไม่ถามว่าเลือกผู้ใด · ถ้าไม่แน่ใจ ให้จดหมู่ที่หรือชื่อชุมชนไว้ตรวจกับรายชื่อหมู่บ้านของ อปท.</span></div>
+  </div>
+  <div class="grid2" id="splitcards"></div>
+</section>
+
+<section id="v-method" hidden><div class="prose" id="method"></div></section>
+
+<section id="v-plan" hidden>
+  <div class="prose" style="max-width:none;gap:14px">
+    <p style="max-width:78ch">ร่างตารางลงพื้นที่สำหรับขนาดตัวอย่างที่เลือกไว้ด้านบน คำนวณจากจำนวนผู้เก็บข้อมูลและจำนวนชุดที่เก็บได้ต่อคนต่อวัน ระบบเรียง อปท. ในแต่ละอำเภอจากตัวเมืองออกไปหา อปท. ที่ใกล้ที่สุดทีละแห่ง แล้วเติมงานลงทีละวัน อปท. ที่ใหญ่เกินหนึ่งวันจะถูกแบ่งไปหลายวัน ตัวเลขตั้งต้นคำนวณจากเวลาตอบ 20–40 นาที รวมเวลาเดินทางและหาผู้ตอบ</p>
+    <div class="plan-in card">
+      <label for="p-enum">ผู้เก็บข้อมูล (คน)<input id="p-enum" type="number" min="1" max="20" value="2"></label>
+      <label for="p-nk">ชุด/คน/วัน · นคร<input id="p-nk" type="number" min="1" max="40" value="12"></label>
+      <label for="p-mg">เมือง<input id="p-mg" type="number" min="1" max="40" value="10"></label>
+      <label for="p-tb">ตำบล<input id="p-tb" type="number" min="1" max="40" value="8"></label>
+      <label for="p-ao">อบต.<input id="p-ao" type="number" min="1" max="40" value="6"></label>
+      <div id="plansum" style="font-size:.95rem"></div>
+    </div>
+    <div class="days" id="days"></div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <span>ประชากร: กรมการปกครอง สถิติประชากรแยกรายอายุ ธันวาคม 2568 (ไฟล์ 6812cc31) เทศบาลที่มีสำนักทะเบียนของตนเอง (ทน.บุรีรัมย์ ทต.สตึก ทต.บ้านด่าน ทต.แคนดง) ใช้ตัวเลขของเทศบาลโดยตรง อปท. อื่นใช้ตัวเลขของตำบล Gen Z = อายุ 18–29 ปี ณ ธ.ค. 2568 (เกิด พ.ศ. 2539–2550)</span>
+  <span>ขนาดตัวอย่าง: ต่ำสุด Cochran ที่ความเชื่อมั่น 90% (271) · กลาง Cochran ที่ 95% (384) ตรงกับตาราง Krejcie & Morgan · สูงสุด จากการจำลองกำลังการทดสอบ (800) ทุกระดับเก็บเผื่อ 10% · การปัดเศษใช้วิธีเศษเหลือมากที่สุด ตัวเลขรวมจึงตรงทุกระดับ</span>
+  <span>ขอบเขต: ตำบลและอำเภอจากชุดข้อมูลขอบเขตการปกครอง ไม่มีขอบเขตเทศบาลจริง ระยะทางวัดเป็นเส้นตรงจากจุดกลางตำบลถึงจุดกลาง ต.ในเมือง ลิงก์สถานที่เปิดการค้นหาใน Google Maps ให้ตรวจสอบก่อนลงพื้นที่ทุกครั้ง</span>
+  <span>ตัวนับร่วมเก็บเฉพาะ อปท. ช่องโควตา ประเภทสถานที่ และวันที่ ไม่เก็บชื่อ เบอร์โทร หรือคำตอบใด ๆ ของผู้ตอบ</span>
+</footer>
+</div>
+<div class="toast" id="toast" hidden><span id="toastmsg"></span><button id="toastundo">ย้อน</button></div>
+
+<script>
+const DATA = {"W":1000,"H":1135.2,"tambons":[{"a":"เมืองบุรีรัมย์","t":"ในเมือง","code":"310101","d":"M365.1,685.7L376.0,686.4L372.5,696.3L332.7,710.1L328.0,702.0L344.9,680.8L359.4,675.4L365.1,685.7Z","lx":355.4,"ly":691.3,"lat":14.99672,"lon":103.10342,"km2":5.0,"parts":[{"l":"ทน.บุรีรัมย์","k":"nk","adult":17521,"n":22}],"km":0.0},{"a":"เมืองบุรีรัมย์","t":"อิสาณ","code":"310102","d":"M332.7,710.1L372.5,696.3L376.0,686.4L395.0,693.3L404.7,712.3L422.1,720.1L422.5,733.9L410.7,758.1L384.2,746.4L353.5,748.6L335.0,737.4L324.0,748.9L304.3,726.2L299.4,708.0L283.5,703.3L276.1,666.5L344.9,680.8L328.0,702.0L332.7,710.1Z","lx":352.2,"ly":711.2,"lat":14.98204,"lon":103.10279,"km2":40.1,"parts":[{"l":"ทน.บุรีรัมย์","k":"nk","adult":17654,"n":23}],"km":1.6},{"a":"เมืองบุรีรัมย์","t":"เสม็ด","code":"310103","d":"M353.5,748.6L384.2,746.4L377.7,823.0L360.4,821.2L344.3,809.3L316.1,805.9L298.8,840.6L302.2,855.5L324.2,851.2L331.9,874.8L319.2,899.2L325.2,944.0L278.0,925.1L261.6,950.7L230.4,932.5L233.7,898.0L223.6,882.9L234.2,851.0L251.4,848.9L265.4,839.4L279.7,850.3L275.4,830.3L290.5,833.4L296.7,790.4L312.3,757.5L324.0,748.9L335.0,737.4L353.5,748.6Z","lx":289.1,"ly":844.8,"lat":14.88991,"lon":103.06843,"km2":83.5,"parts":[{"l":"อบต.เสม็ด","k":"ao","adult":9875,"n":13},{"l":"ทน.บุรีรัมย์","k":"nk","adult":4849,"n":6}],"km":12.5},{"a":"เมืองบุรีรัมย์","t":"บ้านบัว","code":"310104","d":"M324.0,748.9L312.3,757.5L296.7,790.4L290.5,833.4L275.4,830.3L279.7,850.3L265.4,839.4L251.4,848.9L234.2,851.0L215.8,836.8L224.5,826.1L240.8,821.8L243.1,807.6L237.3,794.2L246.5,784.7L218.9,781.1L181.1,788.9L180.2,767.3L166.7,773.6L161.2,755.2L174.3,747.8L204.8,738.8L247.1,752.7L270.0,749.9L278.3,756.1L285.4,752.8L287.8,736.9L304.3,726.2L324.0,748.9Z","lx":271.4,"ly":786.8,"lat":14.93489,"lon":103.03138,"km2":53.1,"parts":[{"l":"ทม.บ้านบัว","k":"mg","adult":8489,"n":11}],"km":10.4},{"a":"เมืองบุรีรัมย์","t":"สะแกโพรง","code":"310105","d":"M243.1,807.6L240.8,821.8L224.5,826.1L215.8,836.8L234.2,851.0L223.6,882.9L233.7,898.0L231.8,916.4L185.6,923.8L84.4,928.6L89.7,897.1L86.2,867.9L117.7,882.0L149.3,874.3L153.5,851.2L186.2,804.5L176.2,796.9L181.1,788.9L218.9,781.1L246.5,784.7L237.3,794.2L243.1,807.6Z","lx":191.7,"ly":859.5,"lat":14.87619,"lon":102.9793,"km2":75.1,"parts":[{"l":"อบต.สะแกโพรง","k":"ao","adult":10834,"n":14}],"km":18.9},{"a":"เมืองบุรีรัมย์","t":"สวายจีก","code":"310106","d":"M420.4,897.8L409.5,892.6L387.0,927.7L361.8,933.3L387.1,846.0L377.7,823.0L384.2,746.4L410.7,758.1L430.9,775.7L430.9,805.9L475.2,831.4L449.9,889.3L424.7,891.6L420.4,897.8Z","lx":428.1,"ly":838.7,"lat":14.89554,"lon":103.14705,"km2":60.0,"parts":[{"l":"ทม.สวายจีก","k":"mg","adult":9561,"n":12}],"km":12.2},{"a":"เมืองบุรีรัมย์","t":"บ้านยาง","code":"310108","d":"M466.6,652.0L468.5,660.5L444.0,679.6L436.3,709.6L422.1,720.1L404.7,712.3L395.0,693.3L381.4,629.4L390.7,633.1L411.3,623.8L431.3,630.0L445.7,619.6L472.9,625.1L466.6,652.0Z","lx":423.1,"ly":670.0,"lat":15.01767,"lon":103.15594,"km2":33.2,"parts":[{"l":"อบต.บ้านยาง","k":"ao","adult":11352,"n":14}],"km":6.1},{"a":"เมืองบุรีรัมย์","t":"พระครู","code":"310112","d":"M261.9,518.8L275.0,516.3L269.8,538.8L281.8,554.7L277.8,568.3L282.6,584.0L275.8,588.1L237.6,578.9L198.8,583.8L194.6,582.0L196.2,559.1L189.1,552.3L181.6,524.8L203.9,516.3L217.1,500.1L261.9,518.8Z","lx":231.1,"ly":545.6,"lat":15.09702,"lon":103.0196,"km2":35.6,"parts":[{"l":"อบต.พระครู","k":"ao","adult":5648,"n":7}],"km":14.3},{"a":"เมืองบุรีรัมย์","t":"ถลุงเหล็ก","code":"310113","d":"M334.0,479.5L354.7,486.7L376.1,485.3L379.8,490.3L350.5,514.1L322.2,554.9L277.8,568.3L281.8,554.7L269.8,538.8L275.0,516.3L288.0,500.4L295.9,492.9L318.1,496.0L327.0,479.6L334.0,479.5Z","lx":306.8,"ly":527.6,"lat":15.11553,"lon":103.07812,"km2":28.8,"parts":[{"l":"อบต.ถลุงเหล็ก","k":"ao","adult":4637,"n":6}],"km":13.5},{"a":"เมืองบุรีรัมย์","t":"หนองตาด","code":"310114","d":"M275.8,588.1L284.8,603.1L279.8,621.6L292.8,637.1L276.1,666.5L283.5,703.3L251.7,699.8L221.2,709.7L187.0,697.8L214.8,655.2L192.6,620.4L198.8,583.8L237.6,578.9L275.8,588.1Z","lx":248.4,"ly":646.1,"lat":15.03128,"lon":103.02453,"km2":58.3,"parts":[{"l":"ทต.หนองตาด","k":"tb","adult":9383,"n":12}],"km":9.3},{"a":"เมืองบุรีรัมย์","t":"ลุมปุ๊ก","code":"310117","d":"M166.7,773.6L180.2,767.3L181.1,788.9L176.2,796.9L186.2,804.5L153.5,851.2L149.3,874.3L117.7,882.0L86.2,867.9L94.7,826.0L92.8,799.1L100.7,787.1L113.4,782.0L161.2,755.2L166.7,773.6Z","lx":136.3,"ly":815.2,"lat":14.90928,"lon":102.94876,"km2":46.4,"parts":[{"l":"อบต.ลุมปุ๊ก","k":"ao","adult":6965,"n":9}],"km":19.3},{"a":"เมืองบุรีรัมย์","t":"สองห้อง","code":"310118","d":"M185.6,923.8L186.1,976.0L165.2,987.1L153.4,1045.7L152.2,1047.8L130.8,1036.6L131.0,1002.9L111.8,987.7L93.0,969.1L91.8,950.4L84.4,928.6L185.6,923.8Z","lx":140.6,"ly":981.6,"lat":14.80775,"lon":102.9536,"km2":42.5,"parts":[{"l":"อบต.สองห้อง","k":"ao","adult":5974,"n":8}],"km":26.5},{"a":"เมืองบุรีรัมย์","t":"บัวทอง","code":"310119","d":"M472.9,625.1L445.7,619.6L431.3,630.0L411.3,623.8L390.7,633.1L381.4,629.4L373.7,619.6L369.0,591.8L386.6,562.1L393.8,576.2L471.8,586.9L478.6,616.3L472.9,625.1Z","lx":423.4,"ly":604.1,"lat":15.05884,"lon":103.15189,"km2":27.9,"parts":[{"l":"ทต.บัวทอง","k":"tb","adult":5430,"n":7}],"km":8.6},{"a":"เมืองบุรีรัมย์","t":"ชุมเห็ด","code":"310120","d":"M373.7,619.6L381.4,629.4L395.0,693.3L376.0,686.4L365.1,685.7L359.4,675.4L344.9,680.8L276.1,666.5L292.8,637.1L279.8,621.6L284.8,603.1L369.0,591.8L373.7,619.6Z","lx":335.3,"ly":651.8,"lat":15.0331,"lon":103.09309,"km2":46.2,"parts":[{"l":"ทม.ชุมเห็ด","k":"mg","adult":16618,"n":21}],"km":4.2},{"a":"เมืองบุรีรัมย์","t":"หลักเขต","code":"310122","d":"M451.1,902.2L465.6,917.3L466.3,941.1L486.1,978.2L501.3,988.6L448.7,995.3L412.3,971.0L363.1,961.2L361.8,933.3L387.0,927.7L409.5,892.6L420.4,897.8L424.7,891.6L449.9,889.3L451.1,902.2Z","lx":417.2,"ly":951.2,"lat":14.82406,"lon":103.15872,"km2":46.1,"parts":[{"l":"ทต.หลักเขต","k":"tb","adult":5481,"n":7}],"km":20.1},{"a":"เมืองบุรีรัมย์","t":"สะแกซำ","code":"310125","d":"M344.3,809.3L360.4,821.2L377.7,823.0L387.1,846.0L361.8,933.3L363.1,961.2L342.9,962.0L332.5,954.7L325.2,944.0L319.2,899.2L331.9,874.8L324.2,851.2L302.2,855.5L298.8,840.6L316.1,805.9L344.3,809.3Z","lx":350.4,"ly":887.0,"lat":14.87158,"lon":103.09934,"km2":46.5,"parts":[{"l":"อบต.สะแกซำ","k":"ao","adult":8277,"n":10}],"km":13.9},{"a":"เมืองบุรีรัมย์","t":"กลันทา","code":"310126","d":"M386.6,562.1L369.0,591.8L284.8,603.1L275.8,588.1L282.6,584.0L277.8,568.3L322.2,554.9L350.5,514.1L379.8,490.3L387.3,487.9L386.6,562.1Z","lx":361.6,"ly":534.5,"lat":15.08946,"lon":103.09781,"km2":38.1,"parts":[{"l":"อบต.กลันทา","k":"ao","adult":5766,"n":7}],"km":10.3},{"a":"เมืองบุรีรัมย์","t":"กระสัง","code":"310127","d":"M221.2,709.7L251.7,699.8L283.5,703.3L299.4,708.0L304.3,726.2L287.8,736.9L285.4,752.8L278.3,756.1L270.0,749.9L247.1,752.7L204.8,738.8L174.3,747.8L187.0,697.8L221.2,709.7Z","lx":237.2,"ly":731.5,"lat":14.97455,"lon":103.02515,"km2":29.8,"parts":[{"l":"ทต.กระสัง","k":"tb","adult":6241,"n":8}],"km":8.8},{"a":"เมืองบุรีรัมย์","t":"เมืองฝาง","code":"310128","d":"M153.4,1045.7L165.2,987.1L186.1,976.0L185.6,923.8L231.8,916.4L230.4,932.5L261.6,950.7L229.4,1005.7L221.5,1015.9L153.4,1045.7Z","lx":209.6,"ly":981.6,"lat":14.80132,"lon":103.00001,"km2":41.2,"parts":[{"l":"อบต.เมืองฝาง","k":"ao","adult":6322,"n":8}],"km":24.4},{"a":"สตึก","t":"สตึก","code":"311101","d":"M650.2,224.2L659.3,246.0L656.2,267.5L664.1,269.5L657.2,280.5L664.8,290.2L680.9,291.8L682.1,326.2L672.2,325.0L677.9,337.5L670.1,343.1L652.6,343.5L646.4,356.7L630.1,360.1L593.3,351.8L559.7,333.9L589.2,290.1L627.6,269.3L631.8,255.9L624.0,253.1L612.3,259.3L611.3,252.9L624.8,244.1L635.7,223.3L650.2,224.2Z","lx":630.7,"ly":291.0,"lat":15.26287,"lon":103.30068,"km2":51.9,"parts":[{"l":"ทต.ศรีสตึก","k":"tb","adult":6242,"n":8},{"l":"ทต.สตึก","k":"tb","adult":3242,"n":4}],"km":36.4},{"a":"สตึก","t":"นิคม","code":"311102","d":"M562.9,229.2L556.7,241.8L570.8,230.9L580.2,236.2L578.7,226.7L593.5,223.9L595.7,231.4L607.3,227.3L601.0,240.8L611.3,252.9L612.3,259.3L624.0,253.1L631.8,255.9L627.6,269.3L589.2,290.1L559.7,333.9L544.6,322.0L526.8,336.1L491.5,321.8L487.8,260.3L493.0,252.7L487.8,252.8L492.0,244.6L487.7,239.5L508.1,239.3L506.1,247.4L520.3,251.1L518.9,243.8L530.2,240.6L527.6,235.8L534.8,228.7L538.6,232.1L537.4,222.5L549.0,226.0L559.3,219.4L562.9,229.2Z","lx":548.7,"ly":279.7,"lat":15.28281,"lon":103.24336,"km2":60.2,"parts":[{"l":"อบต.นิคม","k":"ao","adult":7751,"n":10},{"l":"ทต.สตึก","k":"tb","adult":5398,"n":7}],"km":35.2},{"a":"สตึก","t":"ทุ่งวัง","code":"311103","d":"M775.0,303.5L827.4,295.9L850.3,300.9L854.3,311.9L843.4,316.5L826.5,304.8L827.0,312.0L834.7,314.4L820.7,329.8L815.9,353.6L744.0,365.6L713.6,327.0L737.2,297.3L739.5,256.6L764.2,260.6L774.8,278.3L766.9,294.0L775.0,303.5Z","lx":777.6,"ly":308.4,"lat":15.25349,"lon":103.40339,"km2":43.6,"parts":[{"l":"อบต.ทุ่งวัง","k":"ao","adult":6636,"n":8}],"km":43.0},{"a":"สตึก","t":"เมืองแก","code":"311104","d":"M674.5,363.4L686.9,375.6L682.8,394.9L669.2,401.6L681.8,414.7L682.5,452.8L659.2,462.3L645.5,479.5L598.9,470.1L588.5,459.0L612.1,411.5L610.2,389.0L590.7,380.2L587.4,360.4L593.3,351.8L630.1,360.1L646.4,356.7L652.6,343.5L670.1,343.1L674.5,363.4Z","lx":642.8,"ly":406.6,"lat":15.18998,"lon":103.30806,"km2":55.3,"parts":[{"l":"อบต.เมืองแก","k":"ao","adult":9134,"n":12}],"km":30.7},{"a":"สตึก","t":"หนองใหญ่","code":"311105","d":"M682.6,484.2L665.8,504.2L662.1,524.3L649.3,535.8L567.5,529.4L565.6,515.0L545.4,505.8L557.7,473.5L582.5,470.5L588.5,459.0L598.9,470.1L645.5,479.5L659.2,462.3L682.5,452.8L682.6,484.2Z","lx":612.0,"ly":494.2,"lat":15.13038,"lon":103.29184,"km2":42.2,"parts":[{"l":"อบต.หนองใหญ่","k":"ao","adult":7429,"n":9}],"km":25.1},{"a":"สตึก","t":"ร่อนทอง","code":"311106","d":"M526.8,336.1L544.6,322.0L559.7,333.9L593.3,351.8L587.4,360.4L590.7,380.2L610.2,389.0L612.1,411.5L582.5,470.5L557.7,473.5L484.6,445.7L490.1,435.5L484.2,429.0L491.8,422.7L486.6,407.3L492.7,381.6L484.5,373.6L496.2,336.5L490.4,332.1L491.5,321.8L526.8,336.1Z","lx":549.9,"ly":398.2,"lat":15.19822,"lon":103.24071,"km2":83.0,"parts":[{"l":"อบต.ร่อนทอง","k":"ao","adult":9563,"n":12}],"km":26.8},{"a":"สตึก","t":"ดอนมนต์","code":"311109","d":"M484.5,373.6L492.7,381.6L486.6,407.3L491.8,422.7L484.2,429.0L490.1,435.5L484.6,445.7L452.1,434.7L444.3,399.2L427.0,373.9L425.2,344.0L482.0,338.5L490.4,332.1L496.2,336.5L484.5,373.6Z","lx":464.4,"ly":390.4,"lat":15.20895,"lon":103.18331,"km2":30.2,"parts":[{"l":"ทต.ดอนมนต์","k":"tb","adult":4624,"n":6}],"km":25.1},{"a":"สตึก","t":"ชุมแสง","code":"311110","d":"M775.2,449.2L797.2,444.7L809.5,456.7L797.1,468.2L809.3,483.1L802.3,486.5L803.3,495.6L815.1,510.7L806.8,522.8L790.6,526.1L746.6,513.7L725.1,529.1L701.0,526.1L664.5,545.4L649.3,535.8L662.1,524.3L665.8,504.2L682.6,484.2L682.5,452.8L730.6,438.1L775.2,449.2Z","lx":739.8,"ly":491.1,"lat":15.13725,"lon":103.37724,"km2":62.6,"parts":[{"l":"อบต.ชุมแสง","k":"ao","adult":8323,"n":10}],"km":33.3},{"a":"สตึก","t":"ท่าม่วง","code":"311111","d":"M847.2,199.0L858.4,193.4L869.2,196.9L873.3,208.0L865.3,216.5L872.5,224.0L886.1,223.5L889.7,234.3L897.7,226.2L905.7,239.5L912.6,230.9L913.8,241.4L904.9,253.2L915.6,262.3L894.0,263.8L881.2,258.3L876.1,272.4L867.4,269.1L866.1,280.4L855.5,277.5L850.3,300.9L827.4,295.9L775.0,303.5L766.9,294.0L774.8,278.3L764.2,260.6L739.5,256.6L764.0,231.5L773.8,239.0L782.2,230.0L788.0,236.2L792.8,227.2L799.8,227.2L808.2,239.7L808.1,222.7L818.2,218.6L813.4,209.5L816.6,201.8L822.9,199.3L827.3,207.4L838.8,201.7L826.4,194.3L835.1,186.2L847.2,199.0Z","lx":828.9,"ly":247.3,"lat":15.30001,"lon":103.44328,"km2":60.1,"parts":[{"l":"อบต.ท่าม่วง","k":"ao","adult":4833,"n":6}],"km":49.7},{"a":"สตึก","t":"สะแก","code":"311112","d":"M713.9,185.6L711.5,195.7L723.2,194.2L732.0,194.4L748.0,212.9L752.6,202.9L764.0,203.0L765.7,209.7L748.7,220.3L764.0,231.5L739.5,256.6L737.2,297.3L713.6,327.0L682.1,326.2L680.9,291.8L664.8,290.2L657.2,280.5L664.1,269.5L656.2,267.5L659.3,246.0L650.2,224.2L646.1,211.7L654.6,211.6L661.5,201.9L668.7,206.4L667.0,197.2L682.3,200.6L686.6,187.9L697.3,192.8L695.9,183.0L713.9,185.6Z","lx":701.6,"ly":251.3,"lat":15.30049,"lon":103.35373,"km2":60.8,"parts":[{"l":"ทต.สะแก","k":"tb","adult":5933,"n":7}],"km":43.2},{"a":"สตึก","t":"สนามชัย","code":"311114","d":"M682.1,326.2L713.6,327.0L744.0,365.6L739.6,420.8L730.6,438.1L682.5,452.8L681.8,414.7L669.2,401.6L682.8,394.9L686.9,375.6L674.5,363.4L670.1,343.1L677.9,337.5L672.2,325.0L682.1,326.2Z","lx":713.6,"ly":385.3,"lat":15.20726,"lon":103.35649,"km2":39.7,"parts":[{"l":"อบต.สนามชัย","k":"ao","adult":5252,"n":7}],"km":35.9},{"a":"สตึก","t":"กระสัง","code":"311115","d":"M818.6,383.9L815.9,389.5L803.2,386.0L795.3,392.7L793.1,413.7L808.5,422.6L797.2,444.7L775.2,449.2L730.6,438.1L739.6,420.8L744.0,365.6L815.9,353.6L819.9,365.8L807.8,377.9L818.6,383.9Z","lx":767.6,"ly":403.2,"lat":15.19689,"lon":103.40412,"km2":32.2,"parts":[{"l":"อบต.กระสัง","k":"ao","adult":3718,"n":5}],"km":39.2},{"a":"บ้านด่าน","t":"บ้านด่าน","code":"312101","d":"M481.8,468.4L475.0,482.7L479.3,488.4L471.4,495.2L482.9,500.0L470.6,512.4L467.9,530.2L452.0,552.2L466.4,561.4L471.8,586.9L393.8,576.2L386.6,562.1L387.3,487.9L398.2,489.0L411.0,476.0L428.1,467.5L441.3,470.3L444.7,464.5L454.8,468.4L479.1,457.0L481.8,468.4Z","lx":428.1,"ly":521.3,"lat":15.11305,"lon":103.16081,"km2":52.4,"parts":[{"l":"ทต.บ้านด่าน","k":"tb","adult":9605,"n":12}],"km":14.3},{"a":"บ้านด่าน","t":"ปราสาท","code":"312102","d":"M567.5,529.4L569.2,569.5L549.7,594.9L549.7,633.8L527.8,624.1L488.7,625.1L478.6,616.3L466.4,561.4L452.0,552.2L467.9,530.2L493.7,527.3L545.4,505.8L565.6,515.0L567.5,529.4Z","lx":516.2,"ly":578.2,"lat":15.08305,"lon":103.22158,"km2":57.5,"parts":[{"l":"ทต.ปราสาท","k":"tb","adult":7138,"n":9}],"km":15.9},{"a":"บ้านด่าน","t":"วังเหนือ","code":"312103","d":"M557.7,473.5L545.4,505.8L493.7,527.3L467.9,530.2L470.6,512.4L482.9,500.0L471.4,495.2L479.3,488.4L475.0,482.7L481.8,468.4L479.1,457.0L484.6,445.7L557.7,473.5Z","lx":515.1,"ly":485.6,"lat":15.13671,"lon":103.21521,"km2":26.8,"parts":[{"l":"อบต.วังเหนือ","k":"ao","adult":3411,"n":4}],"km":19.7},{"a":"บ้านด่าน","t":"โนนขวาง","code":"312104","d":"M484.6,445.7L479.1,457.0L454.8,468.4L444.7,464.5L441.3,470.3L428.1,467.5L411.0,476.0L418.0,464.5L420.2,437.1L386.1,392.0L393.9,338.3L425.2,344.0L427.0,373.9L444.3,399.2L452.1,434.7L484.6,445.7Z","lx":426.6,"ly":416.9,"lat":15.1913,"lon":103.15649,"km2":33.4,"parts":[{"l":"อบต.โนนขวาง","k":"ao","adult":4564,"n":6}],"km":22.4},{"a":"แคนดง","t":"แคนดง","code":"312201","d":"M403.5,120.2L413.8,132.7L416.1,126.5L422.7,128.2L422.8,136.9L413.6,140.7L425.7,145.3L423.9,157.2L435.9,158.4L428.8,162.4L428.5,174.7L413.6,194.2L408.1,229.6L411.9,254.8L388.2,317.1L378.4,329.7L344.7,329.2L325.5,323.6L328.9,303.4L317.0,302.4L348.4,215.6L371.0,173.9L366.3,143.0L384.4,116.7L385.9,102.0L396.1,103.2L392.5,93.1L398.6,87.4L410.3,100.4L403.5,120.2Z","lx":383.1,"ly":204.9,"lat":15.31673,"lon":103.12239,"km2":79.5,"parts":[{"l":"อบต.แคนดง","k":"ao","adult":5151,"n":7},{"l":"ทต.แคนดง","k":"tb","adult":4391,"n":5}],"km":35.6},{"a":"แคนดง","t":"ดงพลอง","code":"312202","d":"M483.5,160.8L481.0,167.1L469.2,167.0L476.8,174.7L482.4,199.5L487.3,199.6L489.2,189.3L497.0,193.6L503.9,188.5L501.5,205.3L483.3,220.8L429.1,306.1L404.6,316.9L388.2,317.1L411.9,254.8L408.1,229.6L413.6,194.2L428.5,174.7L445.9,158.5L455.5,164.3L457.9,153.9L465.1,153.3L483.5,160.8Z","lx":439.8,"ly":242.2,"lat":15.31473,"lon":103.16784,"km2":51.0,"parts":[{"l":"อบต.ดงพลอง","k":"ao","adult":5450,"n":7}],"km":36.0},{"a":"แคนดง","t":"สระบัว","code":"312203","d":"M364.4,91.5L370.5,102.6L385.9,102.0L384.4,116.7L366.3,143.0L371.0,173.9L348.4,215.6L317.0,302.4L267.1,327.1L246.5,327.0L246.2,292.2L247.8,271.7L270.0,254.0L295.0,164.7L323.9,132.5L347.6,123.0L349.9,110.3L344.0,103.4L354.8,99.6L354.9,91.7L364.4,91.5Z","lx":323.2,"ly":194.7,"lat":15.32298,"lon":103.07678,"km2":83.0,"parts":[{"l":"อบต.สระบัว","k":"ao","adult":4872,"n":6}],"km":36.4},{"a":"แคนดง","t":"หัวฝาย","code":"312204","d":"M520.5,207.9L514.1,210.2L513.0,219.8L524.6,218.0L529.7,226.6L532.3,216.2L537.4,222.5L538.6,232.1L534.8,228.7L527.6,235.8L530.2,240.6L518.9,243.8L520.3,251.1L506.1,247.4L508.1,239.3L487.7,239.5L492.0,244.6L487.8,252.8L493.0,252.7L487.8,260.3L491.5,321.8L490.4,332.1L482.0,338.5L425.2,344.0L393.9,338.3L378.4,329.7L388.2,317.1L404.6,316.9L429.1,306.1L483.3,220.8L501.5,205.3L513.2,199.4L520.5,207.9Z","lx":466.4,"ly":283.2,"lat":15.27504,"lon":103.1839,"km2":44.0,"parts":[{"l":"ทต.หัวฝาย","k":"tb","adult":6053,"n":8}],"km":32.1}],"districts":[{"name":"บ้านด่าน","study":true,"d":"M569.2,569.5L549.7,594.9L549.7,633.8L527.8,624.1L488.7,625.1L478.6,616.3L471.8,586.9L393.8,576.2L386.6,562.1L387.3,487.9L398.2,489.0L411.0,476.0L418.0,464.5L420.2,437.1L386.1,392.0L393.9,338.3L425.2,344.0L427.0,373.9L444.3,399.2L452.1,434.7L557.7,473.5L545.4,505.8L565.6,515.0L569.2,569.5Z","lx":479.8,"ly":481.9},{"name":"แคนดง","study":true,"d":"M514.1,210.2L513.0,219.8L524.6,218.0L529.7,226.6L532.3,216.2L537.4,222.5L538.6,232.1L534.8,228.7L527.6,235.8L530.2,240.6L518.9,243.8L520.3,251.1L506.1,247.4L508.1,239.3L487.7,239.5L492.0,244.6L487.8,252.8L493.0,252.7L487.8,260.3L491.5,321.8L490.4,332.1L482.0,338.5L425.2,344.0L393.9,338.3L378.4,329.7L344.7,329.2L325.5,323.6L328.9,303.4L317.0,302.4L267.1,327.1L246.5,327.0L246.2,292.2L247.8,271.7L270.0,254.0L295.0,164.7L323.9,132.5L347.6,123.0L349.9,110.3L344.0,103.4L354.8,99.6L354.9,91.7L364.4,91.5L370.5,102.6L396.1,103.2L392.5,93.1L398.6,87.4L410.3,100.4L403.5,120.2L413.8,132.7L416.1,126.5L422.7,128.2L422.8,136.9L413.6,140.7L425.7,145.3L423.9,157.2L435.9,158.4L428.8,162.4L428.5,174.7L445.9,158.5L455.5,164.3L457.9,153.9L465.1,153.3L483.5,160.8L481.0,167.1L469.2,167.0L476.8,174.7L482.4,199.5L487.3,199.6L489.2,189.3L497.0,193.6L503.9,188.5L501.5,205.3L513.2,199.4L520.5,207.9L514.1,210.2Z","lx":397.6,"ly":213.2},{"name":"ประโคนชัย","study":false,"d":"M147.7,1087.0L153.4,1045.7L221.5,1015.9L229.4,1005.7L278.0,925.1L325.2,944.0L332.5,954.7L332.2,1036.1L309.2,1059.0L324.6,1068.9L360.8,1068.4L358.0,1105.5L353.9,1132.0L351.6,1135.2L137.3,1135.2L147.7,1087.0ZM490.2,1127.2L505.6,1135.2L485.7,1135.2L490.2,1127.2Z","lx":265.3,"ly":1026.0},{"name":"กระสัง","study":false,"d":"M611.8,968.9L618.2,980.2L616.2,1001.6L602.6,1003.7L598.1,1015.4L576.2,1030.4L569.5,1023.9L566.5,1027.2L543.0,997.4L501.3,988.6L486.1,978.2L466.3,941.1L465.6,917.3L451.1,902.2L449.9,889.3L475.2,831.4L502.7,812.1L499.9,795.6L513.2,780.0L570.1,747.3L576.3,736.8L560.0,716.3L558.6,701.8L572.9,685.9L585.1,680.9L591.2,666.6L608.8,637.2L615.7,616.0L610.4,578.8L635.1,573.7L644.2,555.3L701.0,526.1L725.1,529.1L746.6,513.7L790.6,526.1L806.8,522.8L804.8,535.1L823.3,529.9L824.2,540.9L812.9,542.1L807.9,568.8L822.3,558.1L827.1,562.9L799.7,593.0L804.9,599.8L820.3,601.3L831.3,613.2L835.4,623.1L826.9,638.0L813.3,648.8L799.6,643.2L797.7,648.6L803.1,648.9L794.3,662.3L789.4,675.7L780.7,684.3L805.4,700.0L805.3,706.4L799.3,703.5L796.0,708.2L810.9,718.3L796.1,724.6L807.9,731.3L794.2,739.2L791.0,749.8L798.9,755.5L801.0,766.9L807.6,774.4L800.4,779.2L803.5,792.8L791.4,808.1L770.0,807.1L767.5,813.8L773.7,816.8L765.7,831.7L774.7,836.9L768.3,844.6L753.6,843.0L760.2,849.0L738.7,869.2L745.7,875.2L736.5,876.1L734.7,891.0L715.9,896.0L703.8,918.0L685.0,924.5L692.9,932.5L686.9,937.8L672.3,931.2L655.8,939.9L651.8,952.1L655.9,956.1L646.7,957.3L647.6,964.2L641.2,959.1L638.8,967.5L625.3,969.1L616.9,963.9L611.8,968.9Z","lx":666.9,"ly":770.7},{"name":"นางรอง","study":false,"d":"M12.4,1107.0L5.8,1073.8L10.7,1068.2L25.8,1074.6L21.0,1096.0L38.1,1099.9L72.5,1090.5L97.2,1038.1L111.8,987.7L131.0,1002.9L130.8,1036.6L152.2,1047.8L147.7,1087.0L137.3,1135.2L0.0,1135.2L0.0,1107.1L12.4,1107.0Z","lx":119.4,"ly":1058.0},{"name":"เมืองบุรีรัมย์","study":true,"d":"M152.2,1047.8L130.8,1036.6L131.0,1002.9L111.8,987.7L93.0,969.1L91.8,950.4L84.4,928.6L89.7,897.1L86.2,867.9L94.7,826.0L92.8,799.1L100.7,787.1L113.4,782.0L174.3,747.8L187.0,697.8L214.8,655.2L192.6,620.4L198.8,583.8L194.6,582.0L196.2,559.1L189.1,552.3L181.6,524.8L203.9,516.3L217.1,500.1L261.9,518.8L275.0,516.3L295.9,492.9L318.1,496.0L327.0,479.6L334.0,479.5L354.7,486.7L376.1,485.3L379.8,490.3L387.3,487.9L386.6,562.1L393.8,576.2L471.8,586.9L478.6,616.3L472.9,625.1L466.6,652.0L468.5,660.5L444.0,679.6L436.3,709.6L422.1,720.1L422.5,733.9L410.7,758.1L430.9,775.7L430.9,805.9L475.2,831.4L449.9,889.3L451.1,902.2L465.6,917.3L466.3,941.1L486.1,978.2L501.3,988.6L448.7,995.3L412.3,971.0L363.1,961.2L342.9,962.0L332.5,954.7L325.2,944.0L278.0,925.1L229.4,1005.7L221.5,1015.9L153.4,1045.7L152.2,1047.8Z","lx":280.6,"ly":766.9},{"name":"คูเมือง","study":false,"d":"M275.0,516.3L261.9,518.8L217.1,500.1L203.9,516.3L181.6,524.8L214.2,426.8L235.1,402.7L213.6,394.9L202.4,399.2L185.9,399.6L149.5,370.9L145.4,323.7L153.1,306.9L142.4,292.6L160.2,264.1L138.8,232.0L143.4,218.8L139.1,200.0L182.9,168.4L184.0,143.4L157.4,140.7L142.0,127.1L137.8,100.0L146.9,90.9L147.6,100.6L158.6,94.8L156.1,77.7L164.8,76.5L163.5,67.5L175.2,63.3L172.1,76.7L179.8,82.0L178.4,67.6L182.7,66.0L189.7,72.4L186.1,78.2L195.2,84.7L206.7,65.2L223.3,61.5L215.6,57.9L219.0,52.5L223.5,53.5L236.2,62.2L245.6,51.3L261.2,40.3L267.6,47.3L271.1,29.6L282.1,30.3L284.2,37.5L277.8,45.4L286.1,57.0L292.8,44.5L293.5,58.8L300.8,67.6L305.5,60.9L327.0,65.9L321.7,54.7L335.4,59.1L338.2,49.4L345.9,63.4L331.3,76.8L354.9,91.7L354.8,99.6L344.0,103.4L349.9,110.3L347.6,123.0L323.9,132.5L295.0,164.7L270.0,254.0L247.8,271.7L246.2,292.2L246.5,327.0L267.1,327.1L317.0,302.4L328.9,303.4L325.5,323.6L344.7,329.2L378.4,329.7L393.9,338.3L386.1,392.0L420.2,437.1L418.0,464.5L411.0,476.0L398.2,489.0L387.3,487.9L379.8,490.3L376.1,485.3L354.7,486.7L334.0,479.5L327.0,479.6L318.1,496.0L295.9,492.9L275.0,516.3Z","lx":198.0,"ly":281.9},{"name":"ลำปลายมาศ","study":false,"d":"M86.2,867.9L89.7,897.1L84.4,928.6L91.8,950.4L70.2,939.0L30.9,944.6L31.3,932.3L24.4,921.4L20.6,903.6L12.5,892.6L6.4,896.2L0.0,884.8L0.0,445.1L18.0,449.0L60.9,410.8L90.0,414.2L90.1,423.3L97.2,418.4L117.9,422.1L128.3,415.2L158.2,407.9L169.4,387.8L185.9,399.6L202.4,399.2L213.6,394.9L235.1,402.7L214.2,426.8L181.6,524.8L189.1,552.3L196.2,559.1L194.6,582.0L198.8,583.8L192.6,620.4L214.8,655.2L187.0,697.8L174.3,747.8L113.4,782.0L100.7,787.1L92.8,799.1L94.7,826.0L86.2,867.9Z","lx":100.5,"ly":676.5},{"name":"สตึก","study":true,"d":"M567.5,529.4L565.6,515.0L545.4,505.8L557.7,473.5L452.1,434.7L444.3,399.2L427.0,373.9L425.2,344.0L482.0,338.5L490.4,332.1L491.5,321.8L487.8,260.3L493.0,252.7L487.8,252.8L492.0,244.6L487.7,239.5L508.1,239.3L506.1,247.4L520.3,251.1L518.9,243.8L530.2,240.6L527.6,235.8L534.8,228.7L538.6,232.1L537.4,222.5L549.0,226.0L559.3,219.4L562.9,229.2L556.7,241.8L570.8,230.9L580.2,236.2L578.7,226.7L593.5,223.9L595.7,231.4L607.3,227.3L601.0,240.8L611.3,252.9L624.8,244.1L635.7,223.3L650.2,224.2L646.1,211.7L654.6,211.6L661.5,201.9L668.7,206.4L667.0,197.2L682.3,200.6L686.6,187.9L697.3,192.8L695.9,183.0L713.9,185.6L711.5,195.7L732.0,194.4L748.0,212.9L752.6,202.9L764.0,203.0L765.7,209.7L748.7,220.3L773.8,239.0L782.2,230.0L788.0,236.2L792.8,227.2L799.8,227.2L808.2,239.7L808.1,222.7L818.2,218.6L813.4,209.5L816.6,201.8L822.9,199.3L827.3,207.4L838.8,201.7L826.4,194.3L835.1,186.2L847.2,199.0L858.4,193.4L869.2,196.9L873.3,208.0L865.3,216.5L872.5,224.0L886.1,223.5L889.7,234.3L897.7,226.2L905.7,239.5L912.6,230.9L913.8,241.4L904.9,253.2L915.6,262.3L894.0,263.8L881.2,258.3L876.1,272.4L867.4,269.1L866.1,280.4L855.5,277.5L850.3,300.9L854.3,311.9L843.4,316.5L826.5,304.8L827.0,312.0L834.7,314.4L820.7,329.8L815.9,353.6L819.9,365.8L807.8,377.9L818.6,383.9L815.9,389.5L803.2,386.0L795.3,392.7L793.1,413.7L808.5,422.6L797.2,444.7L809.5,456.7L797.1,468.2L809.3,483.1L802.3,486.5L803.3,495.6L815.1,510.7L806.8,522.8L790.6,526.1L746.6,513.7L725.1,529.1L701.0,526.1L664.5,545.4L649.3,535.8L567.5,529.4Z","lx":622.0,"ly":359.7},{"name":"ชำนิ","study":false,"d":"M72.5,1090.5L38.1,1099.9L21.0,1096.0L25.8,1074.6L10.7,1068.2L5.8,1073.8L12.4,1107.0L0.0,1107.1L0.9,884.2L6.4,896.2L12.5,892.6L20.6,903.6L24.4,921.4L31.3,932.3L30.9,944.6L70.2,939.0L91.8,950.4L93.0,969.1L111.8,987.7L97.2,1038.1L72.5,1090.5Z","lx":52.2,"ly":1012.9},{"name":"ห้วยราช","study":false,"d":"M499.9,795.6L502.7,812.1L475.2,831.4L430.9,805.9L430.9,775.7L410.7,758.1L422.5,733.9L422.1,720.1L436.3,709.6L444.0,679.6L468.5,660.5L466.6,652.0L472.9,625.1L478.6,616.3L488.7,625.1L527.8,624.1L549.7,633.8L549.7,594.9L569.2,569.5L567.5,529.4L649.3,535.8L664.5,545.4L644.2,555.3L635.1,573.7L610.4,578.8L615.7,616.0L608.8,637.2L591.2,666.6L585.1,680.9L572.9,685.9L558.6,701.8L560.0,716.3L576.3,736.8L570.1,747.3L513.2,780.0L499.9,795.6Z","lx":514.6,"ly":680.2},{"name":"พลับพลาชัย","study":false,"d":"M353.9,1132.0L358.0,1105.5L360.8,1068.4L324.6,1068.9L309.2,1059.0L332.2,1036.1L332.5,954.7L342.9,962.0L363.1,961.2L412.3,971.0L448.7,995.3L501.3,988.6L543.0,997.4L566.5,1027.2L554.1,1038.2L555.9,1053.5L579.2,1056.5L591.9,1071.2L586.4,1103.1L579.5,1100.7L583.9,1123.5L575.1,1135.2L505.6,1135.2L490.2,1127.2L485.7,1135.2L351.6,1135.2L353.9,1132.0Z","lx":438.7,"ly":1045.9},{"name":"พุทไธสง","study":false,"d":"M236.2,62.2L223.5,53.5L219.0,52.5L199.8,28.4L196.2,5.3L186.1,8.4L182.2,0.0L364.9,0.0L366.6,7.9L358.9,9.6L354.2,22.1L365.6,49.4L357.1,62.2L345.9,63.4L338.2,49.4L335.4,59.1L321.7,54.7L327.0,65.9L305.5,60.9L300.8,67.6L293.5,58.8L292.8,44.5L286.1,57.0L277.8,45.4L284.2,37.5L282.1,30.3L271.1,29.6L267.6,47.3L261.2,40.3L245.6,51.3L236.2,62.2Z","lx":321.1,"ly":33.9}],"lgus":[{"n":"ทน.บุรีรัมย์","d":"เมืองบุรีรัมย์","k":"nk","adult":40024,"pop":[4805,3857,14420,16942],"nl":51,"q":[6,5,18,22],"mix":[31,15,5],"parts":[{"a":"เมืองบุรีรัมย์","t":"ในเมือง","adult":17521,"pop":[1741,1780,6354,7646],"n":22},{"a":"เมืองบุรีรัมย์","t":"อิสาณ","adult":17654,"pop":[1722,1723,6458,7751],"n":23},{"a":"เมืองบุรีรัมย์","t":"เสม็ด","adult":4849,"pop":[1342,354,1608,1545],"n":6}],"lat":14.98204,"lon":103.10279},{"n":"ทม.ชุมเห็ด","d":"เมืองบุรีรัมย์","k":"mg","adult":16618,"pop":[1681,1617,5993,7327],"nl":21,"q":[2,2,8,9],"mix":[11,7,3],"parts":[{"a":"เมืองบุรีรัมย์","t":"ชุมเห็ด","adult":16618,"pop":[1681,1617,5993,7327],"n":21}],"lat":15.0331,"lon":103.09309},{"n":"ทม.บ้านบัว","d":"เมืองบุรีรัมย์","k":"mg","adult":8489,"pop":[806,806,3284,3593],"nl":11,"q":[1,1,4,5],"mix":[5,4,2],"parts":[{"a":"เมืองบุรีรัมย์","t":"บ้านบัว","adult":8489,"pop":[806,806,3284,3593],"n":11}],"lat":14.93489,"lon":103.03138},{"n":"ทม.สวายจีก","d":"เมืองบุรีรัมย์","k":"mg","adult":9561,"pop":[990,923,3734,3914],"nl":12,"q":[2,1,4,5],"mix":[6,4,2],"parts":[{"a":"เมืองบุรีรัมย์","t":"สวายจีก","adult":9561,"pop":[990,923,3734,3914],"n":12}],"lat":14.89554,"lon":103.14705},{"n":"ทต.หลักเขต","d":"เมืองบุรีรัมย์","k":"tb","adult":5481,"pop":[623,662,2056,2140],"nl":7,"q":[1,1,3,2],"mix":[2,3,2],"parts":[{"a":"เมืองบุรีรัมย์","t":"หลักเขต","adult":5481,"pop":[623,662,2056,2140],"n":7}],"lat":14.82406,"lon":103.15872},{"n":"ทต.หนองตาด","d":"เมืองบุรีรัมย์","k":"tb","adult":9383,"pop":[965,964,3650,3804],"nl":12,"q":[1,1,5,5],"mix":[4,5,3],"parts":[{"a":"เมืองบุรีรัมย์","t":"หนองตาด","adult":9383,"pop":[965,964,3650,3804],"n":12}],"lat":15.03128,"lon":103.02453},{"n":"ทต.บัวทอง","d":"เมืองบุรีรัมย์","k":"tb","adult":5430,"pop":[602,549,2033,2246],"nl":7,"q":[1,0,3,3],"mix":[2,3,2],"parts":[{"a":"เมืองบุรีรัมย์","t":"บัวทอง","adult":5430,"pop":[602,549,2033,2246],"n":7}],"lat":15.05884,"lon":103.15189},{"n":"ทต.กระสัง","d":"เมืองบุรีรัมย์","k":"tb","adult":6241,"pop":[623,611,2435,2572],"nl":8,"q":[1,1,3,3],"mix":[3,3,2],"parts":[{"a":"เมืองบุรีรัมย์","t":"กระสัง","adult":6241,"pop":[623,611,2435,2572],"n":8}],"lat":14.97455,"lon":103.02515},{"n":"อบต.เสม็ด","d":"เมืองบุรีรัมย์","k":"ao","adult":9875,"pop":[1026,977,3836,4036],"nl":13,"q":[2,1,5,5],"mix":[2,5,6],"parts":[{"a":"เมืองบุรีรัมย์","t":"เสม็ด","adult":9875,"pop":[1026,977,3836,4036],"n":13}],"lat":14.88991,"lon":103.06843},{"n":"อบต.สะแกโพรง","d":"เมืองบุรีรัมย์","k":"ao","adult":10834,"pop":[1130,1078,4212,4414],"nl":14,"q":[2,1,5,6],"mix":[2,6,6],"parts":[{"a":"เมืองบุรีรัมย์","t":"สะแกโพรง","adult":10834,"pop":[1130,1078,4212,4414],"n":14}],"lat":14.87619,"lon":102.9793},{"n":"อบต.บ้านยาง","d":"เมืองบุรีรัมย์","k":"ao","adult":11352,"pop":[1202,1660,3980,4510],"nl":14,"q":[1,2,5,6],"mix":[2,6,6],"parts":[{"a":"เมืองบุรีรัมย์","t":"บ้านยาง","adult":11352,"pop":[1202,1660,3980,4510],"n":14}],"lat":15.01767,"lon":103.15594},{"n":"อบต.พระครู","d":"เมืองบุรีรัมย์","k":"ao","adult":5648,"pop":[582,526,2184,2356],"nl":7,"q":[1,0,3,3],"mix":[1,3,3],"parts":[{"a":"เมืองบุรีรัมย์","t":"พระครู","adult":5648,"pop":[582,526,2184,2356],"n":7}],"lat":15.09702,"lon":103.0196},{"n":"อบต.ถลุงเหล็ก","d":"เมืองบุรีรัมย์","k":"ao","adult":4637,"pop":[419,414,1878,1926],"nl":6,"q":[0,1,3,2],"mix":[1,2,3],"parts":[{"a":"เมืองบุรีรัมย์","t":"ถลุงเหล็ก","adult":4637,"pop":[419,414,1878,1926],"n":6}],"lat":15.11553,"lon":103.07812},{"n":"อบต.ลุมปุ๊ก","d":"เมืองบุรีรัมย์","k":"ao","adult":6965,"pop":[725,726,2758,2756],"nl":9,"q":[1,1,4,3],"mix":[1,4,4],"parts":[{"a":"เมืองบุรีรัมย์","t":"ลุมปุ๊ก","adult":6965,"pop":[725,726,2758,2756],"n":9}],"lat":14.90928,"lon":102.94876},{"n":"อบต.สองห้อง","d":"เมืองบุรีรัมย์","k":"ao","adult":5974,"pop":[619,646,2302,2407],"nl":8,"q":[1,1,3,3],"mix":[1,3,4],"parts":[{"a":"เมืองบุรีรัมย์","t":"สองห้อง","adult":5974,"pop":[619,646,2302,2407],"n":8}],"lat":14.80775,"lon":102.9536},{"n":"อบต.สะแกซำ","d":"เมืองบุรีรัมย์","k":"ao","adult":8277,"pop":[892,883,3184,3318],"nl":10,"q":[1,1,4,4],"mix":[2,4,4],"parts":[{"a":"เมืองบุรีรัมย์","t":"สะแกซำ","adult":8277,"pop":[892,883,3184,3318],"n":10}],"lat":14.87158,"lon":103.09934},{"n":"อบต.กลันทา","d":"เมืองบุรีรัมย์","k":"ao","adult":5766,"pop":[551,535,2298,2382],"nl":7,"q":[0,1,3,3],"mix":[1,3,3],"parts":[{"a":"เมืองบุรีรัมย์","t":"กลันทา","adult":5766,"pop":[551,535,2298,2382],"n":7}],"lat":15.08946,"lon":103.09781},{"n":"อบต.เมืองฝาง","d":"เมืองบุรีรัมย์","k":"ao","adult":6322,"pop":[685,666,2456,2515],"nl":8,"q":[1,1,3,3],"mix":[1,3,4],"parts":[{"a":"เมืองบุรีรัมย์","t":"เมืองฝาง","adult":6322,"pop":[685,666,2456,2515],"n":8}],"lat":14.80132,"lon":103.00001},{"n":"ทต.สตึก","d":"สตึก","k":"tb","adult":8640,"pop":[865,823,3221,3731],"nl":11,"q":[1,1,4,5],"mix":[4,4,3],"parts":[{"a":"สตึก","t":"สตึก","adult":3242,"pop":[349,322,1213,1358],"n":4},{"a":"สตึก","t":"นิคม","adult":5398,"pop":[516,501,2008,2373],"n":7}],"lat":15.28281,"lon":103.24336},{"n":"ทต.ศรีสตึก","d":"สตึก","k":"tb","adult":6242,"pop":[631,643,2452,2516],"nl":8,"q":[1,1,3,3],"mix":[3,3,2],"parts":[{"a":"สตึก","t":"สตึก","adult":6242,"pop":[631,643,2452,2516],"n":8}],"lat":15.26287,"lon":103.30068},{"n":"ทต.ดอนมนต์","d":"สตึก","k":"tb","adult":4624,"pop":[425,432,1818,1949],"nl":6,"q":[0,1,2,3],"mix":[2,2,2],"parts":[{"a":"สตึก","t":"ดอนมนต์","adult":4624,"pop":[425,432,1818,1949],"n":6}],"lat":15.20895,"lon":103.18331},{"n":"ทต.สะแก","d":"สตึก","k":"tb","adult":5933,"pop":[593,596,2329,2415],"nl":7,"q":[0,1,3,3],"mix":[2,3,2],"parts":[{"a":"สตึก","t":"สะแก","adult":5933,"pop":[593,596,2329,2415],"n":7}],"lat":15.30049,"lon":103.35373},{"n":"อบต.นิคม","d":"สตึก","k":"ao","adult":7751,"pop":[765,753,3040,3193],"nl":10,"q":[1,1,4,4],"mix":[2,4,4],"parts":[{"a":"สตึก","t":"นิคม","adult":7751,"pop":[765,753,3040,3193],"n":10}],"lat":15.28281,"lon":103.24336},{"n":"อบต.ทุ่งวัง","d":"สตึก","k":"ao","adult":6636,"pop":[766,648,2524,2698],"nl":8,"q":[1,1,3,3],"mix":[1,3,4],"parts":[{"a":"สตึก","t":"ทุ่งวัง","adult":6636,"pop":[766,648,2524,2698],"n":8}],"lat":15.25349,"lon":103.40339},{"n":"อบต.เมืองแก","d":"สตึก","k":"ao","adult":9134,"pop":[906,780,3663,3785],"nl":12,"q":[1,1,5,5],"mix":[2,5,5],"parts":[{"a":"สตึก","t":"เมืองแก","adult":9134,"pop":[906,780,3663,3785],"n":12}],"lat":15.18998,"lon":103.30806},{"n":"อบต.หนองใหญ่","d":"สตึก","k":"ao","adult":7429,"pop":[832,781,2808,3008],"nl":9,"q":[1,1,3,4],"mix":[1,4,4],"parts":[{"a":"สตึก","t":"หนองใหญ่","adult":7429,"pop":[832,781,2808,3008],"n":9}],"lat":15.13038,"lon":103.29184},{"n":"อบต.ร่อนทอง","d":"สตึก","k":"ao","adult":9563,"pop":[1016,934,3753,3860],"nl":12,"q":[2,1,4,5],"mix":[2,5,5],"parts":[{"a":"สตึก","t":"ร่อนทอง","adult":9563,"pop":[1016,934,3753,3860],"n":12}],"lat":15.19822,"lon":103.24071},{"n":"อบต.ชุมแสง","d":"สตึก","k":"ao","adult":8323,"pop":[882,867,3198,3376],"nl":10,"q":[1,1,4,4],"mix":[2,4,4],"parts":[{"a":"สตึก","t":"ชุมแสง","adult":8323,"pop":[882,867,3198,3376],"n":10}],"lat":15.13725,"lon":103.37724},{"n":"อบต.ท่าม่วง","d":"สตึก","k":"ao","adult":4833,"pop":[499,490,1889,1955],"nl":6,"q":[0,1,3,2],"mix":[1,2,3],"parts":[{"a":"สตึก","t":"ท่าม่วง","adult":4833,"pop":[499,490,1889,1955],"n":6}],"lat":15.30001,"lon":103.44328},{"n":"อบต.สนามชัย","d":"สตึก","k":"ao","adult":5252,"pop":[530,498,2102,2122],"nl":7,"q":[1,0,3,3],"mix":[1,3,3],"parts":[{"a":"สตึก","t":"สนามชัย","adult":5252,"pop":[530,498,2102,2122],"n":7}],"lat":15.20726,"lon":103.35649},{"n":"อบต.กระสัง","d":"สตึก","k":"ao","adult":3718,"pop":[404,420,1435,1459],"nl":5,"q":[0,1,2,2],"mix":[1,2,2],"parts":[{"a":"สตึก","t":"กระสัง","adult":3718,"pop":[404,420,1435,1459],"n":5}],"lat":15.19689,"lon":103.40412},{"n":"ทต.บ้านด่าน","d":"บ้านด่าน","k":"tb","adult":9605,"pop":[984,964,3635,4022],"nl":12,"q":[1,1,5,5],"mix":[4,5,3],"parts":[{"a":"บ้านด่าน","t":"บ้านด่าน","adult":9605,"pop":[984,964,3635,4022],"n":12}],"lat":15.11305,"lon":103.16081},{"n":"ทต.ปราสาท","d":"บ้านด่าน","k":"tb","adult":7138,"pop":[802,772,2641,2923],"nl":9,"q":[1,1,3,4],"mix":[3,4,2],"parts":[{"a":"บ้านด่าน","t":"ปราสาท","adult":7138,"pop":[802,772,2641,2923],"n":9}],"lat":15.08305,"lon":103.22158},{"n":"อบต.วังเหนือ","d":"บ้านด่าน","k":"ao","adult":3411,"pop":[347,316,1299,1449],"nl":4,"q":[1,0,1,2],"mix":[0,2,2],"parts":[{"a":"บ้านด่าน","t":"วังเหนือ","adult":3411,"pop":[347,316,1299,1449],"n":4}],"lat":15.13671,"lon":103.21521},{"n":"อบต.โนนขวาง","d":"บ้านด่าน","k":"ao","adult":4564,"pop":[460,414,1802,1888],"nl":6,"q":[1,0,2,3],"mix":[1,2,3],"parts":[{"a":"บ้านด่าน","t":"โนนขวาง","adult":4564,"pop":[460,414,1802,1888],"n":6}],"lat":15.1913,"lon":103.15649},{"n":"ทต.แคนดง","d":"แคนดง","k":"tb","adult":4391,"pop":[428,403,1713,1847],"nl":5,"q":[0,1,2,2],"mix":[2,2,1],"parts":[{"a":"แคนดง","t":"แคนดง","adult":4391,"pop":[428,403,1713,1847],"n":5}],"lat":15.31673,"lon":103.12239},{"n":"ทต.หัวฝาย","d":"แคนดง","k":"tb","adult":6053,"pop":[598,671,2358,2426],"nl":8,"q":[1,1,3,3],"mix":[3,3,2],"parts":[{"a":"แคนดง","t":"หัวฝาย","adult":6053,"pop":[598,671,2358,2426],"n":8}],"lat":15.27504,"lon":103.1839},{"n":"อบต.แคนดง","d":"แคนดง","k":"ao","adult":5151,"pop":[513,564,1993,2081],"nl":7,"q":[0,1,3,3],"mix":[1,3,3],"parts":[{"a":"แคนดง","t":"แคนดง","adult":5151,"pop":[513,564,1993,2081],"n":7}],"lat":15.31673,"lon":103.12239},{"n":"อบต.ดงพลอง","d":"แคนดง","k":"ao","adult":5450,"pop":[588,593,2078,2191],"nl":7,"q":[1,1,2,3],"mix":[1,3,3],"parts":[{"a":"แคนดง","t":"ดงพลอง","adult":5450,"pop":[588,593,2078,2191],"n":7}],"lat":15.31473,"lon":103.16784},{"n":"อบต.สระบัว","d":"แคนดง","k":"ao","adult":4872,"pop":[548,475,1930,1919],"nl":6,"q":[1,0,3,2],"mix":[1,2,3],"parts":[{"a":"แคนดง","t":"สระบัว","adult":4872,"pop":[548,475,1930,1919],"n":6}],"lat":15.32298,"lon":103.07678}],"split":[{"id":"samet","a":"เมืองบุรีรัมย์","t":"เสม็ด","lgus":["ทน.บุรีรัมย์","อบต.เสม็ด"],"ctx":[["เมืองบุรีรัมย์","อิสาณ"]],"edge":"M353.5,748.6L384.2,746.4M324.0,748.9L335.0,737.4M335.0,737.4L353.5,748.6"},{"id":"satuek","a":"สตึก","t":"สตึก","lgus":["ทต.สตึก","ทต.ศรีสตึก"],"ctx":[["สตึก","นิคม"]],"edge":"M559.7,333.9L589.2,290.1M589.2,290.1L627.6,269.3M627.6,269.3L631.8,255.9M631.8,255.9L624.0,253.1M624.0,253.1L612.3,259.3M612.3,259.3L611.3,252.9"},{"id":"nikhom","a":"สตึก","t":"นิคม","lgus":["ทต.สตึก","อบต.นิคม"],"ctx":[["สตึก","สตึก"]],"edge":"M559.7,333.9L589.2,290.1M589.2,290.1L627.6,269.3M627.6,269.3L631.8,255.9M631.8,255.9L624.0,253.1M624.0,253.1L612.3,259.3M612.3,259.3L611.3,252.9"},{"id":"khaendong","a":"แคนดง","t":"แคนดง","lgus":["ทต.แคนดง","อบต.แคนดง"],"ctx":[],"edge":""}]};
+const TYPES = {nk:{label:"เทศบาลนคร",short:"นคร"},mg:{label:"เทศบาลเมือง",short:"เมือง"},tb:{label:"เทศบาลตำบล",short:"ตำบล"},ao:{label:"อบต.",short:"อบต."}};
+const TORDER = ["nk","mg","tb","ao"];
+const CELLS = [{k:0,g:"Gen Z",s:"ชาย"},{k:1,g:"Gen Z",s:"หญิง"},{k:2,g:"Gen อื่น",s:"ชาย"},{k:3,g:"Gen อื่น",s:"หญิง"}];
+const VENUES = [{k:"market",l:"ตลาด/จุดคนเยอะ"},{k:"cafe",l:"สภากาแฟ"},{k:"door",l:"เคาะบ้าน"},{k:"online",l:"ออนไลน์ QR"}];
+const DIST = [{d:"เมืองบุรีรัมย์",seat:"ทน.บุรีรัมย์",short:"เมือง"},{d:"สตึก",seat:"ทต.สตึก",short:"สตึก"},{d:"บ้านด่าน",seat:"ทต.บ้านด่าน",short:"บ้านด่าน"},{d:"แคนดง",seat:"ทต.แคนดง",short:"แคนดง"}];
+const TIERS = [
+  {k:"min",label:"ต่ำสุด",use:271,collect:300,basis:"Cochran ความเชื่อมั่น 90%",note:"ใช้เมื่อเก็บไม่ทัน"},
+  {k:"mid",label:"กลาง",use:400,collect:440,basis:"Cochran / Krejcie & Morgan 95%",note:"แผนหลัก"},
+  {k:"max",label:"สูงสุด",use:800,collect:880,basis:"power ≥ 0.80 ทุกสมมติฐานยกเว้น H2",note:"คุ้มที่สุดถ้ามีเวลาและคน"}];
+const MIXW = {nk:[.60,.30,.10],mg:[.50,.35,.15],tb:[.35,.40,.25],ao:[.15,.40,.45]};
+const FULL = {ทน:"เทศบาลนคร",ทม:"เทศบาลเมือง",ทต:"เทศบาลตำบล",อบต:"องค์การบริหารส่วนตำบล"};
+const LG = Object.fromEntries(DATA.lgus.map(o=>[o.n,o]));
+const fmt = n => Number(n).toLocaleString("th-TH");
+const NS = "http://www.w3.org/2000/svg";
+const el = (n,a={},p)=>{const e=document.createElementNS(NS,n); for(const k in a) e.setAttribute(k,a[k]); if(p) p.appendChild(e); return e;};
+const h = (tag,attrs={},html="")=>{const e=document.createElement(tag); for(const k in attrs) e.setAttribute(k,attrs[k]); if(html) e.innerHTML=html; return e;};
+const fullName = n => { const [p,...r]=n.split("."); return (FULL[p]||p)+r.join("."); };
+const gmap = q => "https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(q);
+const store = { get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}}, set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}} };
+const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const TOTAL_ADULT = DATA.lgus.reduce((s,o)=>s+o.adult,0);
+
+/* ---------- population by district ---------- */
+const DD = DIST.map(x=>{ const ls=DATA.lgus.filter(o=>o.d===x.d); const pop=[0,1,2,3].map(i=>ls.reduce((s,o)=>s+o.pop[i],0));
+  const tams=DATA.tambons.filter(t=>t.a===x.d); const km=tams.reduce((s,t)=>s+t.km,0)/tams.length;
+  return {...x, lgus:ls, pop, adult:pop.reduce((a,b)=>a+b,0), tams, km, kmMin:Math.min(...tams.map(t=>t.km)), kmMax:Math.max(...tams.map(t=>t.km))}; });
+const DMAP = Object.fromEntries(DD.map(x=>[x.d,x]));
+
+/* ---------- proportional allocation (largest remainder) ---------- */
+function lr(n,w){ const W=w.reduce((a,b)=>a+b,0); if(!W) return w.map(()=>0); const raw=w.map(x=>n*x/W); const fl=raw.map(Math.floor);
+  const order=raw.map((x,i)=>[x-fl[i],i]).sort((a,b)=>b[0]-a[0]); const add=n-fl.reduce((a,b)=>a+b,0); for(let k=0;k<add;k++) fl[order[k][1]]++; return fl; }
+function allocate(N){
+  const R={N, dist:{}, lgu:{}};
+  const dn=lr(N, DD.map(x=>x.adult));
+  DD.forEach((x,i)=>{
+    const cells=lr(dn[i], x.pop);
+    R.dist[x.d]={n:dn[i], q:cells};
+    const per=x.lgus.map(()=>[0,0,0,0]);
+    for(let c=0;c<4;c++){ const s=lr(cells[c], x.lgus.map(o=>o.pop[c])); s.forEach((v,j)=>per[j][c]=v); }
+    x.lgus.forEach((o,j)=>{ const n=per[j].reduce((a,b)=>a+b,0); const ps=lr(n,o.parts.map(pp=>pp.adult));
+      R.lgu[o.n]={q:per[j], n, mix:lr(n,MIXW[o.k]), parts:Object.fromEntries(o.parts.map((p,k)=>[p.t, ps[k]]))}; });
+  });
+  return R;
+}
+const ALLOC = Object.fromEntries(TIERS.map(t=>[t.k, allocate(t.collect)]));
+let tier = store.get("tier","mid"); if(!ALLOC[tier]) tier="mid";
+const A = () => ALLOC[tier];
+const tambonN = t => t.parts.reduce((s,p)=>s+(A().lgu[p.l].parts[t.t]||0),0);
+
+/* ---------- tracker state ---------- */
+const logs = new Map();
+let counts = {};
+let db=null, uid=null, canWrite=false, dbReady=false;
+let venue = store.get("venue","market");
+function recount(){ counts=Object.fromEntries(DATA.lgus.map(o=>[o.n,[0,0,0,0]])); for(const d of logs.values()){ if(counts[d.l]&&d.c>=0&&d.c<4) counts[d.l][d.c]++; } }
+recount();
+const done = n => counts[n] ? counts[n].reduce((a,b)=>a+b,0) : 0;
+const distDone = d => { const r=[0,0,0,0]; DMAP[d].lgus.forEach(o=>counts[o.n].forEach((v,i)=>r[i]+=v)); return r; };
+
+/* ---------- header ---------- */
+function renderTiers(){ const box=document.getElementById("tiers"); box.innerHTML="";
+  TIERS.forEach(t=>{ const b=h("button",{class:"tier","aria-pressed":t.k===tier?"true":"false"},`<b>${t.label}<span class="tnote"> · ${t.note}</span></b><span class="tn">เก็บ ${fmt(t.collect)} <small class="muted" style="font-size:.78rem">· ใช้ได้ ≥ ${fmt(t.use)}</small></span><span>${t.basis}</span>`);
+    b.addEventListener("click",()=>{ tier=t.k; store.set("tier",tier); refresh(); }); box.appendChild(b); }); }
+function renderCells(){
+  const tot=[0,0,0,0], dn=[0,0,0,0];
+  DD.forEach(x=>{ const q=A().dist[x.d].q, d=distDone(x.d); q.forEach((v,i)=>{tot[i]+=v; dn[i]+=Math.min(v,d[i]);}); });
+  const box=document.getElementById("cells"); box.innerHTML="";
+  CELLS.forEach((c,i)=>{ const pct=tot[i]?dn[i]/tot[i]*100:0;
+    box.appendChild(h("div",{class:"cell"},`<span class="lab">${c.g} · ${c.s}</span><span class="big">${dbReady?fmt(dn[i])+"<small> / "+fmt(tot[i])+"</small>":fmt(tot[i])}</span><div class="bar"><span style="width:${pct}%"></span></div>`)); });
+  const T=tot.reduce((a,b)=>a+b,0), D=dn.reduce((a,b)=>a+b,0);
+  box.appendChild(h("div",{class:"cell total"},`<span class="lab">รวม · ชาย ${fmt(tot[0]+tot[2])} หญิง ${fmt(tot[1]+tot[3])}</span><span class="big">${dbReady?fmt(D)+"<small> / "+fmt(T)+"</small>":fmt(T)}</span><div class="bar"><span style="width:${T?D/T*100:0}%"></span></div>`));
+}
+
+/* ---------- map ---------- */
+const svg=document.getElementById("map");
+const defSvg=el("svg",{width:0,height:0,"aria-hidden":"true",style:"position:absolute;width:0;height:0;overflow:hidden"}); document.body.prepend(defSvg); const defs=el("defs",{},defSvg);
+const gCtx=el("g",{},svg), gT=el("g",{},svg), gD=el("g",{},svg), gL=el("g",{},svg), gDL=el("g",{},svg);
+let mode="type", level="all", selected=null;
+const tamEls=[], tamLbl=[];
+function pattern(id,a,b){ const p=el("pattern",{id,patternUnits:"userSpaceOnUse",width:12,height:12,patternTransform:"rotate(45)"},defs);
+  el("rect",{width:12,height:12,style:`fill:var(--${a})`},p); el("rect",{width:5,height:12,style:`fill:var(--${b})`},p); }
+const ctxLbl=[]; DATA.districts.filter(d=>!d.study).forEach(d=>{ el("path",{d:d.d,class:"ctx","vector-effect":"non-scaling-stroke"},gCtx); const t=el("text",{x:d.lx,y:d.ly,class:"ctxlbl"},gCtx); t.textContent=d.name; ctxLbl.push(t); });
+DATA.tambons.forEach((t,i)=>{
+  if(t.parts.length>1){ const a=t.parts[0].k, b=t.parts[1].k; pattern("pt"+i,a,a===b?a+"2":b); t._pat=`url(#pt${i})`; }
+  const p=el("path",{d:t.d,class:"tam","vector-effect":"non-scaling-stroke",tabindex:"0",role:"button","aria-label":`ตำบล${t.t} อำเภอ${t.a}`,"data-i":i},gT);
+  p.addEventListener("keydown",e=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); tapTambon(i); } });
+  tamEls.push(p);
+  const g=el("g",{},gL); const lb=el("text",{x:0,y:-6,class:"tl"},g); lb.textContent=t.t;
+  const pill=el("rect",{y:-1,height:14,rx:7,class:"pill"},g); const tn=el("text",{x:0,y:10,class:"tn pilltx"},g);
+  tamLbl.push({g,t,pill,tn});
+});
+const distEl={};
+DATA.districts.filter(d=>d.study).forEach(d=>{ el("path",{d:d.d,class:"dhalo","vector-effect":"non-scaling-stroke"},gD); distEl[d.name]=el("path",{d:d.d,class:"dline","vector-effect":"non-scaling-stroke"},gD); });
+const distBox={}; let FULLV;
+(function(){ const tmp=el("g",{},svg);
+  DIST.forEach(x=>{ const g=el("g",{},tmp); DATA.tambons.filter(t=>t.a===x.d).forEach(t=>el("path",{d:t.d},g)); const b=g.getBBox(); distBox[x.d]=[b.x-20,b.y-20,b.width+40,b.height+40]; });
+  const g=el("g",{},tmp); DATA.tambons.forEach(t=>el("path",{d:t.d},g)); const b=g.getBBox(); FULLV=[b.x-40,b.y-50,b.width+80,b.height+90]; tmp.remove(); })();
+const dLabels={};
+DD.forEach(x=>{ const b=distBox[x.d]; const pos={"เมืองบุรีรัมย์":[b[0]+b[2]*.30,b[1]+b[3]*.80],"สตึก":[b[0]+b[2]*.62,b[1]+b[3]*.42],"บ้านด่าน":[b[0]+b[2]*.60,b[1]+b[3]*.60],"แคนดง":[b[0]+b[2]*.42,b[1]+b[3]*.40]}[x.d];
+  const g=el("g",{},gDL); const t=el("text",{x:0,y:0,class:"dl"},g); t.textContent="อ."+x.d; const n=el("text",{x:0,y:20,class:"dn"},g); dLabels[x.d]={g,n,pos}; });
+
+/* view state */
+let view={x:FULLV[0],y:FULLV[1],w:FULLV[2],h:FULLV[3]};
+const BASEW=FULLV[2];
+function applyView(){
+  svg.setAttribute("viewBox",`${view.x} ${view.y} ${view.w} ${view.h}`);
+  const k=view.w/BASEW; const showT = k<0.62 || level!=="all";
+  tamLbl.forEach(({g,t})=>{ g.setAttribute("transform",`translate(${t.lx},${t.ly}) scale(${Math.max(k,0.22)})`); g.style.display = showT && (level==="all"||t.a===level) ? "" : "none"; });
+  ctxLbl.forEach(t=>t.style.fontSize=(14*Math.max(k,0.35))+"px");
+  DD.forEach(x=>{ const L=dLabels[x.d]; L.g.setAttribute("transform",`translate(${L.pos[0]},${L.pos[1]}) scale(${Math.max(k,0.3)})`); L.g.style.display = (level==="all") ? "" : "none"; });
+}
+function clampW(w){ return Math.min(Math.max(w, BASEW/14), BASEW*1.6); }
+let anim=null;
+function animateTo(v){
+  const ar=(svg.clientWidth/svg.clientHeight)||1; let [x,y,w,hh]=v; if(w/hh<ar){ const nw=hh*ar; x-=(nw-w)/2; w=nw; } else { const nh=w/ar; y-=(nh-hh)/2; hh=nh; }
+  const from={...view}, to={x,y,w,h:hh}; cancelAnimationFrame(anim);
+  if(reduce){ view=to; applyView(); return; }
+  const t0=performance.now(), D=380; const step=(now)=>{ const p=Math.min(1,(now-t0)/D), e=p<.5?2*p*p:1-Math.pow(-2*p+2,2)/2;
+    view={x:from.x+(to.x-from.x)*e,y:from.y+(to.y-from.y)*e,w:from.w+(to.w-from.w)*e,h:from.h+(to.h-from.h)*e}; applyView(); if(p<1) anim=requestAnimationFrame(step); };
+  anim=requestAnimationFrame(step);
+}
+function toSvg(cx,cy){ const r=svg.getBoundingClientRect(); const s=Math.min(r.width/view.w, r.height/view.h);
+  const ox=(r.width-view.w*s)/2, oy=(r.height-view.h*s)/2; return {x:view.x+(cx-r.left-ox)/s, y:view.y+(cy-r.top-oy)/s, s}; }
+function zoomAt(px,py,f){ const nw=clampW(view.w*f); f=nw/view.w; view.x=px-(px-view.x)*f; view.y=py-(py-view.y)*f; view.w*=f; view.h*=f; applyView(); }
+function fitAspect(){ if(!svg.clientWidth) return; const ar=svg.clientWidth/svg.clientHeight; const cx=view.x+view.w/2, cy=view.y+view.h/2; if(view.w/view.h<ar) view.w=view.h*ar; else view.h=view.w/ar; view.x=cx-view.w/2; view.y=cy-view.h/2; applyView(); }
+svg.addEventListener("wheel",e=>{ e.preventDefault(); const p=toSvg(e.clientX,e.clientY); zoomAt(p.x,p.y,Math.exp(e.deltaY*0.0016)); },{passive:false});
+const ptrs=new Map(); let moved=false, startPt=null, pinch=null;
+svg.addEventListener("pointerdown",e=>{ svg.setPointerCapture(e.pointerId); ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY});
+  if(ptrs.size===1){ moved=false; startPt={x:e.clientX,y:e.clientY}; }
+  if(ptrs.size===2){ moved=true; const [a,b]=[...ptrs.values()]; pinch={d:Math.hypot(a.x-b.x,a.y-b.y),m:{x:(a.x+b.x)/2,y:(a.y+b.y)/2}}; } });
+svg.addEventListener("pointermove",e=>{ if(!ptrs.has(e.pointerId)) return; const prev=ptrs.get(e.pointerId); ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY});
+  if(ptrs.size===1){ if(!moved && Math.hypot(e.clientX-startPt.x,e.clientY-startPt.y)>5){ moved=true; svg.classList.add("dragging"); }
+    if(moved){ const s=toSvg(0,0).s; view.x-=(e.clientX-prev.x)/s; view.y-=(e.clientY-prev.y)/s; applyView(); } }
+  else if(ptrs.size===2 && pinch){ const [a,b]=[...ptrs.values()]; const d=Math.hypot(a.x-b.x,a.y-b.y), m={x:(a.x+b.x)/2,y:(a.y+b.y)/2};
+    const s=toSvg(0,0).s; view.x-=(m.x-pinch.m.x)/s; view.y-=(m.y-pinch.m.y)/s; const p=toSvg(m.x,m.y); zoomAt(p.x,p.y,pinch.d/Math.max(d,1)); pinch={d,m}; } });
+function endPtr(e){ if(!ptrs.has(e.pointerId)) return; ptrs.delete(e.pointerId); if(ptrs.size<2) pinch=null;
+  if(ptrs.size===0){ svg.classList.remove("dragging");
+    if(!moved && e.type==="pointerup"){ const hit=document.elementsFromPoint(e.clientX,e.clientY).find(x=>x.classList&&x.classList.contains("tam")); if(hit) tapTambon(+hit.dataset.i); } } }
+svg.addEventListener("pointerup",endPtr); svg.addEventListener("pointercancel",endPtr);
+document.getElementById("zin").addEventListener("click",()=>zoomAt(view.x+view.w/2,view.y+view.h/2,0.7));
+document.getElementById("zout").addEventListener("click",()=>zoomAt(view.x+view.w/2,view.y+view.h/2,1/0.7));
+document.getElementById("zall").addEventListener("click",()=>goAll());
+window.addEventListener("resize",fitAspect);
+
+function colorMap(){
+  DATA.tambons.forEach((t,i)=>{ const p=tamEls[i];
+    if(mode==="type"){ p.style.fill = t._pat || `var(--${t.parts[0].k})`; }
+    else { let tg=0,dn=0; t.parts.forEach(x=>{ const a=A().lgu[x.l]; const n=a.parts[t.t]||0; tg+=n; dn+= a.n? Math.min(a.n,done(x.l))*n/a.n : 0; });
+      const f=tg?dn/tg:0; const lvl=f<=0?0:f<.25?1:f<.5?2:f<1?3:4; p.style.fill=`var(--p${lvl})`; }
+    p.classList.toggle("dim", level!=="all" && t.a!==level);
+  });
+  tamLbl.forEach(({t,pill,tn})=>{ const n=tambonN(t); const w=String(n).length*7+10; pill.setAttribute("x",-w/2); pill.setAttribute("width",w); tn.textContent=n; });
+  DD.forEach(x=>{ dLabels[x.d].n.textContent=`n ${fmt(A().dist[x.d].n)}`; distEl[x.d].classList.toggle("on", level===x.d); });
+  renderLegend(); applyView();
+}
+function renderLegend(){
+  const L=document.getElementById("legend");
+  if(mode==="type"){
+    L.innerHTML = TORDER.map(k=>{ const xs=DATA.lgus.filter(o=>o.k===k); const n=xs.reduce((s,o)=>s+A().lgu[o.n].n,0);
+      return `<span><i class="sw" style="background:var(--${k})"></i>${TYPES[k].label} ${xs.length} แห่ง · n ${n}</span>`; }).join("") +
+      `<span><i class="sw" style="background:repeating-linear-gradient(45deg,var(--ao) 0 4px,var(--tb) 4px 8px)"></i>ตำบลที่มี 2 อปท.</span><span><i class="sw" style="background:none;border:2.5px solid var(--ink)"></i>เขตอำเภอ</span>`;
+  } else {
+    L.innerHTML = ["ยังไม่เริ่ม","< 25%","25–50%","50–99%","ครบ"].map((s,i)=>`<span><i class="sw" style="background:var(--p${i})"></i>${s}</span>`).join("") + (dbReady?"":`<span>ยังไม่มีข้อมูลจากตัวนับร่วม</span>`);
+  }
+}
+document.querySelectorAll("#modeseg button").forEach(b=>b.addEventListener("click",()=>{ mode=b.dataset.m; document.querySelectorAll("#modeseg button").forEach(x=>x.setAttribute("aria-pressed",x===b)); colorMap(); }));
+const zs=document.getElementById("zoomseg");
+function renderZoomSeg(){ zs.innerHTML=""; [["ทั้งหมด","all"],...DIST.map(x=>[x.short,x.d])].forEach(([lab,d])=>{ const b=h("button",{"aria-pressed":level===d?"true":"false"},lab); b.addEventListener("click",()=> d==="all"?goAll():goDistrict(d)); zs.appendChild(b); }); }
+
+/* ---------- navigation ---------- */
+function tapTambon(i){ const t=DATA.tambons[i]; if(level!==t.a){ goDistrict(t.a); return; } selectTambon(i); }
+function goAll(){ level="all"; selected=null; tamEls.forEach(p=>p.classList.remove("sel")); colorMap(); animateTo(FULLV); renderZoomSeg(); renderCrumbs(); overviewPanel(); }
+function goDistrict(d,keepSel){ const changed=level!==d; level=d; if(!keepSel){ selected=null; tamEls.forEach(p=>p.classList.remove("sel")); } colorMap(); if(changed||!keepSel) animateTo(distBox[d]); renderZoomSeg(); renderCrumbs(); if(!keepSel) districtPanel(d); }
+function selectTambon(i){ const t=DATA.tambons[i]; if(level!==t.a) goDistrict(t.a,true); selected=i; tamEls.forEach((p,j)=>p.classList.toggle("sel",j===i)); renderCrumbs(); tambonPanel(i); }
+function selectLgu(n){ const i=DATA.tambons.findIndex(t=>t.parts.some(p=>p.l===n)); showView("map"); if(i>=0){ selectTambon(i); document.getElementById("v-map").scrollIntoView({block:"start",behavior:reduce?"auto":"smooth"}); } }
+function renderCrumbs(){ const c=document.getElementById("crumbs"); c.innerHTML="";
+  const add=(lab,fn)=>{ if(fn){ const b=h("button",{},lab); b.addEventListener("click",fn); c.appendChild(b); } else c.appendChild(h("span",{class:"cur"},lab)); };
+  if(level==="all"){ add("ภาพรวม 4 อำเภอ"); return; }
+  add("ภาพรวม 4 อำเภอ",goAll); c.appendChild(h("i",{},"›"));
+  if(selected==null){ add("อ."+level); return; }
+  add("อ."+level,()=>goDistrict(level)); c.appendChild(h("i",{},"›")); add("ต."+DATA.tambons[selected].t);
+}
+
+/* ---------- panels ---------- */
+const panel=document.getElementById("panel");
+const cellLine = q => `Gen Z ช ${q[0]} ญ ${q[1]} · Gen อื่น ช ${q[2]} ญ ${q[3]}`;
+function tierCard(){ const T=TIERS.find(t=>t.k===tier);
+  return h("div",{class:"card"},`<span class="eyebrow">ขนาดตัวอย่างที่เลือก</span><div class="kv"><span>ระดับ <b>${T.label}</b></span><span>เก็บจริง <b>${fmt(T.collect)}</b></span><span>ใช้วิเคราะห์ได้ไม่น้อยกว่า <b>${fmt(T.use)}</b></span></div><p class="muted" style="font-size:.86rem">${T.basis} · เปลี่ยนระดับได้ที่ด้านบน ตัวเลขทุกจุดในหน้านี้จะคำนวณใหม่ตามสัดส่วน</p>`); }
+function overviewPanel(){
+  panel.innerHTML="";
+  panel.appendChild(h("div",{class:"card hint"},`<h3>แตะอำเภอบนแผนที่เพื่อดูภาพรวม แล้วแตะตำบลเพื่อดู อปท.</h3><p>โควตาหลักอยู่ที่ระดับอำเภอ ตัวเลขราย อปท. เป็นการกระจายตามสัดส่วนเพื่อให้ทุกประเภท อปท. มีผู้ตอบ ลากแผนที่เพื่อเลื่อน และหมุนล้อเมาส์หรือถ่างนิ้วเพื่อซูม</p>`));
+  panel.appendChild(tierCard());
+  const c=h("div",{class:"card"}); c.appendChild(h("div",{class:"eyebrow"},"4 อำเภอ เรียงตามสัดส่วนประชากร"));
+  const box=h("div",{class:"dcards"});
+  DD.forEach(x=>{ const a=A().dist[x.d], d=distDone(x.d), D=d.reduce((s,v)=>s+v,0);
+    const b=h("button",{class:"dcard"},`<div class="top"><b>อ.${x.d}</b><span class="num">${fmt(a.n)} คน · ${(x.adult/TOTAL_ADULT*100).toFixed(1)}%</span></div>
+      <span class="muted" style="font-size:.84rem">${cellLine(a.q)}</span>
+      <span class="muted" style="font-size:.8rem">${x.lgus.length} อปท. · ${x.tams.length} ตำบล · ห่างตัวเมืองเฉลี่ย ${x.km.toFixed(1)} กม.${dbReady?` · บันทึกแล้ว ${D}`:""}</span>
+      ${dbReady?`<div class="bar"><span style="width:${Math.min(100,D/a.n*100)}%"></span></div>`:""}`);
+    b.addEventListener("click",()=>goDistrict(x.d)); box.appendChild(b); });
+  c.appendChild(box); panel.appendChild(c);
+}
+function districtPanel(dn){
+  const x=DMAP[dn], a=A().dist[dn], d=distDone(dn);
+  panel.innerHTML="";
+  const c=h("div",{class:"card"});
+  c.innerHTML=`<div><span class="eyebrow">อำเภอ · โควตาหลัก</span><h2>อ.${dn}</h2></div>
+   <div class="kv"><span>ผู้ใหญ่ 18+ <b>${fmt(x.adult)}</b></span><span>สัดส่วน <b>${(x.adult/TOTAL_ADULT*100).toFixed(1)}%</b></span><span>ต้องเก็บ <b>${fmt(a.n)}</b></span><span>ห่างตัวเมือง <b>${x.kmMin.toFixed(0)}–${x.kmMax.toFixed(0)}</b> กม.</span></div>`;
+  const qg=h("div",{class:"qgrid"});
+  CELLS.forEach((cl,i)=>{ const tg=a.q[i], dn2=d[i]; qg.appendChild(h("div",{class:"q"+(dbReady&&dn2>tg?" over":dbReady&&dn2===tg&&tg>0?" full":"")},
+    `<div class="qt"><span>${cl.g} · ${cl.s}</span><span class="qn">${dbReady?dn2+"<small>/"+tg+"</small>":tg}</span></div><div class="bar"><span style="width:${tg?Math.min(100,dn2/tg*100):0}%"></span></div><span class="pop">ประชากร ${fmt(x.pop[i])} คน</span>`)); });
+  c.appendChild(qg);
+  const mixT=[0,1,2].map(i=>x.lgus.reduce((s,o)=>s+A().lgu[o.n].mix[i],0));
+  c.appendChild(h("p",{class:"muted",style:"font-size:.86rem"},`วิธีเก็บที่แนะนำรวมทั้งอำเภอ: ตลาด/จุดคนเยอะ ${mixT[0]} · สภากาแฟ ${mixT[1]} · เคาะบ้าน ${mixT[2]} · บันทึกที่ อปท. ของผู้ตอบ (ข้อ 4) เพื่อให้วิเคราะห์ราย อปท. ได้`));
+  panel.appendChild(c);
+  const l=h("div",{class:"card"}); l.appendChild(h("div",{class:"eyebrow"},`${x.lgus.length} อปท. · กระจายตามสัดส่วน · แตะเพื่อดูรายละเอียด`));
+  TORDER.forEach(k=>{ const ys=x.lgus.filter(o=>o.k===k); if(!ys.length) return;
+    const sn=ys.reduce((s,o)=>s+A().lgu[o.n].n,0);
+    l.appendChild(h("div",{style:"display:flex;justify-content:space-between;gap:8px;margin-top:6px"},`<span><span class="chip ${k}">${TYPES[k].label}</span></span><span class="num muted">${ys.length} แห่ง · ${sn} ชุด</span>`));
+    const list=h("div",{class:"lgulist"});
+    ys.slice().sort((p,q)=>A().lgu[q.n].n-A().lgu[p.n].n).forEach(o=>{ const al=A().lgu[o.n]; const dd=done(o.n);
+      const r=h("button",{class:"lgurow"},`<span>${o.n}${o.parts.length>1?" *":""}</span><span class="c">${al.q.join("·")}</span><span class="num"><b>${dbReady?dd+"/":""}${al.n}</b></span>`);
+      r.addEventListener("click",()=>selectLgu(o.n)); list.appendChild(r); });
+    l.appendChild(list); });
+  l.appendChild(h("p",{class:"muted",style:"font-size:.78rem"},"ตัวเลขเล็กเรียงเป็น Gen Z ช · Gen Z ญ · Gen อื่น ช · Gen อื่น ญ · * ครอบคลุมมากกว่า 1 ตำบล"));
+  panel.appendChild(l);
+}
+const MIXNOTE={nk:["ตลาดสด ตลาดเย็น ย่านการค้า ห้าง ป้ายรถ","ร้านกาแฟในชุมชนเมือง ลานวัดในเมือง","ชุมชนแออัดและชุมชนเก่ากลางเมือง"],
+  mg:["ตลาดสดเทศบาล ตลาดนัดประจำสัปดาห์","ร้านกาแฟ ร้านค้าในชุมชน ศาลาชุมชน","หมู่บ้านจัดสรรและชุมชนรอบนอกเทศบาล"],
+  tb:["ตลาดสด/ตลาดนัดประจำตำบล หน้าที่ทำการเทศบาล","ร้านค้าชำ ศาลากลางบ้าน ใต้ต้นไม้หน้าหมู่บ้าน","หมู่บ้านที่ไกลจากตลาด"],
+  ao:["ตลาดนัดประจำสัปดาห์ (ถ้ามี) งานบุญ","ศาลากลางบ้าน ร้านค้าชำ ใต้ต้นไม้ ลานวัด","เดินตามเส้นทางสุ่มในหมู่บ้าน"]};
+const GZTIP={nk:"Gen Z: ตลาดเย็น ร้านกาแฟ ร้านอาหาร ช่วงเย็นวันศุกร์–อาทิตย์ หรือ QR ออนไลน์ ระวังนักศึกษาที่ไม่มีสิทธิเลือกตั้งในเขตนี้ (คัดออกด้วยข้อ 5)",
+  mg:"Gen Z: ตลาดเย็นและร้านกาแฟช่วงเย็น วันหยุด หรือ QR ผ่านกลุ่ม LINE ชุมชน",
+  tb:"Gen Z: หลายคนไปเรียนหรือทำงานต่างถิ่น ลงพื้นที่วันเสาร์–อาทิตย์ วันหยุดยาว หรืองานบุญ และใช้ QR ผ่านผู้ใหญ่บ้านหรือ อสม.",
+  ao:"Gen Z: หายากที่สุดในพื้นที่นี้ เลือกวันหยุดยาว งานบวช งานบุญ หรือช่วงหัวค่ำ และใช้ QR ผ่านกลุ่ม LINE หมู่บ้าน"};
+function lguCard(o, focusTambon){
+  const al=A().lgu[o.n]; const c=h("div",{class:"card"});
+  c.innerHTML=`<div class="lhead"><span class="chip ${o.k}">${TYPES[o.k].label}</span><h3>${o.n}</h3><span class="muted" style="font-size:.86rem">อ.${o.d}</span></div>
+  <div class="kv"><span>ผู้ใหญ่ 18+ <b>${fmt(o.adult)}</b></span><span>เป้าตามสัดส่วน <b>${al.n}</b> คน</span><span>บันทึกแล้ว <b>${dbReady?done(o.n):"–"}</b></span></div>`;
+  if(o.parts.length>1){ const t=h("table",{class:"parts"}); t.innerHTML=`<tr><td colspan="3" class="muted">อปท. นี้ครอบคลุมหลายตำบล แบ่งจำนวนตามผู้ใหญ่ในแต่ละส่วน</td></tr>`+o.parts.map(p=>`<tr><td>ต.${p.t}${focusTambon&&p.t===focusTambon?" ←":""}</td><td class="num">${fmt(p.adult)} คน</td><td class="num"><b>${al.parts[p.t]}</b> ชุด</td></tr>`).join(""); c.appendChild(t); }
+  const qg=h("div",{class:"qgrid"});
+  CELLS.forEach((cl,i)=>{ const tgt=al.q[i], dn=counts[o.n][i];
+    const q=h("div",{class:"q"+(dbReady&&dn>tgt?" over":dbReady&&dn===tgt&&tgt>0?" full":"")});
+    q.innerHTML=`<div class="qt"><span>${cl.g} · ${cl.s}</span><span class="qn">${dbReady?dn+"<small>/"+tgt+"</small>":tgt}</span></div><div class="bar"><span style="width:${tgt?Math.min(100,dn/tgt*100):0}%"></span></div><span class="pop">ประชากร ${fmt(o.pop[i])} คน</span>`;
+    if(dbReady&&canWrite){ const b=h("button",{class:"plus"+(tgt===0?" ghost":""),"aria-label":`บันทึก 1 คน ${cl.g} ${cl.s} ${o.n}`},"+1 คน"); b.addEventListener("click",()=>record(o.n,i)); q.appendChild(b); }
+    qg.appendChild(q); });
+  c.appendChild(qg);
+  if(dbReady&&canWrite){
+    const vr=h("div",{class:"row"}); vr.appendChild(h("span",{class:"muted",style:"font-size:.84rem"},"บันทึกด้วยสถานที่:"));
+    const vs=h("div",{class:"venues",role:"group","aria-label":"ประเภทสถานที่"});
+    VENUES.forEach(v=>{ const b=h("button",{"aria-pressed":venue===v.k?"true":"false"},v.l); b.addEventListener("click",()=>{ venue=v.k; store.set("venue",venue); vs.querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x===b)); }); vs.appendChild(b); });
+    vr.appendChild(vs); c.appendChild(vr);
+    const mine=[...logs.entries()].filter(([id,d])=>d.l===o.n&&(!uid||d.by===uid)).sort((a,b)=>b[1].ts-a[1].ts);
+    if(mine.length){ const u=h("button",{class:"btn"},`ย้อนรายการล่าสุดของฉัน (${CELLS[mine[0][1].c].g} ${CELLS[mine[0][1].c].s})`); u.addEventListener("click",()=>undo(mine[0][0])); c.appendChild(u); }
+  }
+  const used=[0,0,0,0]; for(const d of logs.values()) if(d.l===o.n){ const vi=VENUES.findIndex(v=>v.k===d.v); if(vi>=0) used[vi]++; }
+  const mx=h("div",{}); mx.innerHTML=`<div class="eyebrow" style="margin-bottom:6px">สัดส่วนวิธีเก็บที่แนะนำ</div>`;
+  const mg=h("div",{class:"mix"}); ["ตลาด/จุดคนเยอะ","สภากาแฟ","เคาะบ้าน"].forEach((lab,i)=>mg.appendChild(h("div",{},`<b>${al.mix[i]}${dbReady?`<span style="font-size:.78rem;color:var(--muted)"> · ทำแล้ว ${used[i]}</span>`:""}</b><span>${lab}</span><span>${MIXNOTE[o.k][i]}</span>`)));
+  mx.appendChild(mg); c.appendChild(mx);
+  c.appendChild(h("p",{class:"note info"},GZTIP[o.k]));
+  const tn=focusTambon||o.parts[0].t, area=`ต.${tn} อ.${o.d} บุรีรัมย์`;
+  const lk=h("div",{}); lk.innerHTML=`<div class="eyebrow" style="margin-bottom:6px">ค้นหาสถานที่ใน Google Maps</div>`;
+  const ls=h("div",{class:"links"});
+  [["ตลาด","ตลาด "+area],["ตลาดนัด","ตลาดนัด "+area],["วัด","วัด "+area],["ร้านกาแฟ","ร้านกาแฟ "+area],["รพ.สต.","โรงพยาบาลส่งเสริมสุขภาพตำบล "+area],["ที่ทำการ อปท.","ที่ทำการ"+fullName(o.n)+" "+o.d],["จุดกลางตำบล",`${o.lat},${o.lon}`]].forEach(([l,q])=>ls.appendChild(h("a",{href:gmap(q),target:"_blank",rel:"noopener"},l)));
+  lk.appendChild(ls); c.appendChild(lk);
+  return c;
+}
+function tambonPanel(i){
+  const t=DATA.tambons[i]; panel.innerHTML="";
+  const head=h("div",{class:"card"});
+  head.innerHTML=`<div><span class="eyebrow">ตำบลที่เลือก</span><h2>ต.${t.t} <span class="muted" style="font-size:1rem;font-weight:500">อ.${t.a}</span></h2></div>
+  <div class="kv"><span>พื้นที่ราว <b>${fmt(t.km2)}</b> ตร.กม.</span><span>ห่างตัวเมือง <b>${t.km.toFixed(1)}</b> กม.</span><span>เป้าในตำบลนี้ <b>${tambonN(t)}</b> คน</span><span>${t.parts.length} อปท.</span></div>`;
+  if(t.parts.length>1){ const sp=DATA.split.find(s=>s.t===t.t&&s.a===t.a); const tot=t.parts.reduce((s,x)=>s+x.adult,0);
+    const bar=h("div",{class:"splitbar"}); t.parts.forEach(x=>bar.appendChild(h("span",{style:`width:${x.adult/tot*100}%;background:var(--${x.k})`},`${x.l} ${Math.round(x.adult/tot*100)}%`))); head.appendChild(bar);
+    const b=h("button",{class:"btn"},"ดูวิธีเก็บในตำบลที่มี 2 อปท."); b.addEventListener("click",()=>{ showView("split"); const e=document.getElementById("sc-"+(sp?sp.id:"")); if(e) e.scrollIntoView({behavior:reduce?"auto":"smooth",block:"start"}); }); head.appendChild(b); }
+  panel.appendChild(head);
+  t.parts.forEach(x=>panel.appendChild(lguCard(LG[x.l],t.t)));
+}
+
+/* ---------- quota tables ---------- */
+function renderTierTable(){
+  const T=document.getElementById("tiertable");
+  let hd=`<thead><tr><th class="l">อำเภอ</th><th>ผู้ใหญ่ 18+</th><th>สัดส่วน</th>`+TIERS.map(t=>`<th>${t.label} (${t.collect})</th><th>Gen Z ช/ญ</th><th>Gen อื่น ช/ญ</th>`).join("")+`</tr></thead><tbody>`;
+  let rows=DD.map(x=>`<tr><td class="l"><b>อ.${x.d}</b></td><td class="num">${fmt(x.adult)}</td><td class="num">${(x.adult/TOTAL_ADULT*100).toFixed(1)}%</td>`+
+    TIERS.map(t=>{ const a=ALLOC[t.k].dist[x.d]; return `<td class="num"><b>${a.n}</b></td><td class="num">${a.q[0]} / ${a.q[1]}</td><td class="num">${a.q[2]} / ${a.q[3]}</td>`; }).join("")+`</tr>`).join("");
+  const tot=TIERS.map(t=>{ const q=[0,1,2,3].map(i=>DD.reduce((s,x)=>s+ALLOC[t.k].dist[x.d].q[i],0)); return `<td class="num"><b>${t.collect}</b></td><td class="num">${q[0]} / ${q[1]}</td><td class="num">${q[2]} / ${q[3]}</td>`; }).join("");
+  rows+=`<tr class="grand"><td class="l">รวม</td><td class="num">${fmt(TOTAL_ADULT)}</td><td class="num">100%</td>${tot}</tr>`;
+  rows+=`<tr><td class="l muted" colspan="3">ใช้วิเคราะห์ได้ไม่น้อยกว่า</td>`+TIERS.map(t=>`<td class="num muted" colspan="3" style="text-align:center">${t.use} · ${t.basis}</td>`).join("")+`</tr>`;
+  T.innerHTML=hd+rows+`</tbody>`;
+}
+function renderTable(){
+  const Tt=TIERS.find(t=>t.k===tier); document.getElementById("lgutitle").textContent=`ราย อปท. · ระดับ${Tt.label} (เก็บ ${Tt.collect})`;
+  const T=document.getElementById("qtable");
+  let html=`<thead><tr><th class="l">อปท.</th><th class="l">ประเภท</th><th>ผู้ใหญ่ 18+</th><th>ห่างเมือง (กม.)</th><th>n</th><th>Gen Z ช</th><th>Gen Z ญ</th><th>Gen อื่น ช</th><th>Gen อื่น ญ</th><th>ตลาด</th><th>สภากาแฟ</th><th>เคาะบ้าน</th><th class="l">ความคืบหน้า</th></tr></thead><tbody>`;
+  const cellv=(o,i)=>{ const v=A().lgu[o.n].q[i]; return dbReady?`${v} <span class="muted">(${counts[o.n][i]})</span>`:v; };
+  DD.forEach(x=>{ const a=A().dist[x.d]; const dd=distDone(x.d).reduce((s,v)=>s+v,0);
+    const mix=[0,1,2].map(i=>x.lgus.reduce((s,o)=>s+A().lgu[o.n].mix[i],0));
+    html+=`<tr class="dist"><td class="l" colspan="2">อ.${x.d} · โควตาหลัก</td><td class="num">${fmt(x.adult)}</td><td class="num">${x.km.toFixed(1)}</td><td class="num">${a.n}</td>${a.q.map(v=>`<td class="num">${v}</td>`).join("")}<td class="num">${mix[0]}</td><td class="num">${mix[1]}</td><td class="num">${mix[2]}</td><td class="l">${dbReady?dd+" / "+a.n:""}</td></tr>`;
+    x.lgus.slice().sort((p,q)=>TORDER.indexOf(p.k)-TORDER.indexOf(q.k)||q.adult-p.adult).forEach(o=>{ const al=A().lgu[o.n], d=done(o.n);
+      const km=(o.parts.reduce((s,p)=>s+p.adult*(DATA.tambons.find(t=>t.a===p.a&&t.t===p.t).km),0)/o.parts.reduce((s,p)=>s+p.adult,0)).toFixed(1);
+      html+=`<tr class="lg" data-n="${o.n}" tabindex="0"><td class="l">${o.n}${o.parts.length>1?" *":""}</td><td class="l"><span class="dot" style="background:var(--${o.k})"></span>${TYPES[o.k].short}</td><td class="num">${fmt(o.adult)}</td><td class="num">${km}</td><td class="num"><b>${al.n}</b></td>${[0,1,2,3].map(i=>`<td class="num">${cellv(o,i)}</td>`).join("")}<td class="num">${al.mix[0]}</td><td class="num">${al.mix[1]}</td><td class="num">${al.mix[2]}</td><td class="l">${dbReady?`${d}/${al.n}<span class="tbar"><span style="width:${al.n?Math.min(100,d/al.n*100):0}%"></span></span>`:"–"}</td></tr>`; });
+  });
+  T.innerHTML=html+`</tbody><caption style="caption-side:bottom;text-align:left;padding:8px 10px;font-size:.8rem;color:var(--muted)">แถวอำเภอ = โควตาหลักที่ต้องครบ · แถว อปท. = เป้าตามสัดส่วน คลาดได้ ±1–2 ชุด · * ครอบคลุมมากกว่า 1 ตำบล · ตลาด/สภากาแฟ/เคาะบ้าน = จำนวนที่แนะนำตามประเภท อปท.</caption>`;
+  T.querySelectorAll("tr.lg").forEach(r=>{ r.addEventListener("click",()=>selectLgu(r.dataset.n)); r.addEventListener("keydown",e=>{if(e.key==="Enter")selectLgu(r.dataset.n);}); });
+}
+function tsv(){ const rows=[["ระดับ","อำเภอ","อปท.","ประเภท","ผู้ใหญ่18+","n","GenZ_ชาย","GenZ_หญิง","Genอื่น_ชาย","Genอื่น_หญิง","ตลาด","สภากาแฟ","เคาะบ้าน","บันทึกแล้ว"]];
+  TIERS.forEach(t=>DATA.lgus.forEach(o=>{ const al=ALLOC[t.k].lgu[o.n]; rows.push([t.label+" "+t.collect,o.d,o.n,TYPES[o.k].short,o.adult,al.n,...al.q,...al.mix,done(o.n)]); })); return rows; }
+document.getElementById("copytsv").addEventListener("click",()=>{ const s=tsv().map(r=>r.join("\t")).join("\n");
+  navigator.clipboard.writeText(s).then(()=>toast("คัดลอกตารางทั้ง 3 ระดับแล้ว วางใน Excel หรือ Google Sheets ได้เลย")).catch(()=>toast("คัดลอกไม่ได้ในมุมมองนี้ ลองดาวน์โหลด CSV แทน")); });
+
+/* ---------- split cards ---------- */
+const SPLITTXT={
+  samet:{title:"ต.เสม็ด · ทน.บุรีรัมย์ + อบต.เสม็ด",type:"ต่างประเภท (นคร / อบต.) ถ้าจัดผู้ตอบผิดฝั่ง ตัวแปร LocalGov จะผิดด้วย",
+    rules:["ส่วนที่เป็นเทศบาลนครน่าจะอยู่ติดแนวเขตกับ ต.อิสาณ (เส้นประ) ซึ่งต่อจากตัวเมือง หมู่บ้านที่ไกลออกไปทางตะวันตกมักเป็น อบต.เสม็ด",
+      "ผู้ตอบในส่วนนี้ให้นับเข้า ทน.บุรีรัมย์ ไม่ต้องแยกจากเป้าของ ทน.",
+      "ข้อมูลทะเบียนส่วนของ ทน. ใน ต.เสม็ด มีชาย Gen Z 1,342 คน หญิง 354 คน ผิดปกติ น่าจะมีที่พักแบบหน่วยงาน (เช่น หน่วยทหารหรือหอพัก) รวมอยู่ อย่าเข้าไปเก็บในเขตที่ต้องขออนุญาต",
+      "อบต.เสม็ด เป็นพื้นที่ชนบทกว่า ใช้สภากาแฟและเคาะบ้านเป็นหลัก"]},
+  satuek:{title:"ต.สตึก · ทต.สตึก + ทต.ศรีสตึก",type:"ประเภทเดียวกัน (เทศบาลตำบลทั้งคู่) จัดฝั่งผิดไม่กระทบ LocalGov แต่เป้าราย อปท. จะเพี้ยน",
+    rules:["ทต.สตึก คือตัวเมืองสตึก (ตลาด ที่ว่าการอำเภอ) คร่อมแนวเขตระหว่าง ต.สตึก กับ ต.นิคม (เส้นประ) ส่วนที่เหลือของ ต.สตึก คือ ทต.ศรีสตึก",
+      "ตลาดสตึกเป็นจุดที่คนจากหลาย อปท. มารวมกัน ถามข้อ 4 ทุกคน แล้วนับตาม อปท. ที่มีสิทธิเลือกตั้ง",
+      "เก็บในหมู่บ้านของ ทต.ศรีสตึก ด้วย อย่าเก็บแต่ที่ตลาด"]},
+  nikhom:{title:"ต.นิคม · ทต.สตึก + อบต.นิคม",type:"ต่างประเภท (ตำบล / อบต.) ถ้าจัดฝั่งผิด ตัวแปร LocalGov จะผิด",
+    rules:["ประชากรของ ทต.สตึก ราว 2 ใน 3 อยู่ใน ต.นิคม (5,398 จาก 8,640 คน) คือฝั่งตัวเมืองที่ติดแนวเส้นประ",
+      "อบต.นิคม คือหมู่บ้านรอบนอก ใช้สภากาแฟและเคาะบ้าน",
+      "ผู้ตอบชายขอบตัวเมืองมักไม่แน่ใจว่าอยู่เขตไหน ให้ถามข้อ 4 แล้วจดหมู่ที่ในข้อ 3 ไว้ตรวจซ้ำ"]},
+  khaendong:{title:"ต.แคนดง · ทต.แคนดง + อบต.แคนดง",type:"ต่างประเภท (ตำบล / อบต.) ถ้าจัดฝั่งผิด ตัวแปร LocalGov จะผิด",
+    rules:["ทต.แคนดง มีสำนักทะเบียนของตนเอง น่าจะครอบคลุมย่านตัวอำเภอแคนดง (ตลาด ที่ว่าการอำเภอ) ส่วนหมู่บ้านรอบนอกเป็น อบต.แคนดง ไม่มีแนวเขตที่อนุมานได้ จึงไม่มีเส้นประ",
+      "เก็บ ทต.แคนดง ที่ตลาดและย่านตัวอำเภอ เก็บ อบต.แคนดง ในหมู่บ้าน",
+      "ก่อนลงพื้นที่ ขอรายชื่อหมู่บ้านในเขตเทศบาลจากที่ทำการ ทต.แคนดง หรือที่ว่าการอำเภอ"]}};
+function renderSplit(){
+  const box=document.getElementById("splitcards"); box.innerHTML="";
+  DATA.split.forEach(sp=>{ const t=DATA.tambons.find(x=>x.t===sp.t&&x.a===sp.a), tx=SPLITTXT[sp.id];
+    const c=h("div",{class:"card",id:"sc-"+sp.id}); c.innerHTML=`<h3>${tx.title}</h3><p class="muted" style="font-size:.88rem">${tx.type}</p>`;
+    const s=document.createElementNS(NS,"svg"); s.setAttribute("class","mini"); s.setAttribute("role","img"); s.setAttribute("aria-label",`แผนที่ย่อย ต.${sp.t}`); c.appendChild(s);
+    const ctxT=sp.ctx.map(([a,n])=>DATA.tambons.find(x=>x.a===a&&x.t===n)).filter(Boolean); const g=el("g",{},s);
+    ctxT.forEach(ct=>el("path",{d:ct.d,class:"m-ctx"},g)); el("path",{d:t.d,class:"m-t",style:`fill:${t._pat||"var(--"+t.parts[0].k+")"}`},g);
+    if(sp.edge) el("path",{d:sp.edge,class:"edge"},g);
+    ctxT.forEach(ct=>{ const tt=el("text",{x:ct.lx,y:ct.ly},g); tt.textContent="ต."+ct.t; }); const tt=el("text",{x:t.lx,y:t.ly},g); tt.textContent="ต."+t.t;
+    requestAnimationFrame(()=>{ const b=g.getBBox(); s.setAttribute("viewBox",`${b.x-8} ${b.y-8} ${b.width+16} ${b.height+16}`); });
+    const tot=t.parts.reduce((a,x)=>a+x.adult,0);
+    const bar=h("div",{class:"splitbar"}); t.parts.forEach(x=>bar.appendChild(h("span",{style:`width:${x.adult/tot*100}%;background:var(--${x.k})`},x.l))); c.appendChild(bar);
+    const tb=h("table",{class:"parts"}); tb.innerHTML=`<tr class="muted"><td>อปท.</td><td>ผู้ใหญ่ในตำบลนี้</td><td>เป้าในตำบลนี้</td></tr>`+t.parts.map(x=>`<tr><td><span class="dot" style="background:var(--${x.k})"></span>${x.l}</td><td class="num">${fmt(x.adult)} (${Math.round(x.adult/tot*100)}%)</td><td class="num"><b>${A().lgu[x.l].parts[t.t]}</b></td></tr>`).join(""); c.appendChild(tb);
+    const ul=h("ul",{class:"tips"}); tx.rules.forEach(r=>ul.appendChild(h("li",{},r))); c.appendChild(ul);
+    const b=h("button",{class:"btn"},"เปิดบนแผนที่"); b.addEventListener("click",()=>{ showView("map"); selectTambon(DATA.tambons.indexOf(t)); }); c.appendChild(b);
+    box.appendChild(c); });
+}
+
+/* ---------- method ---------- */
+function renderMethod(){
+  const mixRow=k=>{ const xs=DATA.lgus.filter(o=>o.k===k); const s=[0,1,2].map(i=>xs.reduce((a,o)=>a+A().lgu[o.n].mix[i],0)); const n=xs.reduce((a,o)=>a+A().lgu[o.n].n,0); return `<tr><td class="l"><span class="dot" style="background:var(--${k})"></span>${TYPES[k].label}</td><td class="num">${n}</td><td class="num">${s[0]}</td><td class="num">${s[1]}</td><td class="num">${s[2]}</td></tr>`; };
+  const Tt=TIERS.find(t=>t.k===tier);
+  document.getElementById("method").innerHTML=`
+  <div><span class="eyebrow">หลักการ</span><h2>จัดสรรตามอำเภอเป็นหลัก กระจายลง อปท. ตามสัดส่วน</h2></div>
+  <p>ตัวอย่างแบ่งตามสัดส่วนประชากรของ 4 อำเภอก่อน แล้วแบ่งในแต่ละอำเภอเป็น 4 ช่อง (Gen Z / Gen อื่น × ชาย / หญิง) ช่องระดับอำเภอคือ<b>โควตาหลัก</b>ที่ต้องเก็บให้ครบ จากนั้นกระจายลงทั้ง 40 อปท. ตามสัดส่วนประชากร ไม่ตัด อปท. ใดออก เพื่อให้มีผู้ตอบจากทุกประเภท อปท. พอที่จะอนุมานเปรียบเทียบได้ เป้าราย อปท. คลาดได้ ±1–2 ชุด แต่ผลรวมของอำเภอต้องครบ</p>
+  <p class="note"><b>กฎข้อเดียวที่ห้ามพลาด:</b> นับโควตาตาม อปท. ที่ผู้ตอบ<u>มีสิทธิเลือกตั้ง</u> (ข้อ 4 ในแบบสอบถาม) ไม่ใช่ตามสถานที่ที่สัมภาษณ์ คนที่มาตลาดในตัวอำเภออาจมาจาก อบต. รอบ ๆ ถ้าช่องของอำเภอนั้นยังว่างก็นับเข้าได้ และบันทึก อปท. ของเขาตามจริง</p>
+  <div><h2>ขนาดตัวอย่าง 3 ระดับ</h2><p class="muted" style="margin-top:4px">ใช้สูตร Cochran เป็นหลัก ตอนนี้เลือกระดับ${Tt.label}อยู่ เปลี่ยนได้ที่ด้านบนของหน้า</p></div>
+  <div class="tblwrap"><table class="big"><thead><tr><th class="l">ระดับ</th><th>เก็บจริง</th><th>ใช้วิเคราะห์ได้</th><th class="l">เกณฑ์</th><th class="l">ใช้เมื่อ</th></tr></thead><tbody>
+   <tr><td class="l"><b>ต่ำสุด</b></td><td class="num">300</td><td class="num">≥ 271</td><td class="l">Cochran ความเชื่อมั่น 90%</td><td class="l">เก็บไม่ทันตามกำหนด · H4/H5/H1b เป็นการวิเคราะห์เชิงสำรวจ · ใช้ Firth logit</td></tr>
+   <tr><td class="l"><b>กลาง</b></td><td class="num">440</td><td class="num">≥ 400</td><td class="l">Cochran 95% (384) = Krejcie & Morgan</td><td class="l">แผนหลัก · H1a, H3, H6 power ≥ 0.96</td></tr>
+   <tr><td class="l"><b>สูงสุด</b></td><td class="num">880</td><td class="num">≥ 800</td><td class="l">จำลองกำลังการทดสอบ</td><td class="l">ทุกสมมติฐานยกเว้น H2 มี power ≥ 0.80 (H1b แบบทางเดียว)</td></tr>
+  </tbody></table></div>
+  <p class="note info">EC อนุมัติจำนวนผู้เข้าร่วมเป็นเพดาน ถ้ามีโอกาสเก็บถึง 880 ต้องขอเพดานนั้นตั้งแต่ยื่น</p>
+  <div><h2>ข้อคัดกรองในแบบสอบถาม</h2><p class="muted" style="margin-top:4px">ถามก่อนเริ่มส่วนอื่น</p></div>
+  <div class="script">
+    <span><b>ข้อ 1 ปีเกิด</b> · เกิดหลัง 8 ก.พ. 2551 ยุติ · พ.ศ. 2539–2550 = Gen Z · ก่อน 2539 = Gen อื่น</span>
+    <span><b>ข้อ 3 พื้นที่อาศัย</b> อำเภอ ตำบล หมู่ที่หรือชุมชน</span>
+    <span><b>ข้อ 4 ประเภท อปท.</b> “มีสิทธิเลือกนายกเทศมนตรีหรือนายก อบต. ของที่ไหน” ถามสิทธิ ไม่ถามว่าเลือกใคร</span>
+    <span><b>ข้อ 5 สิทธิในพื้นที่</b> ชื่ออยู่ในทะเบียนบ้านที่นี่ไหม ถ้าไม่อยู่ ยุติ ถ้าอยู่แต่ไปทำงานหรือเรียนที่อื่น รับได้</span>
+  </div>
+  <div><h2>สัดส่วนวิธีเก็บตามประเภท อปท. (ระดับ${Tt.label})</h2><p class="muted" style="margin-top:4px">ยิ่งเป็นชนบทยิ่งพึ่งสภากาแฟและการเคาะบ้าน ปรับได้ตามพื้นที่ แต่จดประเภทสถานที่ทุกชุดไว้ตรวจความลำเอียง</p></div>
+  <div class="tblwrap"><table class="big"><thead><tr><th class="l">ประเภท</th><th>n</th><th>ตลาด/จุดคนเยอะ</th><th>สภากาแฟ</th><th>เคาะบ้าน</th></tr></thead><tbody>${TORDER.map(mixRow).join("")}</tbody></table></div>
+  <div><h2>ตลาดและจุดที่มีคนเยอะ</h2></div>
+  <ol><li>ยืนที่จุดเดิมที่เห็นคนผ่านชัด แล้วเข้าหา<b>ทุกคนที่ 3</b> ที่ผ่านมา ถ้าปฏิเสธให้นับใหม่</li>
+    <li>เก็บอย่างน้อย <b>2 ช่วงเวลา</b> (ตลาดเช้า 06:00–09:00 และตลาดเย็น 16:00–19:00) และอย่างน้อย <b>2 แห่ง</b> ต่อ อปท. ที่มีเป้าตั้งแต่ 6 ชุด ตลาดเดียวไม่ควรเกิน 1 ใน 3 ของเป้า อปท.</li>
+    <li>ไม่สัมภาษณ์ผู้ค้าระหว่างขาย และพาผู้ตอบออกห่างจากคนอื่นพอที่จะไม่มีใครได้ยินคำตอบ</li></ol>
+  <div><h2>สภากาแฟ</h2></div>
+  <ol><li>แจ้งผู้ใหญ่บ้านด้วยวาจาก่อนเข้าหมู่บ้าน และถามว่าคนมักนั่งรวมกันที่ไหน ช่วงกี่โมง ส่วนใหญ่คือเช้า 07:00–10:00 และบ่าย 15:00–18:00 ผู้ใหญ่บ้านไม่อยู่ในบริเวณขณะสัมภาษณ์</li>
+    <li><b>สัมภาษณ์ทีละคน ห่างจากกลุ่ม</b> ห้ามให้คนอื่นตอบแทน ถ้าทั้งกลุ่มอยากตอบพร้อมกัน ให้แจกแบบกรอกเองแล้วนั่งแยกกัน</li>
+    <li>เก็บ<b>ไม่เกิน 3 คนต่อจุด</b> แล้วย้ายจุด</li></ol>
+  <div><h2>เคาะบ้าน</h2></div>
+  <ol><li>เริ่มจากศาลากลางบ้านหรือวัด เดินตามถนนหลัก <b>เว้นทุก 3 หลังคาเรือน</b> สลับฝั่งถนน</li>
+    <li><b>1 คนต่อครัวเรือน</b> เลือกคนที่ตรงช่องโควตาที่ยังว่าง ถ้ามีหลายคนตรงช่อง เลือกคนที่วันเกิดใกล้ที่สุด</li>
+    <li>ไม่มีคนอยู่ ไปบ้านถัดไปตามรอบ ไม่ต้องกลับมาซ้ำ</li></ol>
+  <div><h2>เวลาและฤดูกาล</h2></div>
+  <ul><li>พฤศจิกายน–ธันวาคมเป็นฤดูเกี่ยวข้าว กลางวันคนอยู่ในนา ลงหมู่บ้านช่วงเช้ามืด หัวค่ำ หรือวันที่ไม่ได้ลงนา</li>
+    <li>วันพระมีผู้สูงอายุไปวัด สัมภาษณ์หลังทำบุญเสร็จ</li>
+    <li>แบบอ่านให้ฟังใช้ราว 40 นาที ให้พักระหว่างส่วนที่ 4 (คู่ผู้สมัคร) กับส่วนที่ 6 (แบบวัด IPC)</li></ul>
+  <div><h2>Gen Z ที่ไม่อยู่บ้าน</h2></div>
+  <p>Gen Z เป็นช่องที่น่าจะเต็มช้าที่สุด ทางที่ใช้ได้คือลงพื้นที่วันหยุดยาวหรือวันที่มีงานบุญงานบวช ใช้ QR ออนไลน์ผ่านกลุ่ม LINE หมู่บ้าน (ยังต้องผ่านข้อคัดกรอง) และเก็บ Gen Z ในตัวเมืองช่วงเย็นวันศุกร์–อาทิตย์</p>
+  <div><h2>เมื่อโควตาไม่เต็ม</h2></div>
+  <ol><li>ลงพื้นที่ครบ 2 รอบแล้วช่องยังว่าง เปิด QR ออนไลน์ใน อปท. นั้นก่อน</li>
+    <li>ถ้ายังไม่ได้ ให้<b>แทนด้วย อปท. ประเภทเดียวกันในอำเภอเดียวกัน</b> ช่องเดียวกัน และจดการแทนไว้ ห้ามแทนข้ามอำเภอ เพราะโควตาหลักอยู่ที่อำเภอ</li>
+    <li>ถ้าช่องเกิน (ตัวนับเป็นสีแดง) หยุดเก็บช่องนั้น ชุดที่เกินยังเก็บไว้ได้ แต่ต้องถ่วงน้ำหนักกลับตอนวิเคราะห์</li></ol>
+  <div><h2>จริยธรรมและข้อมูล</h2></div>
+  <ul><li>ห้ามถามและห้ามบันทึกว่าผู้ตอบเลือกผู้สมัครหรือพรรคใด</li>
+    <li>ขอความยินยอมด้วยวาจาก่อนเริ่ม บอกเวลาที่ใช้โดยประมาณ (กรอกเองราว 20 นาที อ่านให้ฟังราว 40 นาที)</li>
+    <li>หมู่ที่หรือชุมชนในข้อ 3 ใช้ลงรหัส อปท. เท่านั้น ตัดออกจากชุดข้อมูลหลังลงรหัส</li></ul>
+  <div><h2>ข้อจำกัดของแผนที่</h2></div>
+  <ul><li>เส้นแบ่งเป็นระดับตำบล ไม่ใช่เขตเทศบาลจริง ใน 4 ตำบลที่มี 2 อปท. ให้ตัดสินจากข้อ 4</li>
+    <li>ประชากรมาจากทะเบียนราษฎร ซึ่งนับตามชื่อในทะเบียนบ้าน ไม่ใช่คนที่อาศัยอยู่จริง</li>
+    <li>ระยะทางเป็นเส้นตรงจากจุดกลางตำบล ไม่ใช่ระยะทางถนน</li></ul>`;
+}
+
+/* ---------- planner ---------- */
+function dist2(a,b){ const dx=(a.lon-b.lon)*Math.cos(15*Math.PI/180), dy=a.lat-b.lat; return dx*dx+dy*dy; }
+function renderPlan(){
+  const E=Math.max(1,+document.getElementById("p-enum").value||1);
+  const R={nk:+document.getElementById("p-nk").value||12,mg:+document.getElementById("p-mg").value||10,tb:+document.getElementById("p-tb").value||8,ao:+document.getElementById("p-ao").value||6};
+  const days=[]; let pdTot=0;
+  DIST.forEach(x=>{
+    let rest=DATA.lgus.filter(o=>o.d===x.d).map(o=>({o,left:Math.max(0,A().lgu[o.n].n-done(o.n))})).filter(r=>r.left>0);
+    const order=[]; let cur=LG[x.seat]; const si=rest.findIndex(r=>r.o.n===x.seat); if(si>=0){ order.push(rest[si]); rest.splice(si,1); }
+    while(rest.length){ rest.sort((a,b)=>dist2(cur,a.o)-dist2(cur,b.o)); const nx=rest.shift(); order.push(nx); cur=nx.o; }
+    let day=null;
+    for(const r of order){ let left=r.left;
+      while(left>0){ if(!day||day.cap<=1e-9){ day={d:x.d,items:[],cap:E,n:0}; days.push(day); }
+        const per=R[r.o.k], can=Math.max(1,Math.floor(day.cap*per+1e-9)), take=Math.min(left,can);
+        day.items.push({n:r.o.n,k:r.o.k,c:take}); day.n+=take; day.cap-=take/per; pdTot+=take/per; left-=take; if(day.cap<0.15) day.cap=0; } }
+  });
+  const remain=DATA.lgus.reduce((a,o)=>a+Math.max(0,A().lgu[o.n].n-done(o.n)),0);
+  const Tt=TIERS.find(t=>t.k===tier);
+  document.getElementById("plansum").innerHTML=`ระดับ${Tt.label} · <b class="num">${days.length}</b> วันลงพื้นที่ · <span class="num">${pdTot.toFixed(1)}</span> คน-วัน · เหลือ <span class="num">${remain}</span> ชุด${dbReady?" (หักชุดที่บันทึกแล้ว)":""}`;
+  const box=document.getElementById("days"); box.innerHTML="";
+  days.forEach((d,i)=>{ const c=h("div",{class:"day"}); c.innerHTML=`<h3><span>วันที่ ${i+1} · อ.${d.d}</span><span class="num muted">${d.n} ชุด</span></h3><ul>${d.items.map(it=>`<li><span><span class="dot" style="background:var(--${it.k})"></span>${it.n}</span><span class="num">${it.c}</span></li>`).join("")}</ul>`; box.appendChild(c); });
+  if(!days.length) box.appendChild(h("p",{class:"muted"},"เก็บครบทุก อปท. แล้ว"));
+}
+["p-enum","p-nk","p-mg","p-tb","p-ao"].forEach(id=>document.getElementById(id).addEventListener("input",renderPlan));
+
+/* ---------- views ---------- */
+const VIEWS=["map","quota","split","method","plan"];
+function showView(v){ if(!VIEWS.includes(v)) v="map";
+  VIEWS.forEach(x=>document.getElementById("v-"+x).hidden = x!==v);
+  document.querySelectorAll("nav.tabs button").forEach(b=>b.setAttribute("aria-selected",b.dataset.v===v));
+  if(v==="split") renderSplit(); if(v==="plan") renderPlan(); if(v==="map") requestAnimationFrame(fitAspect); }
+document.querySelectorAll("nav.tabs button").forEach(b=>b.addEventListener("click",()=>showView(b.dataset.v)));
+
+/* ---------- toast & db ---------- */
+let toastTimer=null, toastUndo=null;
+function toast(msg,undoFn){ const t=document.getElementById("toast"); document.getElementById("toastmsg").textContent=msg; const u=document.getElementById("toastundo"); u.hidden=!undoFn; toastUndo=undoFn||null; t.hidden=false; clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.hidden=true,4500); }
+document.getElementById("toastundo").addEventListener("click",()=>{ if(toastUndo) toastUndo(); document.getElementById("toast").hidden=true; });
+async function record(l,c){ if(!db) return; const ref=db.collection("interviews").doc();
+  const body={l,c,v:venue,ts:Date.now(),day:new Date().toISOString().slice(0,10)}; if(uid) body.by=uid;
+  try{ await ref.set(body); toast(`บันทึกแล้ว: ${l} · ${CELLS[c].g} ${CELLS[c].s} · ${VENUES.find(v=>v.k===venue).l}`,()=>undo(ref.id)); }
+  catch(e){ if(e&&e.code==="invalid_argument"){ canWrite=false; refresh(); toast("บัญชีนี้ดูได้อย่างเดียว บันทึกไม่ได้"); } else toast("บันทึกไม่สำเร็จ ลองอีกครั้ง"); } }
+async function undo(id){ if(!db) return; try{ await db.collection("interviews").doc(id).delete(); toast("ลบรายการแล้ว"); }catch(e){ toast("ลบไม่สำเร็จ ลองอีกครั้ง"); } }
+function setSync(state,txt){ const s=document.getElementById("sync"); s.className="sync "+state; s.querySelector("span").textContent=txt; }
+function refreshPanel(){ if(selected!=null) tambonPanel(selected); else if(level!=="all") districtPanel(level); else overviewPanel(); }
+function refresh(){ recount(); renderTiers(); renderCells(); colorMap(); renderTierTable(); renderTable(); renderMethod(); refreshPanel();
+  if(!document.getElementById("v-plan").hidden) renderPlan(); if(!document.getElementById("v-split").hidden) renderSplit(); }
+
+/* ---------- boot ---------- */
+renderTiers(); renderCells(); renderZoomSeg(); renderCrumbs(); colorMap(); renderTierTable(); renderTable(); renderMethod(); overviewPanel();
+showView((location.hash||"").replace("#","")); fitAspect();
+(async()=>{
+  try{
+    const [d,u]=await Promise.all([window.claude?.use?window.claude.use("db"):null, window.claude?.use?window.claude.use("user"):null]);
+    if(!d){ setSync("off","ฉบับเว็บไซต์ · ไม่มีตัวนับร่วม"); return; }
+    db=d;
+    if(u){ try{ uid=await u.id(); }catch(e){} try{ const cw=await u.can("data.write"); canWrite = cw!==false; }catch(e){ canWrite=true; } } else canWrite=true;
+    db.collection("interviews").onSnapshot(snap=>{ logs.clear(); snap.docs.forEach(x=>{ const v=x.data(); if(v) logs.set(x.id,v); });
+      dbReady=true; setSync("on",`ตัวนับร่วม · บันทึกแล้ว ${logs.size} ชุด${canWrite?"":" · ดูอย่างเดียว"}`); refresh(); },
+      e=>{ setSync("off","ตัวนับร่วมขาดการเชื่อมต่อ โหลดหน้าใหม่"); });
+    const dl=window.claude.use?await window.claude.use("downloads"):null;
+    if(dl){ const b=document.getElementById("dlcsv"); b.hidden=false; b.addEventListener("click",async()=>{ const s="﻿"+tsv().map(r=>r.map(v=>/[",\n]/.test(String(v))?`"${String(v).replace(/"/g,'""')}"`:v).join(",")).join("\n");
+      try{ await dl.save({filename:"quota_buriram_3tiers.csv",data:s}); }catch(e){ if(e&&e.code!=="cancelled") toast("ดาวน์โหลดไม่สำเร็จ"); } }); }
+  }catch(e){ setSync("off","ตัวนับร่วมใช้ไม่ได้ในมุมมองนี้"); }
+})();
+</script>
+
+</body>
+</html>
