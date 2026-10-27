@@ -50,10 +50,10 @@
       e.preventDefault(); err.textContent = "";
       if (!f.u.value.trim() || !f.p.value) { err.textContent = "กรอกชื่อผู้ใช้และรหัสผ่าน"; return; }
       const b = f.querySelector("[type=submit]"); b.disabled = true; b.textContent = "กำลังตรวจสอบ…";
-      const j = await login(f.u.value.trim(), f.p.value);
+      const j = await login(f.u.value.trim(), f.p.value.trim());          // copied passwords often carry a stray space
       b.disabled = false; b.textContent = "เข้าสู่ระบบ";
       if (!j.ok) { err.textContent = j.error || "เข้าสู่ระบบไม่สำเร็จ"; f.p.value = ""; f.p.focus(); return; }
-      if (j.user.mustChange) return changeForm(el, opts, f.p.value);
+      if (j.user.mustChange) return changeForm(el, opts, f.p.value.trim());
       opts.onDone && opts.onDone(get());
     };
   }
@@ -69,7 +69,7 @@
     el.querySelector("[data-out]").onclick = () => { clear(); form(el, opts); };
     f.onsubmit = async e => {
       e.preventDefault(); err.textContent = "";
-      const o = oldPw || (f.o && f.o.value) || "";
+      const o = (oldPw || (f.o && f.o.value) || "").trim();
       if (f.n.value.length < 8) { err.textContent = "รหัสผ่านใหม่ต้องยาวอย่างน้อย 8 ตัว"; return; }
       if (f.n.value !== f.n2.value) { err.textContent = "รหัสผ่านใหม่สองช่องไม่ตรงกัน"; return; }
       const j = await changePassword(o, f.n.value);
