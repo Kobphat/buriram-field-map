@@ -201,7 +201,7 @@
       ${INV ? `<div class="notice acc" id="invbox">กำลังตรวจ QR…</div>` : ""}
       <div class="admin" ${INV ? `style="display:none"` : ""}>
         <fieldset class="q"><legend class="qh"><span class="qt">วิธีตอบ</span></legend><div class="opts row">
-          ${[[1, "ผู้เก็บข้อมูลอ่านให้ฟัง"], [0, "คีย์จากฟอร์มกระดาษ (ผู้ตอบกรอกเอง)"], [2, "ตอบเองออนไลน์"]].map(([c, t]) => `<label class="opt"><input type="radio" name="mode" value="${c}" ${st.meta.mode === c ? "checked" : ""}><span class="box"></span><span class="ot">${t}</span></label>`).join("")}</div></fieldset>
+          ${[[1, "ผู้เก็บข้อมูลอ่านให้ฟัง"], [0, "คีย์จากฟอร์มกระดาษ (ผู้ตอบกรอกเอง)"], [3, "ให้ผู้ตอบสแกน QR ทำในโทรศัพท์ตัวเอง"], [2, "ตอบเองออนไลน์"]].map(([c, t]) => `<label class="opt"><input type="radio" name="mode" value="${c}" ${st.meta.mode === c ? "checked" : ""}><span class="box"></span><span class="ot">${t}</span></label>`).join("")}</div></fieldset>
         <fieldset class="q" id="venue-q" ${st.meta.mode === 2 ? "hidden" : ""}><legend class="qh"><span class="qt">สถานที่พบผู้ตอบ <em class="muted">(ผู้เก็บข้อมูลเลือก)</em></span></legend><div class="opts row">
           ${[[1, "ตลาดหรือจุดที่คนพลุกพล่าน"], [2, "จุดรวมตัวของชุมชน (สภากาแฟ)"], [3, "เยี่ยมครัวเรือน"]].map(([c, t]) => `<label class="opt"><input type="radio" name="venue" value="${c}" ${st.meta.venue === c ? "checked" : ""}><span class="box"></span><span class="ot">${t}</span></label>`).join("")}</div></fieldset>
 
@@ -210,16 +210,16 @@
         </fieldset>
       </div>
       ${!INV && !DEMO && !TESTRUN && store.get("done", false) ? `<div class="notice">เครื่องนี้เคยส่งคำตอบแบบตอบเองออนไลน์ไปแล้ว ถ้าเป็นผู้ตอบคนใหม่ ให้ผู้เก็บข้อมูลเลือก “ผู้เก็บข้อมูลอ่านให้ฟัง” หรือใช้อีกเครื่อง</div>` : ""}
-      <p class="consent">การกด “เริ่มตอบ” ถือว่าท่านยินยอมเข้าร่วมการวิจัย (ความยินยอมโดยการกระทำ)</p>
+      <p class="consent" id="consent"></p>
       <div class="nav"><span></span><button class="btn primary" id="start">เริ่มตอบ</button></div>
     </section>`;
     app.onchange = e => {
       const t = e.target;
-      if (t.name === "mode") { st.meta.mode = +t.value; $("#venue-q").hidden = st.meta.mode === 2; $("#enum-q").hidden = st.meta.mode === 2; if (st.meta.mode === 2) st.meta.venue = 4; else if (st.meta.venue === 4) st.meta.venue = null; renderWho(); }
+      if (t.name === "mode") { st.meta.mode = +t.value; if (st.meta.mode === 2) st.meta.venue = 4; else if (st.meta.venue === 4) st.meta.venue = null; modeUI(); renderWho(); }
       if (t.name === "venue") st.meta.venue = +t.value;
       if (t.name === "cdate") st.meta.cdate = t.value;
     };
-    renderWho();
+    modeUI(); renderWho();
     if (INV) checkInvite();
     $("#start").onclick = () => {
       if (INV) {
@@ -228,6 +228,12 @@
         st.meta.started = new Date().toISOString(); st.t0 = performance.now(); st.screen = "part"; st.part = 0; return render();
       }
       if (st.meta.mode == null) st.meta.mode = 2, st.meta.venue = 4;
+      if (st.meta.mode === 3) {                         // collector hands a QR; no form starts on this device
+        const se = Auth.get();
+        if (!se || se.user.mustChange) { toast("เข้าสู่ระบบก่อนสร้าง QR"); $("#who").scrollIntoView({ block: "center" }); return; }
+        if (!se.user.enumerator) { toast("บัญชีนี้ยังไม่มีเลขผู้เก็บข้อมูล จึงสร้าง QR ไม่ได้"); return; }
+        return showQR();
+      }
       if (st.meta.mode !== 2) {
         const se = Auth.get();
         if (!se || se.user.mustChange) { toast("ผู้เก็บข้อมูลต้องเข้าสู่ระบบก่อนเริ่ม"); $("#who").scrollIntoView({ block: "center" }); return; }
@@ -238,6 +244,15 @@
       st.meta.started = new Date().toISOString(); st.t0 = performance.now();
       st.screen = "part"; st.part = 0; render();
     };
+  }
+
+  /* what the intro shows for each way of answering */
+  function modeUI() {
+    const m = st.meta.mode, v = $("#venue-q"), e = $("#enum-q"), go = $("#start"), c = $("#consent");
+    if (v) v.hidden = m === 2; if (e) e.hidden = m === 2 || m == null;
+    if (go && !INV) go.textContent = m === 3 ? "สร้าง QR ให้ผู้ตอบ" : "เริ่มตอบ";
+    if (c) c.innerHTML = m === 3 && !INV ? "ให้ QR หลังอธิบายโครงการและผู้ตอบยินยอมแล้วเท่านั้น ผู้ตอบสแกนแล้วทำเองในโทรศัพท์ของเขา คำตอบนับเป็นชุดของคุณ หนึ่ง QR ใช้ได้ 1 คน ภายใน 7 วัน"
+      : "การกด “เริ่มตอบ” ถือว่าท่านยินยอมเข้าร่วมการวิจัย (ความยินยอมโดยการกระทำ)";
   }
 
   async function checkInvite() {
@@ -304,13 +319,12 @@
         <div><b>${esc(u.name || u.username)}</b><p class="small muted">${esc(u.username)} · ${u.enumerator ? "ผู้เก็บเลข " + u.enumerator : "ยังไม่มีเลขผู้เก็บ"}${se.demo ? " · บัญชีสาธิต" : ""}</p></div>
         <button type="button" class="btn ghost small" id="logout">ออกจากระบบ</button></div>
       ${u.enumerator ? "" : `<div class="notice small">บัญชีนี้ดูข้อมูลได้แต่เก็บข้อมูลไม่ได้ เพราะยังไม่มีเลขผู้เก็บ ให้ผู้ดูแลกำหนดเลขให้ในหน้าหลังบ้าน</div>`}
-      ${u.enumerator ? `<div class="qrrow"><button type="button" class="btn" id="mkqr">▣ ให้ผู้ตอบทำในโทรศัพท์ตัวเอง (QR)</button><span class="small muted">ผู้ตอบสแกนแล้วตอบเอง ระบบนับเป็นชุดของคุณ</span></div>` : ""}
+      ${st.meta.mode === 3 ? `<p class="small muted">วันที่ในรหัสผู้ตอบคือวันที่ผู้ตอบส่งคำตอบจากโทรศัพท์ของเขา</p>` : `
       <label class="fld" style="max-width:220px"><span>วันที่เก็บข้อมูล</span><input class="txt" type="date" name="cdate" value="${st.meta.cdate || todayISO()}" max="${todayISO()}"></label>
-      <p class="small muted">คีย์ฟอร์มกระดาษย้อนหลัง ให้ใส่วันที่ที่ผู้ตอบกรอกจริง ระบบออกรหัสผู้ตอบให้หลังส่งสำเร็จ แล้วเขียนรหัสนั้นลงมุมขวาบนของฟอร์มกระดาษ</p>
+      <p class="small muted">คีย์ฟอร์มกระดาษย้อนหลัง ให้ใส่วันที่ที่ผู้ตอบกรอกจริง ระบบออกรหัสผู้ตอบให้หลังส่งสำเร็จ แล้วเขียนรหัสนั้นลงมุมขวาบนของฟอร์มกระดาษ</p>`}
       ${sent.length ? `<details class="sent"><summary>ส่งจากเครื่องนี้ล่าสุด ${sent.length} ชุด</summary><table><thead><tr><th>เวลา</th><th>เลขอ้างอิง</th><th>รหัสผู้ตอบ</th></tr></thead><tbody>${sent.map(x => `<tr><td class="num">${esc(new Date(x.at).toLocaleString("th-TH", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }))}</td><td class="num">${esc(x.ref)}</td><td class="num"><b>${esc(x.code)}</b></td></tr>`).join("")}</tbody></table></details>` : ""}
     </div>`;
     $("#logout").onclick = () => { Auth.clear(); renderWho(); chips(); };
-    const mq = $("#mkqr"); if (mq) mq.onclick = showQR;
   }
 
   function partHead(i, extra = "") {
