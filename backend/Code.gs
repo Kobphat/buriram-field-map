@@ -4,10 +4,12 @@
      ACCEPT    "1" after the ethics committee approves; until then only test records (meta.test) are saved
      DELETE_BY date by which phone numbers must be deleted, e.g. 2570-06-30
      SECRET    created by setup(); signs sign-in tokens. Changing it signs everyone out.
-     SHEET_ID  optional; leave empty when this script is bound to the spreadsheet */
+     SHEET_ID  optional; leave empty when this script is bound to the spreadsheet
+   Modes (meta.mode): 0 paper keyed by a collector · 1 read aloud by a collector · 2 online, no collector (code digit 9)
+                      3 online on the respondent's own phone from a collector's one-time QR (code digit = that collector) */
 
 var SHEETS = { responses: "คำตอบ", conjoint: "คู่ผู้สมัคร", contacts: "เบอร์ติดต่อ (ลบหลังสัมภาษณ์)", log: "บันทึกระบบ" };
-var RESP_HEADER = ["code", "rid", "collector", "received", "test", "flag", "json"];
+var RESP_HEADER = ["code", "rid", "collector", "inv", "received", "test", "flag", "json"];
 var CONTACT_HEADER = ["code", "phone", "best_time", "consented", "delete_by"];
 var TZ = "Asia/Bangkok";
 
@@ -43,7 +45,7 @@ var API = {
   submit: apiSubmit_, login: apiLogin_, me: apiMe_, changePassword: apiChangePassword_, mine: apiMine_,
   data: apiData_, detail: apiDetail_, contacts: apiContacts_, deleteContacts: apiDeleteContacts_, exportCsv: apiExport_,
   users: apiUsers_, addUser: apiAddUser_, resetPassword: apiResetPassword_, setUser: apiSetUser_,
-  seedTest: apiSeedTest_, clearTest: apiClearTest_,
+  seedTest: apiSeedTest_, clearTest: apiClearTest_, invite: apiInvite_, checkInvite: apiCheckInvite_,
 };
 function doPost(e) {
   var lock = LockService.getScriptLock();
@@ -78,7 +80,12 @@ function apiSubmit_(body) {
   if (props_().getProperty("ACCEPT") !== "1" && !isTest) throw new Error("ระบบยังไม่เปิดรับข้อมูลจริง");
   if (!m.id || String(m.id).length < 6) throw new Error("คำตอบไม่มีเลขอ้างอิง");
   var mode = +m.mode, enumr, collector = "", cdate;
-  if (mode === 2) { enumr = 9; cdate = todayISO_(); }
+  if (mode === 3) {                                     // answered on the respondent's own phone from a collector's QR
+    var o = readInvite_(body.invite), used = inviteUsed_(o.i);
+    if (used && used !== String(m.id)) throw new Error("QR นี้ถูกใช้ตอบไปแล้ว หนึ่ง QR ใช้ได้หนึ่งคน");
+    enumr = o.e; collector = o.u; cdate = todayISO_(); m.inv = o.i; m.venue = o.v;
+  }
+  else if (mode === 2) { enumr = 9; cdate = todayISO_(); }
   else if (mode === 0 || mode === 1) { var u = auth_(body.token, "collector"); enumr = u.enumerator; collector = u.username; cdate = validDate_(m.cdate); }
   else throw new Error("ไม่ทราบวิธีตอบ");
   return saveRecord_(rec, enumr, collector, cdate);

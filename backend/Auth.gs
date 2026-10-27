@@ -71,6 +71,7 @@ function auth_(token, need, allowMustChange) {
   var p = String(token).split(".");
   if (p.length !== 2 || !safeEq_(sign_(p[0]), p[1])) throw authErr_("การเข้าสู่ระบบไม่ถูกต้อง กรุณาเข้าสู่ระบบใหม่");
   var o; try { o = JSON.parse(unb64_(p[0])); } catch (e) { throw authErr_("การเข้าสู่ระบบไม่ถูกต้อง กรุณาเข้าสู่ระบบใหม่"); }
+  if (o.k) throw authErr_("การเข้าสู่ระบบไม่ถูกต้อง กรุณาเข้าสู่ระบบใหม่");          // a QR invite is not a sign-in
   if (!o.x || o.x < Date.now()) throw authErr_("หมดเวลาเข้าสู่ระบบ กรุณาเข้าสู่ระบบใหม่");
   var u = findUser_(o.u);
   if (!u || !u.active || u.ver !== o.v) throw authErr_("บัญชีถูกปิดหรือรหัสผ่านถูกเปลี่ยน กรุณาเข้าสู่ระบบใหม่");
@@ -163,4 +164,39 @@ function resetAdminPassword() {
   log_("editor", "ตั้งรหัสผ่านชั่วคราวให้ admin");
   Logger.log("ชื่อผู้ใช้: admin  รหัสผ่านชั่วคราว: " + pw + "  (ระบบจะให้ตั้งรหัสใหม่ตอนเข้าครั้งแรก)");
   return pw;
+}
+
+/* ---------- QR invites: a collector hands a respondent a one-time link to answer on the respondent's own phone ---------- */
+var INVITE_DAYS = 7;
+function apiInvite_(b) {
+  var u = auth_(b.token, "collector"), n = Math.max(1, Math.min(10, +b.n || 1)), venue = Math.max(1, Math.min(3, +b.venue || 1)), out = [];
+  for (var i = 0; i < n; i++) {
+    var body = b64_(JSON.stringify({ k: "inv", i: Utilities.getUuid().replace(/-/g, "").slice(0, 12), u: u.username, e: u.enumerator, v: venue, x: Date.now() + INVITE_DAYS * 864e5 }));
+    out.push(body + "." + sign_(body));
+  }
+  log_(u.username, "สร้าง QR ให้ผู้ตอบ " + n + " ใบ");
+  return { invites: out, days: INVITE_DAYS };
+}
+/** Checks an invite; returns its payload with the collector's current account, or throws. */
+function readInvite_(t) {
+  var p = String(t || "").split(".");
+  if (p.length !== 2 || !safeEq_(sign_(p[0]), p[1])) throw new Error("QR นี้ไม่ถูกต้อง ขอ QR ใหม่จากผู้เก็บข้อมูล");
+  var o; try { o = JSON.parse(unb64_(p[0])); } catch (e) { throw new Error("QR นี้ไม่ถูกต้อง ขอ QR ใหม่จากผู้เก็บข้อมูล"); }
+  if (o.k !== "inv") throw new Error("QR นี้ไม่ถูกต้อง ขอ QR ใหม่จากผู้เก็บข้อมูล");
+  if (o.x < Date.now()) throw new Error("QR นี้หมดอายุแล้ว (ใช้ได้ " + INVITE_DAYS + " วัน) ขอ QR ใหม่จากผู้เก็บข้อมูล");
+  var u = findUser_(o.u);
+  if (!u || !u.active || u.enumerator !== o.e) throw new Error("ผู้เก็บข้อมูลที่ให้ QR นี้ไม่ได้อยู่ในระบบแล้ว ขอ QR ใหม่");
+  return o;
+}
+function inviteUsed_(id) {
+  var v = sheet_(SHEETS.responses, RESP_HEADER).getDataRange().getValues(), h = v[0].map(String), ii = h.indexOf("inv"), ri = h.indexOf("rid");
+  if (ii < 0) return null;
+  for (var i = 1; i < v.length; i++) if (String(v[i][ii]) === String(id)) return String(v[i][ri]);
+  return null;
+}
+/** Before the respondent starts: is this QR still good? Answers only yes/no and the collector number, nothing else. */
+function apiCheckInvite_(b) {
+  var o = readInvite_(b.invite);
+  if (inviteUsed_(o.i)) throw new Error("QR นี้ถูกใช้ตอบไปแล้ว หนึ่ง QR ใช้ได้หนึ่งคน ขอ QR ใหม่จากผู้เก็บข้อมูล");
+  return { enumerator: o.e, venue: o.v, expires: o.x };
 }

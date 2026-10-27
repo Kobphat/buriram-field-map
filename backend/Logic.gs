@@ -96,7 +96,7 @@ function findLikelyDuplicate(rec, others) {
 /** Flatten one record into a column map for the responses sheet. Contact details never go here. */
 function flattenRecord(rec) {
   var row = {}, m = rec.meta || {};
-  row.code = m.code; row.rid = m.id; row.collector = m.collector || ""; row.test = m.test ? 1 : 0; row.started = m.started; row.finished = m.finished; row.seconds = m.seconds;
+  row.code = m.code; row.rid = m.id; row.collector = m.collector || ""; row.inv = m.inv || ""; row.test = m.test ? 1 : 0; row.started = m.started; row.finished = m.finished; row.seconds = m.seconds;
   row.mode = m.mode; row.venue = m.venue; row.enumerator = m.enumerator; row.version = m.version; row.order = m.order;
   var A = rec.answers || {};
   Object.keys(A).forEach(function (k) {

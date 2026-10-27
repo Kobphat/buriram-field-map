@@ -10,6 +10,9 @@
     set(k, v) { try { localStorage.setItem("bfm." + k, JSON.stringify(v)); } catch (e) {} },
   };
   const S = window.SURVEY;
+  // a one-time QR from a collector: ?q=<invite>. The respondent answers on their own phone; the code carries that collector's number.
+  const INV = new URLSearchParams(location.search).get("q");
+  let invInfo = null;          // {enumerator, venue} once checked
   const PARTS = S.parts;
   const $ = (s, el = document) => el.querySelector(s);
   const $$ = (s, el = document) => [...el.querySelectorAll(s)];
@@ -38,7 +41,7 @@
     const gen = y ? genFromAge(beYear(iso) - y) : "Z";
     let lc = LGU_CODE[st.ans["4"]];
     if (!lc) { const d = st.ans["3"] || {}; const L = S.lgus.filter(l => l.d === d.a && d.t && l.t.includes(d.t)); lc = L.length === 1 ? L[0].code : "U00"; }
-    const online = st.meta.mode === 2;
+    const online = st.meta.mode === 2;            // mode 3 (QR) uses the collector's own number
     return `${gen}${lc}-${ddmmOf(iso)}-${online ? "9" : (st.meta.enumerator || 1)}${online ? "01" : "01"}`;
   }
   const refOf = (id = st.meta.id) => String(id).replace(/-/g, "").slice(0, 8).toUpperCase();
@@ -195,7 +198,8 @@
         <div><b>ข้อมูลของท่าน</b><p>ใช้วิเคราะห์ในภาพรวมเท่านั้น ไม่นำเสนอรายบุคคลหรือรายหมู่บ้าน</p></div>
       </div>
       ${DEMO ? `<div class="notice"><b>โหมดตัวอย่าง:</b> หน้านี้ใช้ดูและทดลองแบบสอบถามเท่านั้น ระบบไม่ส่งหรือบันทึกคำตอบใด ๆ การเก็บข้อมูลจริงจะเปิดหลังคณะกรรมการจริยธรรมการวิจัยในมนุษย์ (EC) อนุมัติ</div>` : ""}
-      <div class="admin">
+      ${INV ? `<div class="notice acc" id="invbox">กำลังตรวจ QR…</div>` : ""}
+      <div class="admin" ${INV ? `style="display:none"` : ""}>
         <fieldset class="q"><legend class="qh"><span class="qt">วิธีตอบ</span></legend><div class="opts row">
           ${[[1, "ผู้เก็บข้อมูลอ่านให้ฟัง"], [0, "คีย์จากฟอร์มกระดาษ (ผู้ตอบกรอกเอง)"], [2, "ตอบเองออนไลน์"]].map(([c, t]) => `<label class="opt"><input type="radio" name="mode" value="${c}" ${st.meta.mode === c ? "checked" : ""}><span class="box"></span><span class="ot">${t}</span></label>`).join("")}</div></fieldset>
         <fieldset class="q" id="venue-q" ${st.meta.mode === 2 ? "hidden" : ""}><legend class="qh"><span class="qt">สถานที่พบผู้ตอบ <em class="muted">(ผู้เก็บข้อมูลเลือก)</em></span></legend><div class="opts row">
@@ -205,7 +209,7 @@
           <div id="who"></div>
         </fieldset>
       </div>
-      ${!DEMO && !TESTRUN && store.get("done", false) ? `<div class="notice">เครื่องนี้เคยส่งคำตอบแบบตอบเองออนไลน์ไปแล้ว ถ้าเป็นผู้ตอบคนใหม่ ให้ผู้เก็บข้อมูลเลือก “ผู้เก็บข้อมูลอ่านให้ฟัง” หรือใช้อีกเครื่อง</div>` : ""}
+      ${!INV && !DEMO && !TESTRUN && store.get("done", false) ? `<div class="notice">เครื่องนี้เคยส่งคำตอบแบบตอบเองออนไลน์ไปแล้ว ถ้าเป็นผู้ตอบคนใหม่ ให้ผู้เก็บข้อมูลเลือก “ผู้เก็บข้อมูลอ่านให้ฟัง” หรือใช้อีกเครื่อง</div>` : ""}
       <p class="consent">การกด “เริ่มตอบ” ถือว่าท่านยินยอมเข้าร่วมการวิจัย (ความยินยอมโดยการกระทำ)</p>
       <div class="nav"><span></span><button class="btn primary" id="start">เริ่มตอบ</button></div>
     </section>`;
@@ -216,7 +220,13 @@
       if (t.name === "cdate") st.meta.cdate = t.value;
     };
     renderWho();
+    if (INV) checkInvite();
     $("#start").onclick = () => {
+      if (INV) {
+        if (!invInfo) { toast("QR นี้ใช้ไม่ได้ ขอ QR ใหม่จากผู้เก็บข้อมูล"); return; }
+        st.meta.mode = 3; st.meta.venue = invInfo.venue || null; st.meta.enumerator = invInfo.enumerator; st.meta.cdate = todayISO();
+        st.meta.started = new Date().toISOString(); st.t0 = performance.now(); st.screen = "part"; st.part = 0; return render();
+      }
       if (st.meta.mode == null) st.meta.mode = 2, st.meta.venue = 4;
       if (st.meta.mode !== 2) {
         const se = Auth.get();
@@ -228,6 +238,55 @@
       st.meta.started = new Date().toISOString(); st.t0 = performance.now();
       st.screen = "part"; st.part = 0; render();
     };
+  }
+
+  async function checkInvite() {
+    const box = $("#invbox"), go = $("#start");
+    const done = store.get("inv.done", []).includes(INV.slice(-24));
+    if (done) { box.className = "notice"; box.innerHTML = "เครื่องนี้ส่งคำตอบจาก QR นี้ไปแล้ว ขอบคุณครับ ถ้าเป็นผู้ตอบคนใหม่ ขอ QR ใหม่จากผู้เก็บข้อมูล"; go.disabled = true; return; }
+    if (INV === "demo" || DEMO) { invInfo = { enumerator: 1, venue: 1 }; }
+    else {
+      const j = await Auth.api("checkInvite", { invite: INV });
+      if (!j.ok) { box.className = "notice"; box.innerHTML = `<b>QR นี้ใช้ไม่ได้</b> ${esc(j.error || "")}`; go.disabled = true; return; }
+      invInfo = { enumerator: j.enumerator, venue: j.venue };
+    }
+    box.innerHTML = `<b>แบบสอบถามนี้ส่งมาจากผู้เก็บข้อมูลเลข ${invInfo.enumerator}</b><br><span class="small">ท่านตอบบนโทรศัพท์ของท่านเองได้เลย ไม่ต้องเข้าสู่ระบบ ใช้เวลาราว 30 นาที ปิดแล้วกลับมาตอบต่อจาก QR เดิมได้ภายใน 7 วัน (เริ่มใหม่ตั้งแต่ต้น)</span>${INV === "demo" || DEMO ? `<br><span class="small">โหมดตัวอย่าง: QR สาธิต ไม่บันทึกคำตอบ</span>` : ""}`;
+    chips();
+  }
+
+  /* ---------- collector: QR for a respondent who wants to answer on their own phone ----------
+     Each QR works for one respondent, for 7 days. A few are fetched at once so the next one shows even when the signal drops. */
+  const invKey = () => "inv.stash." + ((Auth.get() || {}).user || {}).username;
+  async function nextInvite(venue) {
+    const se = Auth.get();
+    if (DEMO || !se || se.demo) return { t: "demo", demo: true };
+    let stash = store.get(invKey(), []).filter(x => x.exp > Date.now() + 864e5 && x.venue === venue);
+    if (!stash.length) {
+      const j = await Auth.api("invite", { venue, n: 5 });
+      if (!j.ok) throw new Error(j.error || "สร้าง QR ไม่สำเร็จ");
+      stash = j.invites.map(t => ({ t, venue, exp: Date.now() + j.days * 864e5 }));
+    }
+    const it = stash.shift(); store.set(invKey(), stash); return it;
+  }
+  async function showQR() {
+    if (st.meta.venue == null || st.meta.venue === 4) { toast("เลือกสถานที่พบผู้ตอบก่อนสร้าง QR"); $("#venue-q").scrollIntoView({ block: "center" }); return; }
+    let dlg = $("#qrdlg");
+    if (!dlg) { dlg = document.createElement("dialog"); dlg.id = "qrdlg"; dlg.className = "qrdlg"; document.body.appendChild(dlg); }
+    dlg.innerHTML = `<div class="qr-in"><p class="small muted">กำลังสร้าง QR…</p></div>`; dlg.showModal();
+    let it;
+    try { it = await nextInvite(st.meta.venue); } catch (e) { dlg.innerHTML = `<div class="qr-in"><p class="notice">${esc(e.message)}</p><button class="btn" id="qrx">ปิด</button></div>`; $("#qrx").onclick = () => dlg.close(); return; }
+    const url = location.origin + location.pathname + "?q=" + encodeURIComponent(it.t);
+    const qr = qrcode(0, "M"); qr.addData(url); qr.make();
+    const se = Auth.get(), V = { 1: "ตลาดหรือจุดที่คนพลุกพล่าน", 2: "จุดรวมตัวของชุมชน", 3: "เยี่ยมครัวเรือน" };
+    dlg.innerHTML = `<div class="qr-in">
+      <h3>ให้ผู้ตอบสแกนด้วยโทรศัพท์ของตัวเอง</h3>
+      <div class="qr-img">${qr.createSvgTag({ cellSize: 6, margin: 2, scalable: true })}</div>
+      <p class="small">ใช้ได้ <b>1 คน</b> ภายใน 7 วัน · ผู้เก็บเลข ${se ? se.user.enumerator : 1} · ${V[st.meta.venue]}</p>
+      <p class="small muted">ให้ QR หลังอธิบายโครงการและผู้ตอบยินยอมแล้วเท่านั้น รหัสผู้ตอบจะออกเมื่อเขาส่งคำตอบ และขึ้นในหน้า “เข้าสู่ระบบ” ของคุณ${it.demo ? " · โหมดตัวอย่าง: QR สาธิต" : ""}</p>
+      <div class="qr-btns"><button class="btn" id="qrcopy">คัดลอกลิงก์ (ส่งทาง LINE)</button><button class="btn primary" id="qrnext">QR ใบถัดไป</button><button class="btn ghost" id="qrx">ปิด</button></div></div>`;
+    $("#qrx").onclick = () => dlg.close();
+    $("#qrnext").onclick = () => showQR();
+    $("#qrcopy").onclick = async e => { try { await navigator.clipboard.writeText(url); e.target.textContent = "คัดลอกแล้ว"; } catch (x) { prompt("คัดลอกลิงก์นี้", url); } };
   }
 
   /* ---------- enumerator sign-in inside the intro ---------- */
@@ -245,17 +304,19 @@
         <div><b>${esc(u.name || u.username)}</b><p class="small muted">${esc(u.username)} · ${u.enumerator ? "ผู้เก็บเลข " + u.enumerator : "ยังไม่มีเลขผู้เก็บ"}${se.demo ? " · บัญชีสาธิต" : ""}</p></div>
         <button type="button" class="btn ghost small" id="logout">ออกจากระบบ</button></div>
       ${u.enumerator ? "" : `<div class="notice small">บัญชีนี้ดูข้อมูลได้แต่เก็บข้อมูลไม่ได้ เพราะยังไม่มีเลขผู้เก็บ ให้ผู้ดูแลกำหนดเลขให้ในหน้าหลังบ้าน</div>`}
+      ${u.enumerator ? `<div class="qrrow"><button type="button" class="btn" id="mkqr">▣ ให้ผู้ตอบทำในโทรศัพท์ตัวเอง (QR)</button><span class="small muted">ผู้ตอบสแกนแล้วตอบเอง ระบบนับเป็นชุดของคุณ</span></div>` : ""}
       <label class="fld" style="max-width:220px"><span>วันที่เก็บข้อมูล</span><input class="txt" type="date" name="cdate" value="${st.meta.cdate || todayISO()}" max="${todayISO()}"></label>
       <p class="small muted">คีย์ฟอร์มกระดาษย้อนหลัง ให้ใส่วันที่ที่ผู้ตอบกรอกจริง ระบบออกรหัสผู้ตอบให้หลังส่งสำเร็จ แล้วเขียนรหัสนั้นลงมุมขวาบนของฟอร์มกระดาษ</p>
       ${sent.length ? `<details class="sent"><summary>ส่งจากเครื่องนี้ล่าสุด ${sent.length} ชุด</summary><table><thead><tr><th>เวลา</th><th>เลขอ้างอิง</th><th>รหัสผู้ตอบ</th></tr></thead><tbody>${sent.map(x => `<tr><td class="num">${esc(new Date(x.at).toLocaleString("th-TH", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }))}</td><td class="num">${esc(x.ref)}</td><td class="num"><b>${esc(x.code)}</b></td></tr>`).join("")}</tbody></table></details>` : ""}
     </div>`;
     $("#logout").onclick = () => { Auth.clear(); renderWho(); chips(); };
+    const mq = $("#mkqr"); if (mq) mq.onclick = showQR;
   }
 
   function partHead(i, extra = "") {
     const P = PARTS[i];
     const m = P.title.replace("(ข้อ 15–28)", "(ข้อ 16–28)").match(/^ส่วนที่ (\d) (.+?) \((ข้อ .+)\)$/);
-    const bar = st.meta.mode != null && st.meta.mode !== 2 ? `<p class="codebar">เลขอ้างอิงฟอร์ม <b class="num">${refOf()}</b><span>รหัสผู้ตอบจะออกหลังส่ง</span></p>` : "";
+    const bar = st.meta.mode === 0 || st.meta.mode === 1 ? `<p class="codebar">เลขอ้างอิงฟอร์ม <b class="num">${refOf()}</b><span>รหัสผู้ตอบจะออกหลังส่ง</span></p>` : "";
     return `${progress()}<header class="phead">${bar}<p class="eyebrow">ส่วนที่ ${m[1]} · ${m[3]}</p><h2>${m[2]}</h2>${extra}</header>`;
   }
 
@@ -625,7 +686,7 @@
   function record() {
     const sc = scores();
     return {
-      meta: { id: st.meta.id, code: null, test: DEMO || TESTRUN, enumerator: st.meta.mode === 2 ? 9 : st.meta.enumerator, collector: st.meta.mode === 2 ? "" : st.meta.collector, cdate: st.meta.cdate, collectedBE: beYear(st.meta.cdate || todayISO()), started: st.meta.started, finished: new Date().toISOString(), seconds: Math.round((performance.now() - (st.t0 || 0)) / 1000), mode: st.meta.mode, venue: st.meta.venue, design: st.meta.design, version: st.meta.version, order: st.meta.order, instrument: "IOC v1.5" },
+      meta: { id: st.meta.id, code: null, test: DEMO || TESTRUN, enumerator: st.meta.mode === 2 ? 9 : st.meta.enumerator, collector: st.meta.mode === 0 || st.meta.mode === 1 ? st.meta.collector : "", cdate: st.meta.cdate, collectedBE: beYear(st.meta.cdate || todayISO()), started: st.meta.started, finished: new Date().toISOString(), seconds: Math.round((performance.now() - (st.t0 || 0)) / 1000), mode: st.meta.mode, venue: st.meta.venue, design: st.meta.design, version: st.meta.version, order: st.meta.order, instrument: "IOC v1.5" },
       answers: { ...st.ans }, text: { ...st.txt },
       conjoint: (st.cj.tasks || []).map((t, i) => ({ task: i + 1, pair: t.k, item: t.n, chosen: t.choice, ms: t.at, left: strip(t.L, t.design), right: strip(t.Rt, t.design) })),
       ipc: { I: sc.I, P: sc.P, C: sc.C, complete: sc.complete },
@@ -653,12 +714,12 @@
     if (flushing) return; flushing = true;
     const se = Auth.get(), keep = [];
     for (const it of outbox()) {
-      const mine = it.rec.meta.id === st.meta.id, needSign = it.rec.meta.mode !== 2;
+      const mine = it.rec.meta.id === st.meta.id, needSign = it.rec.meta.mode === 0 || it.rec.meta.mode === 1;
       if (needSign && (!se || se.demo || se.user.username !== it.rec.meta.collector)) {          // wait for the person who collected it to sign in
         keep.push(it); if (mine) st.send = { state: "login" }; continue;
       }
-      const j = await Auth.api("submit", { rec: it.rec });
-      if (j.ok) { remember(it.rec, j.code); if (mine) st.send = { state: "ok", code: j.code, flag: j.flag }; if (it.rec.meta.mode === 2 && !TESTRUN) store.set("done", true); }
+      const j = await Auth.api("submit", { rec: it.rec, invite: it.invite });
+      if (j.ok) { remember(it.rec, j.code); if (it.invite) store.set("inv.done", store.get("inv.done", []).concat([it.invite.slice(-24)]).slice(-50)); if (mine) st.send = { state: "ok", code: j.code, flag: j.flag }; if (it.rec.meta.mode === 2 && !TESTRUN) store.set("done", true); }
       else if (j.offline || j.auth) { keep.push(it); if (mine) st.send = { state: j.auth ? "login" : "queued" }; }
       else if (mine) st.send = { state: "rejected", error: j.error };          // the current interview stays on screen
       else keep.push(Object.assign(it, { error: j.error }));
@@ -670,7 +731,7 @@
     if (DEMO) st.meta.code = makeCode();
     const rec = record();
     st.rec = rec;
-    if (!DEMO && CONFIG.endpoint) { store.set("outbox", outbox().concat([{ rec }])); st.send = { state: "sending" }; flush(); }
+    if (!DEMO && CONFIG.endpoint) { store.set("outbox", outbox().concat([st.meta.mode === 3 ? { rec, invite: INV } : { rec }])); st.send = { state: "sending" }; flush(); }
     st.screen = "done"; render();
   }
   function sendBox() {
@@ -691,7 +752,7 @@
     el.innerHTML = (DEMO ? `<span class="chip warn"><i></i>โหมดตัวอย่าง · ไม่บันทึกคำตอบ</span><span class="chip">รอ EC อนุมัติก่อนเปิดเก็บจริง</span>`
       : TESTRUN ? `<span class="chip warn"><i></i>โหมดทดสอบระบบ · บันทึกเป็นข้อมูลทดสอบ</span>` : `<span class="chip mint"><i></i>เก็บข้อมูลจริง</span>`) +
       (n ? `<span class="chip warn">รอส่ง ${n} ชุด</span>` : "") +
-      (Auth.get() ? `<span class="chip">เข้าสู่ระบบ: ${esc(Auth.get().user.username)}</span>` : "");
+      (INV ? `<span class="chip acc">ตอบผ่าน QR ของผู้เก็บข้อมูล${invInfo ? " เลข " + invInfo.enumerator : ""}</span>` : Auth.get() ? `<span class="chip">เข้าสู่ระบบ: ${esc(Auth.get().user.username)}</span>` : "");
   }
 
   function renderDone() {
