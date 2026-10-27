@@ -92,9 +92,18 @@
       } else { a.textContent = a.dataset.label; a.classList.remove("me"); a.removeAttribute("title"); a.removeAttribute("aria-label"); }
     });
   }
+  /* pick up changes the researcher made to this account (e.g. a collector number) without signing out */
+  async function refresh() {
+    const s = get(); if (!s || s.demo || !connected) return s;
+    const j = await api("me"); if (!j.ok || !j.user) return get();
+    const cur = get(); if (!cur) return null;
+    if (JSON.stringify(cur.user) !== JSON.stringify(Object.assign({}, cur.user, j.user))) { cur.user = Object.assign({}, cur.user, j.user); try { localStorage.setItem(KEY, JSON.stringify(cur)); } catch (e) {} fire(); }
+    return cur;
+  }
   subs.push(paintNav);
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", paintNav); else paintNav();
+  setTimeout(refresh, 0);
   window.addEventListener("storage", e => { if (e.key === KEY) fire(); });     // sign-in or sign-out in another tab
 
-  window.Auth = { connected, get, set, clear, api, login, changePassword, form, onChange: f => subs.push(f), esc };
+  window.Auth = { connected, get, set, clear, api, login, changePassword, refresh, form, onChange: f => subs.push(f), esc };
 })();

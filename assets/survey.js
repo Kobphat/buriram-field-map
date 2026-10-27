@@ -221,6 +221,7 @@
     };
     modeUI(); renderWho();
     if (INV) checkInvite();
+    if (!whoSub) { whoSub = true; Auth.onChange(() => { if (st.screen === "intro") renderWho(); }); }
     $("#start").onclick = () => {
       if (INV) {
         if (!invInfo) { toast("QR นี้ใช้ไม่ได้ ขอ QR ใหม่จากผู้เก็บข้อมูล"); return; }
@@ -246,6 +247,7 @@
     };
   }
 
+  let whoSub = false;
   /* what the intro shows for each way of answering */
   function modeUI() {
     const m = st.meta.mode, v = $("#venue-q"), e = $("#enum-q"), go = $("#start"), c = $("#consent");
@@ -318,7 +320,7 @@
       <div class="whotop"><span class="avatar" aria-hidden="true">${esc((u.name || u.username).slice(0, 1))}</span>
         <div><b>${esc(u.name || u.username)}</b><p class="small muted">${esc(u.username)} · ${u.enumerator ? "ผู้เก็บเลข " + u.enumerator : "ยังไม่มีเลขผู้เก็บ"}${se.demo ? " · บัญชีสาธิต" : ""}</p></div>
         <button type="button" class="btn ghost small" id="logout">ออกจากระบบ</button></div>
-      ${u.enumerator ? "" : `<div class="notice small">บัญชีนี้ดูข้อมูลได้แต่เก็บข้อมูลไม่ได้ เพราะยังไม่มีเลขผู้เก็บ ให้ผู้ดูแลกำหนดเลขให้ในหน้าหลังบ้าน</div>`}
+      ${u.enumerator ? "" : `<div class="notice small">บัญชีนี้ดูข้อมูลได้แต่เก็บข้อมูลไม่ได้ เพราะยังไม่มีเลขผู้เก็บ ${u.role === "admin" ? `กำหนดเลขให้ตัวเองได้ที่ <a href="../admin/#users">หน้าผู้ใช้ → บัญชีผู้ใช้</a> แล้วกลับมาหน้านี้` : "ให้ผู้วิจัยกำหนดเลขให้ในหน้าหลังบ้าน"}</div>`}
       ${st.meta.mode === 3 ? `<p class="small muted">วันที่ในรหัสผู้ตอบคือวันที่ผู้ตอบส่งคำตอบจากโทรศัพท์ของเขา</p>` : `
       <label class="fld" style="max-width:220px"><span>วันที่เก็บข้อมูล</span><input class="txt" type="date" name="cdate" value="${st.meta.cdate || todayISO()}" max="${todayISO()}"></label>
       <p class="small muted">คีย์ฟอร์มกระดาษย้อนหลัง ให้ใส่วันที่ที่ผู้ตอบกรอกจริง ระบบออกรหัสผู้ตอบให้หลังส่งสำเร็จ แล้วเขียนรหัสนั้นลงมุมขวาบนของฟอร์มกระดาษ</p>`}

@@ -86,7 +86,7 @@ dialog pre{font-family:var(--f-mono);font-size:.76rem;background:var(--sunk);bor
   var $ = function (s, el) { return (el || document).querySelector(s); }, esc = Auth.esc, root = $("#root");
   var DIST = ["เมืองบุรีรัมย์", "สตึก", "บ้านด่าน", "แคนดง"], CELL = ["Gen Z ชาย", "Gen Z หญิง", "รุ่นอื่น ชาย", "รุ่นอื่น หญิง"];
   var RE = /^([ZYXB])([NMTAU])(\d{2})-(\d{2})(\d{2})-([1-9])(\d{2})$/;
-  var D = null, CONTACTS = null, USERS = null, TIER = 440, TAB = "pl";
+  var D = null, CONTACTS = null, USERS = null, TIER = 440, TAB = location.hash === "#users" ? "pu" : "pl";
   var demo = function () { var s = Auth.get(); return !!(s && s.demo); };
 
   /* ---------- API, or invented data when the page is not connected yet ---------- */
