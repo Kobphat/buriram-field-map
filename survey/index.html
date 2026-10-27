@@ -131,7 +131,23 @@
 .av{width:108px;height:auto;flex:none;border-radius:16px;background:var(--sunk)}
 .av-body{transform-box:view-box;transform-origin:50% 100%;animation:breathe 4.2s ease-in-out infinite;animation-delay:calc(var(--d) * -1)}
 .av-eyes{transform-box:fill-box;transform-origin:center;animation:blink 5.5s infinite;animation-delay:var(--d)}
-@keyframes breathe{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-1.6px) rotate(.6deg)}}
+@keyframes breathe{0%,100%{transform:translateY(0)}50%{transform:translateY(-1px)}}
+/* pose A (hands together): the hands rise slowly into a wai, then the head bows a little */
+.av [class^="g-"]{transform-box:view-box}
+.av.pose-A .g-fa{transform-origin:0 434px;animation:wai-arm 7s ease-in-out infinite;animation-delay:calc(var(--d) * -1)}
+.av.pose-A .g-hn{animation:wai-hand 7s ease-in-out infinite;animation-delay:calc(var(--d) * -1)}
+.av.pose-A .g-hd{transform-origin:0 280px;animation:wai-bow 7s ease-in-out infinite;animation-delay:calc(var(--d) * -1)}
+@keyframes wai-arm{0%,100%{transform:scaleY(.8)}32%,78%{transform:scaleY(1.06)}}
+@keyframes wai-hand{0%,100%{transform:translateY(17px)}32%,78%{transform:translateY(-5px)}}
+@keyframes wai-bow{0%,36%,74%,100%{transform:none}46%,64%{transform:translateY(4px) scaleY(.97)}}
+/* pose B (arms crossed): a slow breath, folded arms and shoulders lift together */
+.av.pose-B .g-ar{animation:hug-arm 4.2s ease-in-out infinite;animation-delay:calc(var(--d) * -1)}
+.av.pose-B .g-ch{transform-origin:0 430px;animation:hug-chest 4.2s ease-in-out infinite;animation-delay:calc(var(--d) * -1)}
+.av.pose-B .g-hd{animation:hug-head 4.2s ease-in-out infinite;animation-delay:calc(var(--d) * -1)}
+@keyframes hug-arm{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+@keyframes hug-chest{0%,100%{transform:scaleY(1)}50%{transform:scaleY(1.018)}}
+@keyframes hug-head{0%,100%{transform:translateY(0)}50%{transform:translateY(-3.5px)}}
+@media (prefers-reduced-motion: reduce){.av [class^="g-"],.av-body{animation:none!important}}
 @keyframes blink{0%,93%,100%{transform:scaleY(1)}95.5%{transform:scaleY(.1)}}
 .cand.picked .av-body{animation:hop .6s cubic-bezier(.3,1.6,.5,1) 1, breathe 4.2s ease-in-out .6s infinite}
 @keyframes hop{0%{transform:translateY(0)}35%{transform:translateY(-9px) rotate(-2deg)}100%{transform:translateY(0)}}
@@ -143,6 +159,15 @@
 .cand dl div{display:grid;gap:1px}
 .cand dt{font-size:.76rem;font-weight:600;color:var(--muted);letter-spacing:.02em}
 .cand dd{margin:0;font-size:.93rem;line-height:1.55}
+/* what differs between the two candidates (pairs 2–7) */
+mark.df{color:inherit;background:linear-gradient(transparent 52%,#fde58a 52%,#fde58a 92%,transparent 92%);padding:0 1px;border-radius:2px;
+  background-size:0% 100%;background-repeat:no-repeat;animation:df-in .6s .5s cubic-bezier(.2,.8,.2,1) forwards}
+@keyframes df-in{to{background-size:100% 100%}}
+@media (prefers-reduced-motion: reduce){mark.df{animation:none;background-size:100% 100%}}
+.cand dl div.dif dt{color:#9a6b12}
+.cand dl div.dif dt::after{content:" · ต่างกัน";font-weight:500}
+.dfnote{font-size:.86rem;color:var(--muted);margin-top:-4px}
+.dfnote mark.df{color:var(--ink);font-weight:600}
 .choose{width:100%;justify-content:center}
 .cand.picked{border-color:var(--ink);box-shadow:0 0 0 3px var(--mint),0 14px 28px -16px rgba(0,0,0,.4);transform:translateY(-4px)}
 .cand.picked .choose{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}

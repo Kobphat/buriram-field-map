@@ -461,14 +461,40 @@
     out.push(["ผลที่จะได้รับ", help ? "ได้รับความช่วยเหลือทันทีเมื่อร้องขอ แต่ช่วยเป็นครั้ง ๆ" : `${ATTR.time.v[p.time]} · ${ATTR.cert.v[p.cert]}`]);
     return out;
   }
+  /* ---------- what differs in a pair: word-level comparison of the two candidates' rows (pairs 2–7 only;
+     pair 1 differs on everything, so nothing is marked there). Names, ages and party letters are not marked,
+     except the party line in pair 7, where the party is the thing that differs. ---------- */
+  const HIGHLIGHT = true;
+  const SEG = window.Intl && Intl.Segmenter ? new Intl.Segmenter("th", { granularity: "word" }) : null;
+  const toks = s => SEG ? [...SEG.segment(s)].map(x => x.segment) : s.split(/(\s+)/);
+  function diffMark(a, b) {                      // returns [htmlA, htmlB] with differing words wrapped in <mark>
+    const A = toks(a), B = toks(b), n = A.length, m = B.length;
+    const L = Array.from({ length: n + 1 }, () => new Int16Array(m + 1));
+    for (let i = n - 1; i >= 0; i--) for (let j = m - 1; j >= 0; j--) L[i][j] = A[i] === B[j] ? L[i + 1][j + 1] + 1 : Math.max(L[i + 1][j], L[i][j + 1]);
+    const ka = new Array(n).fill(false), kb = new Array(m).fill(false);
+    for (let i = 0, j = 0; i < n && j < m;) { if (A[i] === B[j]) { ka[i] = kb[j] = true; i++; j++; } else if (L[i + 1][j] >= L[i][j + 1]) i++; else j++; }
+    const out = (T, keep) => { let h = "", open = false;
+      T.forEach((t, i) => { const ch = !keep[i] && /\S/.test(t); if (ch && !open) { h += '<mark class="df">'; open = true; } else if (!ch && open && /\S/.test(t)) { h += "</mark>"; open = false; } h += esc(t); });
+      return h + (open ? "</mark>" : ""); };
+    return [out(A, ka), out(B, kb)];
+  }
+  function pairMarks(task) {
+    if (!HIGHLIGHT || task.design !== "fixed" || task.k === 1) return null;
+    if (task.marks) return task.marks;
+    const L = {}, Rr = {};
+    ROWS_FIXED.forEach(k => { const a = fill(task.L[k]), b = fill(task.Rt[k]); if (a !== b) [L[k], Rr[k]] = diffMark(a, b); });
+    if (task.k === 7) [L.party, Rr.party] = diffMark(task.L.party, task.Rt.party);
+    return (task.marks = { L, R: Rr });
+  }
   function candCard(p, side, task, col) {
     const uid = `${task.k}${side}${Math.floor(R() * 1e6)}`;
     const party = task.design === "fixed" ? p.party : p.party;
     const sideCls = side === "L" ? "l" : "r";
+    const marks = pairMarks(task), mk = marks ? marks[side === "L" ? "L" : "R"] : null;
     const picked = task.choice === side ? " picked" : task.choice ? " other" : "";
     return `<article class="cand ${sideCls}${picked}" data-side="${side}" style="--d:${(R() * 3).toFixed(2)}s">
-      <div class="cand-top">${Avatar.svg(p.look, uid)}<div class="who"><span class="col">ผู้สมัคร ${col}</span><h3>${esc(p.name)}</h3><p class="num small">อายุ ${p.age} ปี · ${p.sex}</p><span class="party">${/^[A-D]$/.test(party) ? "พรรค " + party : esc(party)}</span></div></div>
-      <dl>${rowsFor(p, task.design).map(([l, v]) => `<div><dt>${l}</dt><dd>${esc(v)}</dd></div>`).join("")}</dl>
+      <div class="cand-top">${Avatar.svg(p.look, uid)}<div class="who"><span class="col">ผู้สมัคร ${col}</span><h3>${esc(p.name)}</h3><p class="num small">อายุ ${p.age} ปี · ${p.sex}</p><span class="party">${mk && mk.party ? mk.party : /^[A-D]$/.test(party) ? "พรรค " + party : esc(party)}</span></div></div>
+      <dl>${task.design === "fixed" ? ROWS_FIXED.map(k => `<div${mk && mk[k] ? ' class="dif"' : ""}><dt>${ROW_L[k]}</dt><dd>${mk && mk[k] ? mk[k] : esc(fill(p[k]))}</dd></div>`).join("") : rowsFor(p, task.design).map(([l, v]) => `<div><dt>${l}</dt><dd>${esc(v)}</dd></div>`).join("")}</dl>
       <button type="button" class="btn choose" data-side="${side}">เลือกผู้สมัคร ${col}</button>
       <span class="stamp" aria-hidden="true">เลือกแล้ว</span>
     </article>`;
@@ -516,6 +542,7 @@
         <div class="dots">${c.tasks.map((x, i) => `<i class="${x.choice ? "on" : ""}${i === c.i ? " cur" : ""}"></i>`).join("")}</div></div>
       ${pre}
       <h3 class="ask">ถ้าท่านต้องเลือกระหว่างผู้สมัครสองคนนี้ ท่านจะลงคะแนนให้คนใด</h3>
+      ${pairMarks(t) ? `<p class="dfnote"><mark class="df">ข้อความที่ขีดเน้น</mark> คือจุดที่สองคนนี้ต่างกัน นอกนั้นเหมือนกัน</p>` : ""}
       <div class="pair">${candCard(t.L, "L", t, "ก")}<div class="vs" aria-hidden="true">หรือ</div>${candCard(t.Rt, "R", t, "ข")}</div>
       <div class="nav"><button type="button" class="btn ghost" id="back">← ย้อนกลับ</button>
         <span class="navr">${DEMO && t.design === "random" ? `<button type="button" class="btn ghost" id="reroll" title="สุ่มคุณลักษณะคู่นี้ใหม่ (โหมดตัวอย่าง)">↻ สุ่มคู่นี้ใหม่</button>` : ""}
