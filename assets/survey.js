@@ -149,7 +149,7 @@
     v = +v;
     if (!v) return "";
     if (v > 2551) return `<span class="bad">ยังไม่มีสิทธิเลือกตั้งในวันที่ 8 ก.พ. 2569 (ไม่อยู่ในเกณฑ์)</span>`;
-    if (v < 2460) return `<span class="bad">ตรวจปีเกิดอีกครั้ง</span>`;
+    if (v < 2440) return `<span class="bad">ตรวจปีเกิดอีกครั้ง (ใส่เป็นปี พ.ศ.)</span>`;
     return `อายุประมาณ <b class="num">${2569 - v}</b> ปี${v === 2551 ? " · ต้องเกิดในหรือก่อน 8 ก.พ. 2551" : ""}`;
   }
 
@@ -196,7 +196,7 @@
       ${DEMO ? `<div class="notice"><b>โหมดตัวอย่าง:</b> หน้านี้ใช้ดูและทดลองแบบสอบถามเท่านั้น ระบบไม่ส่งหรือบันทึกคำตอบใด ๆ การเก็บข้อมูลจริงจะเปิดหลังคณะกรรมการจริยธรรมการวิจัยในมนุษย์ (EC) อนุมัติ</div>` : ""}
       <div class="admin">
         <fieldset class="q"><legend class="qh"><span class="qt">วิธีตอบ</span></legend><div class="opts row">
-          ${[[1, "ผู้เก็บข้อมูลอ่านให้ฟัง"], [0, "กรอกเองโดยมีผู้เก็บข้อมูลอยู่ด้วย"], [2, "ตอบเองออนไลน์"]].map(([c, t]) => `<label class="opt"><input type="radio" name="mode" value="${c}" ${st.meta.mode === c ? "checked" : ""}><span class="box"></span><span class="ot">${t}</span></label>`).join("")}</div></fieldset>
+          ${[[1, "ผู้เก็บข้อมูลอ่านให้ฟัง"], [0, "คีย์จากฟอร์มกระดาษ (ผู้ตอบกรอกเอง)"], [2, "ตอบเองออนไลน์"]].map(([c, t]) => `<label class="opt"><input type="radio" name="mode" value="${c}" ${st.meta.mode === c ? "checked" : ""}><span class="box"></span><span class="ot">${t}</span></label>`).join("")}</div></fieldset>
         <fieldset class="q" id="venue-q" ${st.meta.mode === 2 ? "hidden" : ""}><legend class="qh"><span class="qt">สถานที่พบผู้ตอบ <em class="muted">(ผู้เก็บข้อมูลเลือก)</em></span></legend><div class="opts row">
           ${[[1, "ตลาดหรือจุดที่คนพลุกพล่าน"], [2, "จุดรวมตัวของชุมชน (สภากาแฟ)"], [3, "เยี่ยมครัวเรือน"]].map(([c, t]) => `<label class="opt"><input type="radio" name="venue" value="${c}" ${st.meta.venue === c ? "checked" : ""}><span class="box"></span><span class="ot">${t}</span></label>`).join("")}</div></fieldset>
 
@@ -206,7 +206,7 @@
             <label class="fld"><span>วันที่เก็บ</span><input class="txt" type="date" name="cdate" value="${st.meta.cdate || todayISO()}"></label>
             <label class="fld"><span>ฟอร์มชุดที่ของวันนี้</span><input class="txt num" type="number" min="1" max="99" name="seq" value="${st.meta.seq || ""}"></label>
           </div>
-          <p class="small muted">ผู้เก็บแต่ละคนนับเลขชุดของตัวเองต่อวัน เริ่มที่ 1 ระบบจำเลขล่าสุดของเครื่องนี้ไว้ให้</p></fieldset>
+          <p class="small muted">ผู้เก็บแต่ละคนนับเลขชุดของตัวเองต่อวัน เริ่มที่ 1 ระบบจำเลขล่าสุดของเครื่องนี้ไว้ให้ ถ้าคีย์จากฟอร์มกระดาษ ให้ใส่วันที่ เลขผู้เก็บ และเลขชุดตามรหัสที่เขียนบนฟอร์ม</p></fieldset>
       </div>
       ${!DEMO && !TESTRUN && store.get("done", false) ? `<div class="notice">เครื่องนี้เคยส่งคำตอบแบบตอบเองออนไลน์ไปแล้ว ถ้าเป็นผู้ตอบคนใหม่ ให้ผู้เก็บข้อมูลเลือก “ผู้เก็บข้อมูลอ่านให้ฟัง” หรือใช้อีกเครื่อง</div>` : ""}
       <p class="consent">การกด “เริ่มตอบ” ถือว่าท่านยินยอมเข้าร่วมการวิจัย (ความยินยอมโดยการกระทำ)</p>
@@ -234,19 +234,20 @@
 
   function partHead(i, extra = "") {
     const P = PARTS[i];
-    const m = P.title.match(/^ส่วนที่ (\d) (.+?) \((ข้อ .+)\)$/);
+    const m = P.title.replace("(ข้อ 15–28)", "(ข้อ 16–28)").match(/^ส่วนที่ (\d) (.+?) \((ข้อ .+)\)$/);
     const bar = st.meta.code && st.meta.mode !== 2 ? `<p class="codebar">รหัสผู้ตอบ <b class="num">${st.meta.code}</b><span>เขียนรหัสนี้ไว้มุมขวาบนของฟอร์มกระดาษ</span></p>` : "";
     return `${progress()}<header class="phead">${bar}<p class="eyebrow">ส่วนที่ ${m[1]} · ${m[3]}</p><h2>${m[2]}</h2>${extra}</header>`;
   }
 
   function renderPart() {
     const P = PARTS[st.part];
-    const intro = st.part === 6 ? `<p class="lead">ส่วนสุดท้ายเป็นคำถามเกี่ยวกับชุมชนของท่านโดยทั่วไป ไม่ใช่เรื่องของตัวท่าน ไม่ต้องระบุชื่อบุคคลใด</p>` : st.part === 4 ? `<p class="lead">ส่วนนี้อยู่หลังการเลือกผู้สมัครโดยเจตนา เพื่อไม่ให้คำถามเรื่องความเสี่ยงชี้นำการเลือก</p>` : "";
+    const intro = st.part === 1 ? `<p class="lead">“ครัวเรือน” ในส่วนนี้ หมายถึงคนที่อาศัยและกินอยู่ร่วมกับท่านเป็นประจำ ถ้าท่านไปทำงานหรือเรียนที่อื่น ให้นึกถึงครัวเรือนที่บ้านในพื้นที่นี้</p>` : st.part === 6 ? `<p class="lead">ส่วนสุดท้ายเป็นคำถามเกี่ยวกับชุมชนของท่านโดยทั่วไป ไม่ใช่เรื่องของตัวท่าน ไม่ต้องระบุชื่อบุคคลใด</p>` : st.part === 4 ? `<p class="lead">ส่วนนี้อยู่หลังการเลือกผู้สมัครโดยเจตนา เพื่อไม่ให้คำถามเรื่องความเสี่ยงชี้นำการเลือก</p>` : "";
     let html = partHead(st.part, intro) + `<form class="panel" novalidate>`;
-    P.items.forEach((it, k) => html += itemHTML(it, P.items[k - 1]));
+    const items = P.items.filter(it => !it.ecOnly || DEMO || CONFIG.splitTicket);   // item 43 only after EC approves it
+    items.forEach((it, k) => html += itemHTML(it, items[k - 1]));
     html += `<div class="nav">${navBtns()}</div></form>`;
     app.innerHTML = html;
-    bindForm(P.items);
+    bindForm(items);
   }
   function navBtns(nextLabel = "ถัดไป") {
     return `<button type="button" class="btn ghost" id="back">← ย้อนกลับ</button>
@@ -293,6 +294,11 @@
       st.ans[n] = t.value;
     } else {
       st.ans[n] = +t.value;
+      if (n === "7ก") {                           // not working (10–13) ⇒ employment status 8
+        const notWorking = st.ans[n] >= 10;
+        if (notWorking) st.ans["7ข"] = 8; else if (st.ans["7ข"] === 8) delete st.ans["7ข"];
+        $$('input[name="q_7ข"]').forEach(x => x.checked = st.ans["7ข"] === +x.value); clearFlag("7ข");
+      }
       if (it.type === "phase2") { const box = $("#phonebox"); box.hidden = st.ans[n] !== 1; if (st.ans[n] !== 1) st.contact = null; else if (e.type === "change") $('input[name="ph"]').focus(); }
       if (it.other) { const o = $(`[data-txt="${n}"]`); o.hidden = st.ans[n] !== it.other; if (!o.hidden && e.type === "change") o.focus(); }
     }
@@ -305,7 +311,17 @@
   }
   const clearFlag = n => { const q = $(`#q-${n}`); if (q) q.classList.remove("miss"); };
 
+  const HARD = ["1", "3", "4", "5", "5ก"];          // needed for eligibility and the respondent code: cannot be skipped
+  const yearOK = v => v >= 2440 && v <= 2569;
   function next(items) {
+    const hard = items.filter(it => HARD.includes(it.n) && (!answered(it) || (it.n === "1" && !yearOK(st.ans["1"]))));
+    if (hard.length) {
+      $$(".q.miss").forEach(q => q.classList.remove("miss"));
+      hard.forEach(it => { const q = $(`#q-${it.n}`); if (q) q.classList.add("miss"); });
+      $(`#q-${hard[0].n}`).scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "center" });
+      toast(`ข้อ ${hard.map(i => i.n).join(", ")} ต้องตอบก่อนไปต่อ ใช้คัดกรองและสร้างรหัสผู้ตอบ`);
+      return;
+    }
     const miss = items.filter(it => !answered(it));
     $$(".q.miss").forEach(q => q.classList.remove("miss"));
     const key = st.screen + st.part + (st.part === 3 ? st.cj.stage : "");
