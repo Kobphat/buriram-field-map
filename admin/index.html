@@ -179,7 +179,9 @@ dialog pre{font-family:var(--f-mono);font-size:.76rem;background:var(--sunk);bor
   function loadAdmin() {
     root.innerHTML = headBar("หลังบ้านแบบสอบถาม", "ระบบอุปถัมภ์ · บุรีรัมย์ · ข้อมูลจาก Google Sheet ของผู้วิจัย") + '<p class="empty">กำลังโหลดข้อมูล…</p>';
     wireHead();
-    api("data").then(function (j) { if (!j.ok) return fail(j); D = j; renderAdmin(); });
+    var slow = setTimeout(function () { var e = root.querySelector(".empty"); if (e) e.textContent = "กำลังโหลดข้อมูล… ระบบของ Google ตื่นช้าในครั้งแรก รออีกสักครู่"; }, 8000);
+    api("data").then(function (j) { clearTimeout(slow); if (!j.ok) return fail(j); D = j; try { renderAdmin(); } catch (e) { root.insertAdjacentHTML("beforeend", '<p class="notice">แสดงผลไม่ได้: ' + esc(e.message) + '</p>'); console.error(e); } })
+      .catch(function (e) { clearTimeout(slow); msg("โหลดข้อมูลไม่สำเร็จ: " + (e && e.message || e), true); });
   }
   function rows() { return D.rows.filter(function (r) { return $("#showTest").checked || !r.test; }).map(function (r) { r.p = parse(r.code); return r; }).filter(function (r) { return r.p; }); }
   function renderAdmin() {

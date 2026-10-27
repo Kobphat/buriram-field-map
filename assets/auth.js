@@ -22,7 +22,8 @@
     try {
       r = await fetch(CONF.endpoint, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(Object.assign({ action, token: s && s.token }, body)) });
     } catch (e) { return { ok: false, offline: true, error: "ติดต่อระบบไม่ได้ ตรวจสัญญาณอินเทอร์เน็ต" }; }
-    let j; try { j = await r.json(); } catch (e) { return { ok: false, error: "ระบบตอบกลับผิดรูปแบบ" }; }
+    let t = ""; try { t = await r.text(); } catch (e) {}
+    let j; try { j = JSON.parse(t); } catch (e) { console.error("back end replied:", t.slice(0, 800)); return { ok: false, error: "ระบบตอบกลับผิดรูปแบบ (HTTP " + r.status + ") " + t.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim().slice(0, 160) }; }
     if (!j.ok && j.auth) clear();
     if (!j.ok && j.forbidden && /รหัสผ่านใหม่/.test(j.error || "") && s) { s.user.mustChange = true; set(s.token, s.user); }
     return j;
