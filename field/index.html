@@ -7,6 +7,9 @@
 <style>
 .site-nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:40;background:color-mix(in oklab,#f7f7f4 86%,transparent);backdrop-filter:saturate(1.6) blur(14px);-webkit-backdrop-filter:saturate(1.6) blur(14px);border-bottom:1px solid #e4e2dc;margin-inline:calc(-1 * max(16px,env(safe-area-inset-left,0px)));padding-inline:max(16px,env(safe-area-inset-left,0px));margin-bottom:8px;font-family:"IBM Plex Sans Thai",Tahoma,sans-serif}
 .site-nav .wrap{display:flex;align-items:center;gap:16px;min-height:52px;max-width:1320px;margin:0 auto}
+.site-nav a.nl.me{display:flex;align-items:center;gap:7px;padding:4px 12px 4px 4px;background:#fff;border:1px solid #c9c6be;color:#1d1b19;font-weight:500}
+.site-nav .me-av{width:24px;height:24px;border-radius:50%;background:#b6f3b5;color:#1f4d2c;display:grid;place-items:center;font-size:.8rem;font-weight:600;flex:none}
+.site-nav .me-nm{max-width:12ch;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .site-nav .brand{font-family:"Kanit","IBM Plex Sans Thai",sans-serif;font-weight:600;color:#1d1b19;text-decoration:none;white-space:nowrap;font-size:.98rem;display:flex;align-items:center;gap:8px}
 .site-nav .brand img.logo{width:33px;height:22px;display:block;flex:none}
 .site-nav .brand i b{width:7px;height:7px;border-radius:2px;display:block}
@@ -805,5 +808,7 @@ showView((location.hash||"").replace("#","")); fitAspect();
 })();
 </script>
 
+<script src="../assets/config.js"></script>
+<script src="../assets/auth.js"></script>
 </body>
 </html>

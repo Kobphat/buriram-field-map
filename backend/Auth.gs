@@ -6,7 +6,7 @@
 
 var USERS = "ผู้ใช้";
 var USER_HEADER = ["username", "name", "role", "enumerator", "hash", "ver", "active", "must_change", "created", "last_login"];
-var TOKEN_HOURS = { admin: 12, enumerator: 72 };
+var TOKEN_HOURS = { admin: 12, enumerator: 72 }, REMEMBER_DAYS = 30;   // "remember me on this device" keeps the sign-in for 30 days
 var MAX_FAILS = 5, LOCK_SECONDS = 900;
 
 function authErr_(msg, forbidden) { var e = new Error(msg); e.auth = !forbidden; e.forbidden = !!forbidden; return e; }
@@ -59,11 +59,12 @@ function saveUser_(u) {
 function publicUser_(u) { return { username: u.username, name: String(u.name || ""), role: u.role, enumerator: u.enumerator || 0, active: u.active, mustChange: u.must_change, lastLogin: u.last_login ? new Date(u.last_login).toISOString() : "" }; }
 
 /* ---------- tokens ---------- */
-function makeToken_(u) {
-  var hrs = TOKEN_HOURS[u.role] || 12;
-  var body = b64_(JSON.stringify({ u: u.username, v: u.ver, x: Date.now() + hrs * 3600 * 1000 }));
+function makeToken_(u, remember) {
+  var hrs = remember ? REMEMBER_DAYS * 24 : (TOKEN_HOURS[u.role] || 12), x = Date.now() + hrs * 3600 * 1000;
+  var body = b64_(JSON.stringify({ u: u.username, v: u.ver, x: x, r: remember ? 1 : 0 }));
   return body + "." + sign_(body);
 }
+function session_(u, remember) { var t = makeToken_(u, remember); return { token: t, expires: JSON.parse(unb64_(t.split(".")[0])).x, user: publicUser_(u) }; }
 /** Checks a token. need: "any" | "admin" | "collector". allowMustChange lets the change-password call through. */
 function auth_(token, need, allowMustChange) {
   if (!token) throw authErr_("กรุณาเข้าสู่ระบบ");
@@ -73,6 +74,7 @@ function auth_(token, need, allowMustChange) {
   if (!o.x || o.x < Date.now()) throw authErr_("หมดเวลาเข้าสู่ระบบ กรุณาเข้าสู่ระบบใหม่");
   var u = findUser_(o.u);
   if (!u || !u.active || u.ver !== o.v) throw authErr_("บัญชีถูกปิดหรือรหัสผ่านถูกเปลี่ยน กรุณาเข้าสู่ระบบใหม่");
+  u._remember = !!o.r;
   if (u.must_change && !allowMustChange) throw authErr_("ต้องตั้งรหัสผ่านใหม่ก่อนใช้งาน", true);
   if (need === "admin" && u.role !== "admin") throw authErr_("บัญชีนี้ไม่มีสิทธิ์ดูข้อมูล", true);
   if (need === "collector" && !u.enumerator) throw authErr_("บัญชีนี้ยังไม่มีเลขผู้เก็บข้อมูล ติดต่อผู้วิจัย", true);
@@ -91,8 +93,8 @@ function apiLogin_(b) {
   }
   cache.remove(key);
   u.last_login = new Date(); saveUser_(u);
-  log_(u.username, "เข้าสู่ระบบ");
-  return { token: makeToken_(u), user: publicUser_(u) };
+  log_(u.username, "เข้าสู่ระบบ" + (b.remember ? " (จำในเครื่อง " + REMEMBER_DAYS + " วัน)" : ""));
+  return session_(u, !!b.remember);
 }
 function apiMe_(b) { var u = auth_(b.token, "any", true); return { user: publicUser_(u) }; }
 function apiChangePassword_(b) {
@@ -103,7 +105,7 @@ function apiChangePassword_(b) {
   if (pw === String(b.old)) throw new Error("รหัสผ่านใหม่ต้องไม่ซ้ำรหัสเดิม");
   u.hash = hashPw_(pw, Utilities.getUuid()); u.ver++; u.must_change = false; saveUser_(u);
   log_(u.username, "เปลี่ยนรหัสผ่าน");
-  return { token: makeToken_(u), user: publicUser_(u) };
+  return session_(u, u._remember);
 }
 
 /* ---------- API: account management (admin) ---------- */

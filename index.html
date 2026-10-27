@@ -512,5 +512,7 @@ const LIT = [{"k":"K2000","s":"Kitschelt (2000)","m":"งานเชิงแ�
   document.getElementById("reflist").innerHTML=all.map(r=>`<li>${r.l?cleanRef(r.l):md(r.ref)} ${r.url?`<a href="${r.url}" target="_blank" rel="noopener">${r.url.replace("https://","")}</a>`:""}${r.inc?` <span class="chip warn">ยังไม่ครบ</span>`:""}</li>`).join("");
 })();
 </script>
+<script src="assets/config.js"></script>
+<script src="assets/auth.js"></script>
 </body>
 </html>

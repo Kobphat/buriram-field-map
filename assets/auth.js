@@ -10,7 +10,7 @@
   const connected = !!(CONF.live && CONF.endpoint);
 
   function get() { try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && s.exp > Date.now()) return s; } catch (e) {} return null; }
-  function set(token, user) { const s = { token, user, exp: Date.now() + (HOURS[user.role] || 12) * 3600e3 - 60e3 }; try { localStorage.setItem(KEY, JSON.stringify(s)); } catch (e) {} fire(); return s; }
+  function set(token, user, expires) { const s = { token, user, exp: (expires || Date.now() + (HOURS[user.role] || 12) * 3600e3) - 60e3 }; try { localStorage.setItem(KEY, JSON.stringify(s)); } catch (e) {} fire(); return s; }
   function clear() { try { localStorage.removeItem(KEY); } catch (e) {} fire(); }
   const subs = [];
   function fire() { subs.forEach(f => { try { f(get()); } catch (e) {} }); }
@@ -28,8 +28,8 @@
     if (!j.ok && j.forbidden && /รหัสผ่านใหม่/.test(j.error || "") && s) { s.user.mustChange = true; set(s.token, s.user); }
     return j;
   }
-  async function login(username, password) { const j = await api("login", { username, password }); if (j.ok) set(j.token, j.user); return j; }
-  async function changePassword(old, password) { const j = await api("changePassword", { old, password }); if (j.ok) set(j.token, j.user); return j; }
+  async function login(username, password, remember) { const j = await api("login", { username, password, remember: !!remember }); if (j.ok) set(j.token, j.user, j.expires); return j; }
+  async function changePassword(old, password) { const j = await api("changePassword", { old, password }); if (j.ok) set(j.token, j.user, j.expires); return j; }
 
   /** Draws the sign-in box. opts: { title, lead, onDone(session), demo: {label, user} } */
   function form(el, opts = {}) {
@@ -40,6 +40,7 @@
       <label class="fld"><span>ชื่อผู้ใช้</span><input class="txt" name="u" autocomplete="username" autocapitalize="none" spellcheck="false" required></label>
       <label class="fld"><span>รหัสผ่าน</span><span class="pw"><input class="txt" name="p" type="password" autocomplete="current-password" required><button type="button" class="eye" aria-label="แสดงรหัสผ่าน">แสดง</button></span></label>
       <p class="err small" role="alert"></p>
+      <label class="remember"><input type="checkbox" name="r" checked> จำการเข้าสู่ระบบในเครื่องนี้ 30 วัน <span class="muted">(ไม่ต้องติ๊กถ้าเป็นเครื่องที่คนอื่นใช้ด้วย)</span></label>
       <div class="row"><button class="btn primary" type="submit" ${connected ? "" : "disabled"}>เข้าสู่ระบบ</button>
       ${!connected && opts.demo ? `<button class="btn" type="button" data-demo>${esc(opts.demo.label)}</button>` : ""}</div>
       ${connected ? `<p class="small muted">ลืมรหัสผ่าน: ขอให้ผู้วิจัยตั้งรหัสผ่านชั่วคราวให้ใหม่</p>` : `<p class="small muted">หน้านี้ยังเป็นโหมดตัวอย่าง ระบบเข้าสู่ระบบจะใช้ได้เมื่อเชื่อมกับหลังบ้าน (Google Apps Script) แล้ว</p>`}
@@ -51,7 +52,7 @@
       e.preventDefault(); err.textContent = "";
       if (!f.u.value.trim() || !f.p.value) { err.textContent = "กรอกชื่อผู้ใช้และรหัสผ่าน"; return; }
       const b = f.querySelector("[type=submit]"); b.disabled = true; b.textContent = "กำลังตรวจสอบ…";
-      const j = await login(f.u.value.trim(), f.p.value.trim());          // copied passwords often carry a stray space
+      const j = await login(f.u.value.trim(), f.p.value.trim(), f.r.checked);          // copied passwords often carry a stray space
       b.disabled = false; b.textContent = "เข้าสู่ระบบ";
       if (!j.ok) { err.textContent = j.error || "เข้าสู่ระบบไม่สำเร็จ"; f.p.value = ""; f.p.focus(); return; }
       if (j.user.mustChange) return changeForm(el, opts, f.p.value.trim());
@@ -78,6 +79,22 @@
       opts.onDone && opts.onDone(get());
     };
   }
+
+  /* the "เข้าสู่ระบบ" item in the site menu becomes the signed-in user's own page */
+  function paintNav() {
+    const s = get();
+    document.querySelectorAll('.site-nav a[href$="admin/"]').forEach(a => {
+      if (!a.dataset.label) a.dataset.label = a.textContent;
+      if (s && !s.user.mustChange) {
+        const nm = s.user.name || s.user.username;
+        a.innerHTML = `<span class="me-av" aria-hidden="true">${esc(nm.slice(0, 1))}</span><span class="me-nm">${esc(nm)}</span>`;
+        a.classList.add("me"); a.title = "บัญชีของฉัน (" + s.user.username + ")"; a.setAttribute("aria-label", "บัญชีของฉัน: " + nm);
+      } else { a.textContent = a.dataset.label; a.classList.remove("me"); a.removeAttribute("title"); a.removeAttribute("aria-label"); }
+    });
+  }
+  subs.push(paintNav);
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", paintNav); else paintNav();
+  window.addEventListener("storage", e => { if (e.key === KEY) fire(); });     // sign-in or sign-out in another tab
 
   window.Auth = { connected, get, set, clear, api, login, changePassword, form, onChange: f => subs.push(f), esc };
 })();

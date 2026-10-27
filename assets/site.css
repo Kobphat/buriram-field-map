@@ -87,3 +87,9 @@ td.r,th.r{text-align:right}
 details.sent summary{cursor:pointer;font-size:.9rem;color:var(--muted)}
 details.sent table{margin-top:8px;font-size:.85rem}
 .big-code{font-size:1.25rem;letter-spacing:.04em}
+.login .remember{display:flex;gap:8px;align-items:flex-start;font-size:.86rem;line-height:1.5;cursor:pointer}
+.login .remember input{margin-top:3px;accent-color:var(--ink)}
+.site-nav a.nl.me{display:flex;align-items:center;gap:7px;padding:4px 12px 4px 4px;background:var(--surface);border:1px solid var(--line2);color:var(--ink);font-weight:500}
+.site-nav a.nl.me:hover{border-color:var(--ink)}
+.me-av{width:24px;height:24px;border-radius:50%;background:var(--mint);color:var(--mint-ink);display:grid;place-items:center;font-family:var(--f-display);font-size:.8rem;font-weight:600;flex:none}
+.me-nm{max-width:12ch;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
